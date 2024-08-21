@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_share/flutter_share.dart';
 import 'package:get/get.dart';
+import 'package:get/get_navigation/src/routes/get_transition_mixin.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,6 +19,7 @@ import 'package:zezo/service/product_service.dart';
 import 'package:zezo/view/bottom_nav/admins.dart';
 import 'package:zezo/view/bottom_nav/cart.dart';
 import 'package:zezo/view/bottom_nav/peoduct_details.dart';
+import 'package:zezo/view/categories/categories_view.dart';
 import 'package:zezo/view/categories/drinks/drinks_home.dart';
 import 'package:zezo/view/drawer_screens/add_subcategory_screen.dart';
 import 'package:zezo/view/drawer_screens/sendMessage.dart';
@@ -465,15 +467,20 @@ class _HomePageState extends State<HomePage> {
                   ? Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
-                        margin: EdgeInsets.only(top: 15, left: 15),
-                        alignment: Alignment.topLeft,
-                        child: Text(
-                          'جميع الأصناف',
-                          style: TextStyle(
-                            fontSize: 19,
-                            fontWeight: FontWeight.bold,
-                            decoration: TextDecoration.underline,
+                      GestureDetector(
+                        onTap: (){
+                          Get.to(const Categories());
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(top: 15, left: 15),
+                          alignment: Alignment.topLeft,
+                          child: Text(
+                            'جميع الأصناف',
+                            style: TextStyle(
+                              fontSize: 19,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
+                            ),
                           ),
                         ),
                       ),
@@ -510,7 +517,7 @@ class _HomePageState extends State<HomePage> {
                         final categories = snapshot.data;
                         return SizedBox(
                           width: Get.width,
-                          height: Get.height * 0.1,
+                          height: Get.height * 0.11,
                           child: ListView.builder(
                             reverse: true,
                             scrollDirection: Axis.horizontal,
@@ -585,9 +592,9 @@ class _HomePageState extends State<HomePage> {
                                         children: [
                                           Expanded(
                                             child: Container(
-                                              height: Get.height * 0.06,
-                                              width: Get.width * 0.2,
-                                              child: Image.asset("images/logo_zezo.png")
+                                              height: Get.height * 0.05,
+                                              width: Get.width * 0.1,
+                                              child: Image.network(category.image,fit: BoxFit.fill,)
                                             ),
                                           ),
                                           Expanded(
@@ -622,6 +629,7 @@ class _HomePageState extends State<HomePage> {
                   ? StreamBuilder<List<Product>>(
                       stream: ProductsService().getProducts(),
                       builder: (context, snapshot) {
+                        final products = snapshot.data!;
                         if (snapshot.hasError) {
                           return Center(
                             child: Text(snapshot.error.toString()),
@@ -630,10 +638,10 @@ class _HomePageState extends State<HomePage> {
 
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return buildShimmer();
+                          return buildShimmer(products.length);
                         }
 
-                        final products = snapshot.data!;
+
                         return SizedBox(
                           height: Get.height * .295,
                           width: Get.width,
@@ -922,6 +930,7 @@ class _HomePageState extends State<HomePage> {
                           stream: ProductsService()
                               .searchForProduct(searchValue.text),
                           builder: (context, snapshot) {
+                            final products = snapshot.data!;
                             if (snapshot.hasError) {
                               return const Center(
                                 child: Text('Error'),
@@ -931,10 +940,10 @@ class _HomePageState extends State<HomePage> {
                             if (snapshot.connectionState ==
                                     ConnectionState.waiting &&
                                 searchValue.text != '') {
-                              return buildShimmer();
+                              return buildShimmer(products.length);
                             }
                             if (searchValue.text != '') {
-                              final products = snapshot.data;
+
                               return GridView.builder(
                                   gridDelegate:
                                       const SliverGridDelegateWithMaxCrossAxisExtent(
@@ -1261,6 +1270,7 @@ class _HomePageState extends State<HomePage> {
                   ? StreamBuilder<List<Product>>(
                       stream: ProductsService().getProducts(),
                       builder: (context, snapshot) {
+                        final products = snapshot.data!;
                         if (snapshot.hasError) {
                           return Center(
                             child: Text(snapshot.error.toString()),
@@ -1269,10 +1279,10 @@ class _HomePageState extends State<HomePage> {
 
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return buildShimmer();
+                          return buildShimmer(products.length);
                         }
 
-                        final products = snapshot.data!;
+
                         return Container(
                           height: Get.height * .195,
                           width: Get.width,
@@ -1571,6 +1581,7 @@ class _HomePageState extends State<HomePage> {
                   ? StreamBuilder<List<Product>>(
                       stream: ProductsService().getProducts(),
                       builder: (context, snapshot) {
+                        final products = snapshot.data!;
                         if (snapshot.hasError) {
                           return Center(
                             child: Text(snapshot.error.toString()),
@@ -1579,10 +1590,9 @@ class _HomePageState extends State<HomePage> {
 
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return buildShimmer();
+                          return buildShimmer(products.length);
                         }
 
-                        final products = snapshot.data!;
                         return Container(
                           height: Get.height * .195,
                           width: Get.width,

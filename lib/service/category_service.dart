@@ -3,13 +3,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Category {
   final String id;
   final String name;
+  final String image;
 
-  Category({required this.id, required this.name});
+  Category({required this.image,required this.id, required this.name});
 
   factory Category.fromSnapshot(DocumentSnapshot snapshot) {
     final data = snapshot.data() as Map<String, dynamic>;
     return Category(
       id: snapshot.id,
+      image: data['image'],
       name: data['name'],
     );
   }
@@ -30,6 +32,7 @@ class Category {
     return Category(
       id: id ?? this.id,
       name: name ?? this.name,
+      image: image,
     );
   }
 
@@ -64,9 +67,10 @@ class CategoryService {
   }
 
   // add a category
-  Future<void> addCategory(String name) async {
+  Future<void> addCategory(String name,String image) async {
     await _categoryCollectionRef.add({
       'name': name,
+      'image': image,
     });
   }
 

@@ -146,6 +146,7 @@ class _SearchState extends State<Search> {
                   child: StreamBuilder<List<Product>>(
                       stream: ProductsService().searchForProduct(searchValue.text) ,
                       builder: (context, snapshot) {
+                        final products = snapshot.data!;
                         if (snapshot.hasError) {
                           return const Center(
                             child: Text('Error'),
@@ -153,10 +154,10 @@ class _SearchState extends State<Search> {
                         }
 
                         if (snapshot.connectionState == ConnectionState.waiting && searchValue.text != '') {
-                          return buildShimmer();
+                          return buildShimmer(products.length);
                         }
                         if(searchValue.text != '') {
-                          final products = snapshot.data;
+
                           return GridView.builder(
                               gridDelegate:
                               const SliverGridDelegateWithMaxCrossAxisExtent(
@@ -164,7 +165,7 @@ class _SearchState extends State<Search> {
                                   childAspectRatio: .8,
                                   crossAxisSpacing: 10,
                                   mainAxisSpacing: 10),
-                              itemCount: products!.length,
+                              itemCount: products.length,
                               itemBuilder: (context, index) {
                                 final product = products[index];
                                 return Padding(
