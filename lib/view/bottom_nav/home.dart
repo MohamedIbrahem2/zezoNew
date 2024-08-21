@@ -462,18 +462,36 @@ class _HomePageState extends State<HomePage> {
               // ),
 
               searchValue.text == ""
-                  ? Container(
-                      margin: EdgeInsets.only(top: 15, right: 15),
-                      alignment: Alignment.topRight,
-                      child: Text(
-                        'الاصناف',
-                        style: TextStyle(
-                          fontSize: 19,
-                          fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.underline,
+                  ? Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        margin: EdgeInsets.only(top: 15, left: 15),
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          'جميع الأصناف',
+                          style: TextStyle(
+                            fontSize: 19,
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.underline,
+                          ),
                         ),
                       ),
-                    )
+                      Container(
+                          margin: EdgeInsets.only(top: 15, right: 15),
+                          alignment: Alignment.topRight,
+                          child: Text(
+                            'الاصناف',
+                            style: TextStyle(
+                              fontSize: 19,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+
+                    ],
+                  )
                   : Container(),
               searchValue.text == ""
                   ? StreamBuilder<List<Category>>(
@@ -492,7 +510,7 @@ class _HomePageState extends State<HomePage> {
                         final categories = snapshot.data;
                         return SizedBox(
                           width: Get.width,
-                          height: Get.height * 0.07,
+                          height: Get.height * 0.1,
                           child: ListView.builder(
                             reverse: true,
                             scrollDirection: Axis.horizontal,
@@ -501,37 +519,92 @@ class _HomePageState extends State<HomePage> {
                             itemCount: categories!.length,
                             itemBuilder: (context, index) {
                               final category = categories[index];
-                              return InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    _selectedIndex = index;
-                                    categoryId = category.name;
-                                  });
-                                },
-                                child: Padding(
-                                  padding: EdgeInsets.all(8.0),
+
+                              return Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: InkWell(
+                                  onLongPress: (){
+                                    final provider = Provider.of<AdminProvider>(
+                                        context,
+                                        listen: false);
+                                    if (provider.isAdmin) {
+                                      Get.defaultDialog(
+                                          title: 'Do you want to delete ' +
+                                              category.name.tr +
+                                              " category ?",
+                                          content: Row(
+                                            mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                            children: [
+                                              ElevatedButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Text(
+                                                  'no'.tr,
+                                                  style: const TextStyle(
+                                                      color: Colors.black),
+                                                ),
+                                                style: ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                    Colors.white,
+                                                    elevation: 10),
+                                              ),
+                                              ElevatedButton(
+                                                onPressed: () async {
+                                                  await ProductsService()
+                                                      .deleteCategory(
+                                                      category.id);
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Text('yes'.tr,
+                                                    style: const TextStyle(
+                                                        color: Colors.white)),
+                                                style: ElevatedButton.styleFrom(
+                                                    backgroundColor: Colors.red,
+                                                    elevation: 10),
+                                              ),
+                                            ],
+                                          ));
+                                    }
+                                  },
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedIndex = index;
+                                      categoryId = category.name;
+                                    });
+                                  },
                                   child: Container(
                                     decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: _selectedIndex == index
-                                              ? Colors.green
-                                              : Colors.grey,
-                                        ),
-                                        color: _selectedIndex == index
-                                            ? Colors.green
-                                            : Colors.grey,
+                                      border: Border.all(color: mainColor),
                                         borderRadius: const BorderRadius.all(
                                             Radius.circular(20))),
-                                    child: Center(
-                                        child: Padding(
-                                      padding: const EdgeInsets.all(6.0),
-                                      child: Text(
-                                        category.name,
-                                        style: const TextStyle(
-                                            color: Colors.white),
-                                        textDirection: TextDirection.rtl,
+                                    child: Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Column(
+                                        children: [
+                                          Expanded(
+                                            child: Container(
+                                              height: Get.height * 0.06,
+                                              width: Get.width * 0.2,
+                                              child: Image.asset("images/logo_zezo.png")
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Center(
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(6.0),
+                                                  child: Text(
+                                                    category.name,
+                                                    style:  TextStyle(
+                                                        color: mainColor),
+                                                    textDirection: TextDirection.rtl,
+                                                  ),
+                                                )),
+                                          ),
+                                        ],
                                       ),
-                                    )),
+                                    ),
                                   ),
                                 ),
                               );
@@ -542,7 +615,7 @@ class _HomePageState extends State<HomePage> {
                       })
                   : Container(),
               SizedBox(
-                height: Get.height * 0.005,
+                height: Get.height * 0.01,
               ),
 
               searchValue.text == ""
@@ -586,7 +659,7 @@ class _HomePageState extends State<HomePage> {
                                       Get.defaultDialog(
                                           title: 'Do you want to delete ' +
                                               product.brand.tr +
-                                              " Category ?",
+                                              " product ?",
                                           content: Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceAround,
@@ -885,7 +958,7 @@ class _HomePageState extends State<HomePage> {
                                                 title:
                                                     'Do you want to delete ' +
                                                         product.brand.tr +
-                                                        " Category ?",
+                                                        " product ?",
                                                 content: Row(
                                                   mainAxisAlignment:
                                                       MainAxisAlignment
@@ -1225,7 +1298,7 @@ class _HomePageState extends State<HomePage> {
                                       Get.defaultDialog(
                                           title: 'Do you want to delete ' +
                                               product.brand.tr +
-                                              " Category ?",
+                                              " product ?",
                                           content: Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceAround,
