@@ -4,13 +4,15 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:zezo/service/category_service.dart';
+import 'package:zezo/view/categories/products_by_categories_view.dart';
 
 import '../../../constants.dart';
 import '../../service/product_service.dart';
 import '../../widgets/shimmer.dart';
 
 class Categories extends StatefulWidget {
-  const Categories({super.key});
+  final String uniqueId;
+  const Categories({super.key, required this.uniqueId});
 
   @override
   State<Categories> createState() => _CategoriesState();
@@ -29,7 +31,7 @@ class _CategoriesState extends State<Categories> {
         body: StreamBuilder<List<Category>>(
             stream: CategoryService().getCategories(),
             builder: (context, snapshot) {
-              final categories = snapshot.data!;
+
               if (snapshot.hasError) {
                 return Center(
                   child: Text(snapshot.error.toString()),
@@ -37,22 +39,26 @@ class _CategoriesState extends State<Categories> {
               }
 
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return buildShimmer(categories.length);
+                return buildShimmer(2);
               }
-              return Expanded(
-                child: Directionality(
-                  textDirection: TextDirection.rtl,
-                  child: GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithMaxCrossAxisExtent(
-                              maxCrossAxisExtent: 200,
-                              childAspectRatio: .7,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 10),
-                      itemCount: categories.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        final category = categories[index];
-                        return Padding(
+              final categories = snapshot.data!;
+              return Directionality(
+                textDirection: TextDirection.rtl,
+                child: GridView.builder(
+                    gridDelegate:
+                        const SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 200,
+                            childAspectRatio: .7,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10),
+                    itemCount: categories.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final category = categories[index];
+                      return GestureDetector(
+                        onTap: (){
+                          Get.to(ProductsByCategories(categoryId: category.id, uniqueId: widget.uniqueId));
+                        },
+                        child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Container(
                             height: Get.height * 0.08,
@@ -121,9 +127,9 @@ class _CategoriesState extends State<Categories> {
                               ],
                             ),
                           ),
-                        );
-                      }),
-                ),
+                        ),
+                      );
+                    }),
               );
             }));
   }

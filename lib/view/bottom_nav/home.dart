@@ -60,7 +60,7 @@ class _HomePageState extends State<HomePage> {
   FirebaseAuth auth = FirebaseAuth.instance;
   bool first = true;
   int _selectedIndex = 0;
-  String categoryId = "العطور";
+  String categoryId = "6GtrTH5CBa4CgQfPTRM4";
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> _saveProfile() async {
@@ -143,7 +143,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
           iconTheme: const IconThemeData(color: Colors.white),
-          backgroundColor: Colors.green,
+          backgroundColor: mainColor,
           title: Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Image.asset(
@@ -272,6 +272,17 @@ class _HomePageState extends State<HomePage> {
                 if (context.watch<AdminProvider>().isAdmin)
                   ListTile(
                     title: Text(
+                      'المنتجات الغير متاحه'.tr,
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    onTap: () {
+                      Get.to(const UnavailableProduct());
+                    },
+                  ),
+                if (context.watch<AdminProvider>().isAdmin)
+                  ListTile(
+                    title: Text(
                       'أرسال رساله'.tr,
                       style: const TextStyle(
                           fontSize: 18, fontWeight: FontWeight.bold),
@@ -333,48 +344,67 @@ class _HomePageState extends State<HomePage> {
                         linkUrl: appLink);
                   },
                 ),
-                GestureDetector(
-                  onTap: () {
-                    Get.defaultDialog(
-                        title: 'Are you sure?'.tr,
-                        content: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: Text(
-                                'no'.tr,
-                                style: const TextStyle(color: Colors.black),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white, elevation: 10),
-                            ),
-                            ElevatedButton(
-                              onPressed: () {
-                                auth.signOut();
-                                _handleSignOut();
-                                Get.offAll(const SignIn());
-                              },
-                              child: Text('yes'.tr,
-                                  style: const TextStyle(color: Colors.white)),
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red, elevation: 10),
-                            ),
-                          ],
-                        ));
-                  },
-                  child: ListTile(
-                    title: Text(
-                      'تسجيل الخروج'.tr,
-                      style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red),
-                    ),
-                  ),
-                ),
+                FirebaseAuth.instance.currentUser == null
+                    ? GestureDetector(
+                        onTap: () {
+                         Get.to(const SignIn());
+                        },
+                        child: ListTile(
+                          title: Text(
+                            'تسجيل الدخول'.tr,
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: mainColor),
+                          ),
+                        ),
+                      )
+                    : GestureDetector(
+                        onTap: () {
+                          Get.defaultDialog(
+                              title: 'Are you sure?'.tr,
+                              content: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text(
+                                      'no'.tr,
+                                      style:
+                                          const TextStyle(color: Colors.black),
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        elevation: 10),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      auth.signOut();
+                                      _handleSignOut();
+                                      Get.offAll(const SignIn());
+                                    },
+                                    child: Text('yes'.tr,
+                                        style: TextStyle(color: Colors.white)),
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor: mainColor,
+                                        elevation: 10),
+                                  ),
+                                ],
+                              ));
+                        },
+                        child: ListTile(
+                          title: Text(
+                            'تسجيل الخروج'.tr,
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: mainColor),
+                          ),
+                        ),
+                      ),
               ],
             ),
           ),
@@ -417,10 +447,10 @@ class _HomePageState extends State<HomePage> {
                       ),
                       contentPadding: const EdgeInsets.symmetric(vertical: 1),
                       enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(width: 2, color: Colors.green),
+                          borderSide: BorderSide(width: 2, color: mainColor),
                           borderRadius: BorderRadius.circular(25)),
                       focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(width: 3, color: Colors.green),
+                          borderSide: BorderSide(width: 3, color: mainColor),
                           borderRadius: BorderRadius.circular(25)),
                     ),
                   ),
@@ -465,26 +495,28 @@ class _HomePageState extends State<HomePage> {
 
               searchValue.text == ""
                   ? Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      GestureDetector(
-                        onTap: (){
-                          Get.to(const Categories());
-                        },
-                        child: Container(
-                          margin: EdgeInsets.only(top: 15, left: 15),
-                          alignment: Alignment.topLeft,
-                          child: Text(
-                            'جميع الأصناف',
-                            style: TextStyle(
-                              fontSize: 19,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Get.to(Categories(
+                              uniqueId: widget.uniqueId,
+                            ));
+                          },
+                          child: Container(
+                            margin: EdgeInsets.only(top: 15, left: 15),
+                            alignment: Alignment.topLeft,
+                            child: Text(
+                              'جميع الأصناف',
+                              style: TextStyle(
+                                fontSize: 19,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      Container(
+                        Container(
                           margin: EdgeInsets.only(top: 15, right: 15),
                           alignment: Alignment.topRight,
                           child: Text(
@@ -496,9 +528,8 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                         ),
-
-                    ],
-                  )
+                      ],
+                    )
                   : Container(),
               searchValue.text == ""
                   ? StreamBuilder<List<Category>>(
@@ -530,7 +561,7 @@ class _HomePageState extends State<HomePage> {
                               return Padding(
                                 padding: const EdgeInsets.all(5.0),
                                 child: InkWell(
-                                  onLongPress: (){
+                                  onLongPress: () {
                                     final provider = Provider.of<AdminProvider>(
                                         context,
                                         listen: false);
@@ -541,7 +572,7 @@ class _HomePageState extends State<HomePage> {
                                               " category ?",
                                           content: Row(
                                             mainAxisAlignment:
-                                            MainAxisAlignment.spaceAround,
+                                                MainAxisAlignment.spaceAround,
                                             children: [
                                               ElevatedButton(
                                                 onPressed: () {
@@ -554,14 +585,14 @@ class _HomePageState extends State<HomePage> {
                                                 ),
                                                 style: ElevatedButton.styleFrom(
                                                     backgroundColor:
-                                                    Colors.white,
+                                                        Colors.white,
                                                     elevation: 10),
                                               ),
                                               ElevatedButton(
                                                 onPressed: () async {
                                                   await ProductsService()
                                                       .deleteCategory(
-                                                      category.id);
+                                                          category.id);
                                                   Navigator.pop(context);
                                                 },
                                                 child: Text('yes'.tr,
@@ -578,12 +609,16 @@ class _HomePageState extends State<HomePage> {
                                   onTap: () {
                                     setState(() {
                                       _selectedIndex = index;
-                                      categoryId = category.name;
+                                      categoryId = category.id;
                                     });
                                   },
                                   child: Container(
                                     decoration: BoxDecoration(
-                                      border: Border.all(color: mainColor),
+                                        border: Border.all(
+                                            width: 2,
+                                            color: categoryId == category.id
+                                                ? mainColor
+                                                : Colors.grey),
                                         borderRadius: const BorderRadius.all(
                                             Radius.circular(20))),
                                     child: Padding(
@@ -592,22 +627,26 @@ class _HomePageState extends State<HomePage> {
                                         children: [
                                           Expanded(
                                             child: Container(
-                                              height: Get.height * 0.05,
-                                              width: Get.width * 0.1,
-                                              child: Image.network(category.image,fit: BoxFit.fill,)
-                                            ),
+                                                height: Get.height * 0.05,
+                                                width: Get.width * 0.1,
+                                                child: Image.network(
+                                                  category.image,
+                                                  fit: BoxFit.fill,
+                                                )),
                                           ),
                                           Expanded(
                                             child: Center(
                                                 child: Padding(
-                                                  padding: const EdgeInsets.all(6.0),
-                                                  child: Text(
-                                                    category.name,
-                                                    style:  TextStyle(
-                                                        color: mainColor),
-                                                    textDirection: TextDirection.rtl,
-                                                  ),
-                                                )),
+                                              padding:
+                                                  const EdgeInsets.all(6.0),
+                                              child: Text(
+                                                category.name,
+                                                style:
+                                                    TextStyle(color: mainColor),
+                                                textDirection:
+                                                    TextDirection.rtl,
+                                              ),
+                                            )),
                                           ),
                                         ],
                                       ),
@@ -627,9 +666,9 @@ class _HomePageState extends State<HomePage> {
 
               searchValue.text == ""
                   ? StreamBuilder<List<Product>>(
-                      stream: ProductsService().getProducts(),
+                      stream:
+                          ProductsService().getProductsByCategory(categoryId),
                       builder: (context, snapshot) {
-                        final products = snapshot.data!;
                         if (snapshot.hasError) {
                           return Center(
                             child: Text(snapshot.error.toString()),
@@ -638,9 +677,9 @@ class _HomePageState extends State<HomePage> {
 
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return buildShimmer(products.length);
+                          return buildShimmer(1);
                         }
-
+                        final products = snapshot.data!;
 
                         return SizedBox(
                           height: Get.height * .295,
@@ -810,7 +849,7 @@ class _HomePageState extends State<HomePage> {
                                                           Container(
                                                             width: 15,
                                                             height: 1.5,
-                                                            color: Colors.green,
+                                                            color: mainColor,
                                                           )
                                                         ],
                                                       ),
@@ -828,7 +867,7 @@ class _HomePageState extends State<HomePage> {
                                                             fontSize: 17,
                                                             fontWeight:
                                                                 FontWeight.bold,
-                                                            color: Colors.green),
+                                                            color: mainColor),
                                                       ),
                                                     if (product.discountPrice ==
                                                         0)
@@ -839,7 +878,7 @@ class _HomePageState extends State<HomePage> {
                                                             fontSize: 12,
                                                             fontWeight:
                                                                 FontWeight.bold,
-                                                            color: Colors.green),
+                                                            color: mainColor),
                                                       ),
                                                   ],
                                                 ),
@@ -856,45 +895,50 @@ class _HomePageState extends State<HomePage> {
                                                       //   Get.snackbar("لا يمكن اتمام العمليه", "لأتمام العمليه يجب تسجيل الدخول");
                                                       //   Get.to(const SignIn());
                                                       // }else{
-                                                      final result = await CartService()
-                                                          .isProductInCart(
-                                                              product.id,
-                                                              FirebaseAuth.instance
-                                                                          .currentUser !=
-                                                                      null
-                                                                  ? FirebaseAuth
-                                                                      .instance
-                                                                      .currentUser!
-                                                                      .uid
-                                                                  : widget
-                                                                      .uniqueId);
-                                                      // if (result != null && result > 0) {
-                                                      //   // remove snakebar
-
-                                                      //   Get.snackbar(
-                                                      //       'Sorry', 'Product already in cart');
-                                                      // }
-                                                      CartService().addToCart(
-                                                        productId: product.id,
-                                                        productName:
-                                                            product.brand,
-                                                        price: product
-                                                                .regularPrice -
-                                                            product
-                                                                .discountPrice,
-                                                        quantity: count,
-                                                        userId: FirebaseAuth
+                                                      if (!product.available) {
+                                                        Get.snackbar(
+                                                            "لا يمكن اتمام العمليه",
+                                                            "هذا المنتج غير متاح حاليا");
+                                                      } else {
+                                                        final result = await CartService().isProductInCart(
+                                                            product.id,
+                                                            FirebaseAuth.instance
+                                                                        .currentUser !=
+                                                                    null
+                                                                ? FirebaseAuth
                                                                     .instance
-                                                                    .currentUser !=
-                                                                null
-                                                            ? FirebaseAuth
-                                                                .instance
-                                                                .currentUser!
-                                                                .uid
-                                                            : widget.uniqueId,
-                                                        image: product
-                                                            .images.first,
-                                                      );
+                                                                    .currentUser!
+                                                                    .uid
+                                                                : widget
+                                                                    .uniqueId);
+                                                        // if (result != null && result > 0) {
+                                                        //   // remove snakebar
+
+                                                        //   Get.snackbar(
+                                                        //       'Sorry', 'Product already in cart');
+                                                        // }
+                                                        CartService().addToCart(
+                                                          productId: product.id,
+                                                          productName:
+                                                              product.brand,
+                                                          price: product
+                                                                  .regularPrice -
+                                                              product
+                                                                  .discountPrice,
+                                                          quantity: count,
+                                                          userId: FirebaseAuth
+                                                                      .instance
+                                                                      .currentUser !=
+                                                                  null
+                                                              ? FirebaseAuth
+                                                                  .instance
+                                                                  .currentUser!
+                                                                  .uid
+                                                              : widget.uniqueId,
+                                                          image: product
+                                                              .images.first,
+                                                        );
+                                                      }
                                                     },
                                                     child: const Center(
                                                       child: Icon(
@@ -907,7 +951,7 @@ class _HomePageState extends State<HomePage> {
                                                             padding:
                                                                 EdgeInsets.zero,
                                                             backgroundColor:
-                                                                Colors.green),
+                                                                mainColor),
                                                   ),
                                                 ),
                                               )
@@ -930,7 +974,6 @@ class _HomePageState extends State<HomePage> {
                           stream: ProductsService()
                               .searchForProduct(searchValue.text),
                           builder: (context, snapshot) {
-                            final products = snapshot.data!;
                             if (snapshot.hasError) {
                               return const Center(
                                 child: Text('Error'),
@@ -940,10 +983,10 @@ class _HomePageState extends State<HomePage> {
                             if (snapshot.connectionState ==
                                     ConnectionState.waiting &&
                                 searchValue.text != '') {
-                              return buildShimmer(products.length);
+                              return buildShimmer(1);
                             }
+                            final products = snapshot.data!;
                             if (searchValue.text != '') {
-
                               return GridView.builder(
                                   gridDelegate:
                                       const SliverGridDelegateWithMaxCrossAxisExtent(
@@ -963,55 +1006,52 @@ class _HomePageState extends State<HomePage> {
                                                   context,
                                                   listen: false);
                                           // if (provider.isAdmin) {
-                                            Get.defaultDialog(
-                                                title:
-                                                    'Do you want to delete ' +
-                                                        product.brand.tr +
-                                                        " product ?",
-                                                content: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceAround,
-                                                  children: [
-                                                    ElevatedButton(
-                                                      onPressed: () {
-                                                        Navigator.pop(context);
-                                                      },
-                                                      child: Text(
-                                                        'no'.tr,
+                                          Get.defaultDialog(
+                                              title: 'Do you want to delete ' +
+                                                  product.brand.tr +
+                                                  " product ?",
+                                              content: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceAround,
+                                                children: [
+                                                  ElevatedButton(
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child: Text(
+                                                      'no'.tr,
+                                                      style: const TextStyle(
+                                                          color: Colors.black),
+                                                    ),
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                            backgroundColor:
+                                                                Colors.white,
+                                                            elevation: 10),
+                                                  ),
+                                                  ElevatedButton(
+                                                    onPressed: () async {
+                                                      await ProductsService()
+                                                          .deleteProductFromBestSelling(
+                                                              product.id);
+                                                      ProductsService()
+                                                          .deleteProduct(
+                                                              product.id);
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child: Text('yes'.tr,
                                                         style: const TextStyle(
                                                             color:
-                                                                Colors.black),
-                                                      ),
-                                                      style: ElevatedButton
-                                                          .styleFrom(
-                                                              backgroundColor:
-                                                                  Colors.white,
-                                                              elevation: 10),
-                                                    ),
-                                                    ElevatedButton(
-                                                      onPressed: () async {
-                                                        await ProductsService()
-                                                            .deleteProductFromBestSelling(
-                                                                product.id);
-                                                        ProductsService()
-                                                            .deleteProduct(
-                                                                product.id);
-                                                        Navigator.pop(context);
-                                                      },
-                                                      child: Text('yes'.tr,
-                                                          style:
-                                                              const TextStyle(
-                                                                  color: Colors
-                                                                      .white)),
-                                                      style: ElevatedButton
-                                                          .styleFrom(
-                                                              backgroundColor:
-                                                                  Colors.red,
-                                                              elevation: 10),
-                                                    ),
-                                                  ],
-                                                ));
+                                                                Colors.white)),
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                            backgroundColor:
+                                                                Colors.red,
+                                                            elevation: 10),
+                                                  ),
+                                                ],
+                                              ));
                                         },
                                         onTap: () {
                                           final provider =
@@ -1019,10 +1059,10 @@ class _HomePageState extends State<HomePage> {
                                                   context,
                                                   listen: false);
                                           // if (provider.isAdmin) {
-                                            Get.to(ProductDetails(
-                                              product: product,
-                                              uniqueId: widget.uniqueId,
-                                            ));
+                                          Get.to(ProductDetails(
+                                            product: product,
+                                            uniqueId: widget.uniqueId,
+                                          ));
                                         },
                                         child: Container(
                                           height: Get.height * 0.09,
@@ -1134,7 +1174,7 @@ class _HomePageState extends State<HomePage> {
                                                                   width: 15,
                                                                   height: 1.5,
                                                                   color:
-                                                                      Colors.green,
+                                                                      mainColor,
                                                                 )
                                                               ],
                                                             ),
@@ -1155,7 +1195,7 @@ class _HomePageState extends State<HomePage> {
                                                                       FontWeight
                                                                           .bold,
                                                                   color:
-                                                                      Colors.green),
+                                                                      mainColor),
                                                             ),
                                                           if (product
                                                                   .discountPrice ==
@@ -1186,37 +1226,47 @@ class _HomePageState extends State<HomePage> {
                                                             Get.height * 0.03,
                                                         child: ElevatedButton(
                                                           onPressed: () async {
-                                                            final result = await CartService()
-                                                                .isProductInCart(
-                                                                    product.id,
-                                                                    FirebaseAuth
-                                                                        .instance
-                                                                        .currentUser!
-                                                                        .uid);
-                                                            // if (result != null && result > 0) {
-                                                            //   // remove snakebar
+                                                            if (!product
+                                                                .available) {
+                                                              Get.snackbar(
+                                                                  "لا يمكن اتمام العمليه",
+                                                                  "هذا المنتج غير متاح حاليا");
+                                                            } else {
+                                                              final result = await CartService()
+                                                                  .isProductInCart(
+                                                                      product
+                                                                          .id,
+                                                                      FirebaseAuth
+                                                                          .instance
+                                                                          .currentUser!
+                                                                          .uid);
+                                                              // if (result != null && result > 0) {
+                                                              //   // remove snakebar
 
-                                                            //   Get.snackbar(
-                                                            //       'Sorry', 'Product already in cart');
-                                                            // }
-                                                            CartService()
-                                                                .addToCart(
-                                                              productId:
-                                                                  product.id,
-                                                              productName:
-                                                                  product.brand,
-                                                              price: product
-                                                                      .regularPrice -
-                                                                  product
-                                                                      .discountPrice,
-                                                              quantity: count,
-                                                              userId: FirebaseAuth
-                                                                  .instance
-                                                                  .currentUser!
-                                                                  .uid,
-                                                              image: product
-                                                                  .images.first,
-                                                            );
+                                                              //   Get.snackbar(
+                                                              //       'Sorry', 'Product already in cart');
+                                                              // }
+                                                              CartService()
+                                                                  .addToCart(
+                                                                productId:
+                                                                    product.id,
+                                                                productName:
+                                                                    product
+                                                                        .brand,
+                                                                price: product
+                                                                        .regularPrice -
+                                                                    product
+                                                                        .discountPrice,
+                                                                quantity: count,
+                                                                userId: FirebaseAuth
+                                                                    .instance
+                                                                    .currentUser!
+                                                                    .uid,
+                                                                image: product
+                                                                    .images
+                                                                    .first,
+                                                              );
+                                                            }
                                                           },
                                                           child: const Center(
                                                             child: Icon(
@@ -1268,9 +1318,8 @@ class _HomePageState extends State<HomePage> {
                   : Container(),
               searchValue.text == ""
                   ? StreamBuilder<List<Product>>(
-                      stream: ProductsService().getProducts(),
+                      stream: ProductsService().getBestSellingProducts(),
                       builder: (context, snapshot) {
-                        final products = snapshot.data!;
                         if (snapshot.hasError) {
                           return Center(
                             child: Text(snapshot.error.toString()),
@@ -1279,10 +1328,10 @@ class _HomePageState extends State<HomePage> {
 
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return buildShimmer(products.length);
+                          return buildShimmer(1);
                         }
 
-
+                        final products = snapshot.data!;
                         return Container(
                           height: Get.height * .195,
                           width: Get.width,
@@ -1331,9 +1380,6 @@ class _HomePageState extends State<HomePage> {
                                                 onPressed: () async {
                                                   await ProductsService()
                                                       .deleteProductFromBestSelling(
-                                                          product.id);
-                                                  ProductsService()
-                                                      .deleteProduct(
                                                           product.id);
                                                   Navigator.pop(context);
                                                 },
@@ -1496,45 +1542,50 @@ class _HomePageState extends State<HomePage> {
                                                       //   Get.snackbar("لا يمكن اتمام العمليه", "لأتمام العمليه يجب تسجيل الدخول");
                                                       //   Get.to(const SignIn());
                                                       // }else{
-                                                      final result = await CartService()
-                                                          .isProductInCart(
-                                                              product.id,
-                                                              FirebaseAuth.instance
-                                                                          .currentUser !=
-                                                                      null
-                                                                  ? FirebaseAuth
-                                                                      .instance
-                                                                      .currentUser!
-                                                                      .uid
-                                                                  : widget
-                                                                      .uniqueId);
-                                                      // if (result != null && result > 0) {
-                                                      //   // remove snakebar
-
-                                                      //   Get.snackbar(
-                                                      //       'Sorry', 'Product already in cart');
-                                                      // }
-                                                      CartService().addToCart(
-                                                        productId: product.id,
-                                                        productName:
-                                                            product.brand,
-                                                        price: product
-                                                                .regularPrice -
-                                                            product
-                                                                .discountPrice,
-                                                        quantity: count,
-                                                        userId: FirebaseAuth
+                                                      if (!product.available) {
+                                                        Get.snackbar(
+                                                            "لا يمكن اتمام العمليه",
+                                                            "هذا المنتج غير متاح حاليا");
+                                                      } else {
+                                                        final result = await CartService().isProductInCart(
+                                                            product.id,
+                                                            FirebaseAuth.instance
+                                                                        .currentUser !=
+                                                                    null
+                                                                ? FirebaseAuth
                                                                     .instance
-                                                                    .currentUser !=
-                                                                null
-                                                            ? FirebaseAuth
-                                                                .instance
-                                                                .currentUser!
-                                                                .uid
-                                                            : widget.uniqueId,
-                                                        image: product
-                                                            .images.first,
-                                                      );
+                                                                    .currentUser!
+                                                                    .uid
+                                                                : widget
+                                                                    .uniqueId);
+                                                        // if (result != null && result > 0) {
+                                                        //   // remove snakebar
+
+                                                        //   Get.snackbar(
+                                                        //       'Sorry', 'Product already in cart');
+                                                        // }
+                                                        CartService().addToCart(
+                                                          productId: product.id,
+                                                          productName:
+                                                              product.brand,
+                                                          price: product
+                                                                  .regularPrice -
+                                                              product
+                                                                  .discountPrice,
+                                                          quantity: count,
+                                                          userId: FirebaseAuth
+                                                                      .instance
+                                                                      .currentUser !=
+                                                                  null
+                                                              ? FirebaseAuth
+                                                                  .instance
+                                                                  .currentUser!
+                                                                  .uid
+                                                              : widget.uniqueId,
+                                                          image: product
+                                                              .images.first,
+                                                        );
+                                                      }
                                                     },
                                                     child: const Center(
                                                       child: Icon(
@@ -1579,20 +1630,23 @@ class _HomePageState extends State<HomePage> {
                   : Container(),
               searchValue.text == ""
                   ? StreamBuilder<List<Product>>(
-                      stream: ProductsService().getProducts(),
+                      stream: ProductsService().getFavoriteProducts(),
                       builder: (context, snapshot) {
-                        final products = snapshot.data!;
                         if (snapshot.hasError) {
                           return Center(
                             child: Text(snapshot.error.toString()),
                           );
                         }
-
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return buildShimmer(products.length);
+                          return buildShimmer(1);
                         }
-
+                        if (snapshot.data!.isEmpty) {
+                          return const Center(
+                            child: Text("لا يوجد منتجات مفضله"),
+                          );
+                        }
+                        final products = snapshot.data;
                         return Container(
                           height: Get.height * .195,
                           width: Get.width,
@@ -1600,7 +1654,7 @@ class _HomePageState extends State<HomePage> {
                             reverse: true,
                             scrollDirection: Axis.horizontal,
                             //  physics: const NeverScrollableScrollPhysics(),
-                            itemCount: products.length,
+                            itemCount: products!.length,
                             shrinkWrap: true,
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
@@ -1645,11 +1699,8 @@ class _HomePageState extends State<HomePage> {
                                                   ElevatedButton(
                                                     onPressed: () async {
                                                       await ProductsService()
-                                                          .deleteProductFromBestSelling(
-                                                              product.id);
-                                                      ProductsService()
-                                                          .deleteProduct(
-                                                              product.id);
+                                                          .removeProductFromFavorite(
+                                                              product);
                                                       Navigator.pop(context);
                                                     },
                                                     child: Text('yes'.tr,
@@ -1848,47 +1899,56 @@ class _HomePageState extends State<HomePage> {
                                                               //   Get.snackbar("لا يمكن اتمام العمليه", "لأتمام العمليه يجب تسجيل الدخول");
                                                               //   Get.to(const SignIn());
                                                               // }else{
-                                                              final result = await CartService().isProductInCart(
-                                                                  product.id,
-                                                                  FirebaseAuth.instance
-                                                                              .currentUser !=
+                                                              if (!product
+                                                                  .available) {
+                                                                Get.snackbar(
+                                                                    "لا يمكن اتمام العمليه",
+                                                                    "هذا المنتج غير متاح حاليا");
+                                                              } else {
+                                                                final result = await CartService().isProductInCart(
+                                                                    product.id,
+                                                                    FirebaseAuth.instance.currentUser !=
+                                                                            null
+                                                                        ? FirebaseAuth
+                                                                            .instance
+                                                                            .currentUser!
+                                                                            .uid
+                                                                        : widget
+                                                                            .uniqueId);
+                                                                // if (result != null && result > 0) {
+                                                                //   // remove snakebar
+
+                                                                //   Get.snackbar(
+                                                                //       'Sorry', 'Product already in cart');
+                                                                // }
+                                                                CartService()
+                                                                    .addToCart(
+                                                                  productId:
+                                                                      product
+                                                                          .id,
+                                                                  productName:
+                                                                      product
+                                                                          .brand,
+                                                                  price: product
+                                                                          .regularPrice -
+                                                                      product
+                                                                          .discountPrice,
+                                                                  quantity:
+                                                                      count,
+                                                                  userId: FirebaseAuth
+                                                                              .instance.currentUser !=
                                                                           null
                                                                       ? FirebaseAuth
                                                                           .instance
                                                                           .currentUser!
                                                                           .uid
                                                                       : widget
-                                                                          .uniqueId);
-                                                              // if (result != null && result > 0) {
-                                                              //   // remove snakebar
-
-                                                              //   Get.snackbar(
-                                                              //       'Sorry', 'Product already in cart');
-                                                              // }
-                                                              CartService()
-                                                                  .addToCart(
-                                                                productId:
-                                                                    product.id,
-                                                                productName:
-                                                                    product
-                                                                        .brand,
-                                                                price: product
-                                                                        .regularPrice -
-                                                                    product
-                                                                        .discountPrice,
-                                                                quantity: count,
-                                                                userId: FirebaseAuth.instance.currentUser !=
-                                                                        null
-                                                                    ? FirebaseAuth
-                                                                        .instance
-                                                                        .currentUser!
-                                                                        .uid
-                                                                    : widget
-                                                                        .uniqueId,
-                                                                image: product
-                                                                    .images
-                                                                    .first,
-                                                              );
+                                                                          .uniqueId,
+                                                                  image: product
+                                                                      .images
+                                                                      .first,
+                                                                );
+                                                              }
                                                             },
                                                             child: const Center(
                                                               child: Icon(
@@ -1914,9 +1974,30 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                     ),
                                   ),
-                                  Icon(
-                                    Icons.star,
-                                    color: Colors.green,
+                                  IconButton(
+                                    onPressed: () async {
+                                      if (product.favorite) {
+                                        await ProductsService()
+                                            .removeProductFromFavorite(product);
+                                        Get.defaultDialog(
+                                          middleText: "",
+                                          title: product.brand.tr +
+                                              " Removed successfully from Favorite",
+                                        );
+                                      } else {
+                                        await ProductsService()
+                                            .addProductToFavorite(product);
+                                        Get.defaultDialog(
+                                          middleText: "",
+                                          title: product.brand.tr +
+                                              " Added successfully to Favorite.",
+                                        );
+                                      }
+                                    },
+                                    icon: Icon(product.favorite
+                                        ? Icons.favorite_outlined
+                                        : Icons.favorite_outline_outlined),
+                                    color: mainColor,
                                   ),
                                 ],
                               );

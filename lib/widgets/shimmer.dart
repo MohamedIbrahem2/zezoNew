@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
-Widget buildShimmer(int itemCount) {
+Widget buildShimmer(int crossAxis) {
   return Directionality(
     textDirection: TextDirection.rtl,
     child: Shimmer.fromColors(
@@ -10,7 +10,7 @@ Widget buildShimmer(int itemCount) {
       child: GridView.builder(
         reverse: true,
         shrinkWrap: true,
-        itemCount: itemCount, // Example item count
+        itemCount: 6, // Example item count
         itemBuilder: (context, index) {
           return Padding(
             padding: const EdgeInsets.all(8.0),
@@ -29,7 +29,7 @@ Widget buildShimmer(int itemCount) {
             ),
           );
         }, gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,childAspectRatio: .6,),
+        crossAxisCount: 2,childAspectRatio: .6,),
       ),
     ),
   );

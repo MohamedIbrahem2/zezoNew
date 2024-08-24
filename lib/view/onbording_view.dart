@@ -34,7 +34,7 @@ class _OnBordingState extends State<OnBording> {
         curve: Curves.easeIn,
       );
     } else {
-      Get.to(const SignIn());
+      Get.off(const SignIn());
     }
   }
 
@@ -84,7 +84,7 @@ class _OnBordingState extends State<OnBording> {
               left: 0,
               right: 250,
               child: TextButton(onPressed: (){
-                Get.to(const HomeView());
+                Get.off(const HomeView());
               }, child: Text("تخطي",textDirection: TextDirection.rtl,
                   style: TextStyle(fontSize: 20,color: Colors.white)))
           ),

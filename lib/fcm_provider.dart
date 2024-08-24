@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:googleapis_auth/auth_io.dart' as auth;
 import 'dart:convert';
+import 'dart:io';
+import 'package:googleapis_auth/auth_io.dart';
 import 'package:flutter/services.dart';
 import 'dart:developer' as devtools show log;
 import 'package:awesome_notifications/awesome_notifications.dart';
@@ -144,6 +146,74 @@ class FcmProvider {
       setLoading(false);
     }
   }
+  Future<String> getAccessToken() async {
+    final jsonCredentials = await rootBundle.loadString('data/zezo-6778a-674cf09cf39d.json');
+    var accountCredentials = ServiceAccountCredentials.fromJson(jsonCredentials);
+
+    var scopes = ['https://www.googleapis.com/auth/cloud-platform'];
+
+    var client = http.Client();
+    var authClient = await clientViaServiceAccount(accountCredentials, scopes);
+
+    var accessToken = authClient.credentials.accessToken;
+    return accessToken.data;
+  }
+  Future<void> sendHttpNotification(
+      String token,
+      String title,
+      String body,
+      Map<String, dynamic> data,
+      ) async {
+    String accessToken = await getAccessToken();
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    final bodyContent = {
+      'message': {
+        'token': token,
+        'notification': {
+          'title': title,
+          'body': body,
+        },
+        'data': data,
+        'android': {
+          'priority': 'high',
+          'notification': {
+            'sound': 'default',
+            'default_sound': true,
+          },
+        },
+        'apns': {
+          'payload': {
+            'aps': {
+              'sound': 'default',
+              'badge': 1,
+            },
+          },
+        },
+      }
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse('https://fcm.googleapis.com/v1/projects/970646820738/messages:send'),
+        headers: headers,
+        body: json.encode(bodyContent),
+      );
+
+      if (response.statusCode == 200) {
+        print('Notification sent successfully');
+      } else {
+        print('Failed to send notification. Status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
+      }
+    } catch (e) {
+      print('Error sending notification: $e');
+    }
+  }
+
   Future<void> sendHttppNotification(
     String token,
     String title,
@@ -284,7 +354,7 @@ class FcmProvider {
       print('token is');
       print(_token);
       if (_token != null) {
-        await sendHttppNotification(
+        await sendHttpNotification(
           _token,
           title,
           body,

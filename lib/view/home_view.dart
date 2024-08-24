@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart' hide Settings;
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zezo/constants.dart';
 import 'package:zezo/main.dart';
+import 'package:zezo/service/cart_service.dart';
 import 'package:zezo/view/bottom_nav/cart.dart';
 import 'package:zezo/view/bottom_nav/profile.dart';
 import 'package:zezo/view_model/auth_view_model.dart';
@@ -20,7 +22,7 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  late String _uniqueId;
+  String _uniqueId = "";
   final AuthViewModel yourController =
   Get.put(AuthViewModel()..getUserProfile());
   Future<void> _getUniqueId() async {
@@ -28,7 +30,6 @@ class _HomeViewState extends State<HomeView> {
     String? uniqueId = prefs.getString('unique_id');
 
     if (uniqueId == null) {
-      // Generate a new unique ID if it doesn't exist
       uniqueId = const Uuid().v4();
       await prefs.setString('unique_id', uniqueId);
     }
@@ -36,9 +37,8 @@ class _HomeViewState extends State<HomeView> {
     setState(() {
       _uniqueId = uniqueId!;
     });
+    CartService().changeCartItems(FirebaseAuth.instance.currentUser!.uid, _uniqueId);
   }
-
-
 
   @override
   void initState() {
@@ -59,7 +59,7 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     final bottomNavProvider = BottomNavbarProvider.instance(context);
     return Scaffold(
-      body: screens[bottomNavProvider.currentIndex],
+      body: _uniqueId == "" ? const Center(child: CircularProgressIndicator(),): screens[bottomNavProvider.currentIndex],
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
             borderRadius: BorderRadius.only(

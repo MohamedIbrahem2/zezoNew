@@ -44,8 +44,41 @@ class ResetPasswordView extends StatelessWidget {
                   style: ElevatedButton.styleFrom(backgroundColor: mainColor),
                   onPressed: () async {
                     if(FirebaseAuth.instance.currentUser == null){
-                      Get.snackbar("لا يمكن اتمام العمليه", "لأتمام العمليه يجب تسجيل الدخول");
-                      Get.to( const SignIn());
+                      Get.defaultDialog(
+                          title: "لا يمكن اتمام العمليه\n"
+                              "يجب تسجيل الدخول",
+                          content: Row(
+                            mainAxisAlignment:
+                            MainAxisAlignment.spaceAround,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text(
+                                  'الرجوع'.tr,
+                                  style: const TextStyle(
+                                      color: Colors.black),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                    Colors.white,
+                                    elevation: 10),
+                              ),
+                              ElevatedButton(
+                                onPressed: (){
+                                  Navigator.pop(context);
+                                  Get.to(const SignIn());
+                                },
+                                child: Text('تسجيل الدخول'.tr,
+                                    style: const TextStyle(
+                                        color: Colors.white)),
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: mainColor,
+                                    elevation: 10),
+                              ),
+                            ],
+                          ));
                     }else{
                       await ResetPasswordService()
                           .resetPassword(_emailController.text.trim());

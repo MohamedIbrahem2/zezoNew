@@ -22,6 +22,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final FirebaseStorageService _storageService = FirebaseStorageService();
   final ImagePicker _imagePicker = ImagePicker();
   final nameController = TextEditingController();
+  final brandController = TextEditingController();
   final priceController = TextEditingController();
   final deiscountController = TextEditingController();
   @override
@@ -131,7 +132,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
                           onChanged: (v) {
                             setState(() {
                               category = v;
-                              subcategory = null;
                             });
                             print(category);
                           });
@@ -227,6 +227,25 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   height: 20,
                 ),
                 TextFormField(
+                  controller: brandController,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Please enter brand name';
+                    }
+                    return null;
+                  },
+                  decoration: const InputDecoration(
+                    labelText: 'Brand Name',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(
+                  height: 20,
+                ),
+                TextFormField(
                   keyboardType: TextInputType.number,
                   controller: priceController,
                   validator: (value) {
@@ -282,16 +301,22 @@ class _AddProductScreenState extends State<AddProductScreen> {
                           });
                           await _uploadImage();
                             await ProductsService().addProduct(
+                              brand: brandController.text,
                               productName: nameController.text,
-                              image: _imageUrl,
+                              images: [_imageUrl],
                               categoryId: category!.id,
-                              subcategoryId: subcategory!.id,
-                              productPrice: priceController.text.isEmpty
+                              regularPrice: priceController.text.isEmpty
                                   ? 0
                                   : double.parse(priceController.text),
-                              discount: deiscountController.text.isEmpty
+                              discountPrice: deiscountController.text.isEmpty
                                   ? 0
-                                  : double.parse(deiscountController.text), available: false,
+                                  : double.parse(deiscountController.text),
+                              available: false,
+                              category: '',
+                              tags: '', taxRate: '',
+                              description: '',
+                              shippingFee: '',
+                              weight: '',
                             );
                             setState(() {
                               isLoading = false;

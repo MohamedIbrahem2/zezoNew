@@ -167,48 +167,6 @@ class _EditProductState extends State<EditProduct> {
                   const SizedBox(
                     height: 20,
                   ),
-                  if (category != null)
-                    StreamBuilder<List<Subcategory>>(
-                        stream: SubCategoryService()
-                            .getSubcategoriesByCategory(category!.id),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasError) {
-                            return const Center(
-                              child: Text('error'),
-                            );
-                          }
-                          if (!snapshot.hasData) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          }
-                          final subcategories = snapshot.data;
-                          return DropdownButtonFormField<Subcategory>(
-                              value: subcategory,
-                              decoration: const InputDecoration(
-                                labelText: 'Subcategory',
-                                border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
-                                ),
-                              ),
-                              items: subcategories!
-                                  .map((e) => DropdownMenuItem<Subcategory>(
-                                        child: Text(e.name),
-                                        value: e,
-                                      ))
-                                  .toList(),
-                              onChanged: (v) {
-                                setState(() {
-                                  subcategory = v;
-                                });
-                                print(category);
-                              });
-                        }),
-                  const SizedBox(
-                    height: 20,
-                  ),
-
                   TextFormField(
                     controller: nameController,
                     validator: (value) {
@@ -274,12 +232,6 @@ class _EditProductState extends State<EditProduct> {
                             Get.snackbar('Error', 'Please select category');
                             return;
                           }
-
-                          if (subcategory == null) {
-                            Get.snackbar('Error', 'Please select subcategory');
-                            return;
-                          }
-
                           // if (_imageFile == null) {
                           //   Get.snackbar('Error', 'Please select image');
                           //   return;
@@ -297,7 +249,7 @@ class _EditProductState extends State<EditProduct> {
                                 regularPrice: double.parse(priceController.text),
                                 discountPrice:
                                     double.parse(deiscountController.text),
-                                images: _imageUrl,
+                                images: [_imageUrl],
                               ));
                               setState(() {
                                 isLoading = false;

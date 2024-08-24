@@ -10,9 +10,15 @@ class Product {
   final double stock;
   final String title;
   final String weight;
+  final bool isbestselling;
+  final bool favorite;
+  final bool available;
   final List images;
   Product(
       {
+        required this.available,
+        required this.favorite,
+        required this.isbestselling,
         required this.category,
         required this.brand,
         required this.description,
@@ -36,6 +42,9 @@ class Product {
       }
     }
     return Product(
+      available: data['avalible'],
+      favorite:data['favorite'],
+      isbestselling: data['isbestselling'],
       id: snapshot.id,
       regularPrice: parseDouble(data['regularPrice']),
       discountPrice: parseDouble(data['discountPrice']),
@@ -51,6 +60,9 @@ class Product {
 
   Map<String, dynamic> toMap() {
     return {
+      'avalible' : available,
+      'favorite' : favorite,
+      'isbestselling' : isbestselling,
       'regularPrice': regularPrice,
       'discount': discountPrice,
       'images': images,
@@ -64,9 +76,12 @@ class Product {
   }
 
   Product copyWith({
+    bool? available,
+    bool? isbestselling,
+    bool? favorite,
     double? regularPrice,
     double? discountPrice,
-    String? images,
+    List<String>? images,
     String? brand,
     String? description,
     double? stock,
@@ -74,6 +89,9 @@ class Product {
     String? weight
   }) {
     return Product(
+      available: available ?? this.available,
+      favorite: favorite ?? this.favorite,
+      isbestselling: isbestselling ?? this.isbestselling,
       id: id,
       regularPrice: regularPrice ?? this.regularPrice,
       discountPrice: discountPrice ?? this.discountPrice,
@@ -82,7 +100,7 @@ class Product {
       stock: stock ?? this.stock,
       title: title ?? this.title,
       weight: weight ?? this.weight,
-      images: [],
+      images: images ?? this.images,
       category: category,
 
     );
@@ -92,23 +110,36 @@ class Product {
 class ProductsService {
   Future<void> addProduct(
       {required String productName,
+        required String category,
+        required String tags,
+        required String taxRate,
+        required String description,
+        required String shippingFee,
+        required String weight,
+        required String brand,
         required bool available,
-        required double productPrice,
-        required double discount,
-        required String image,
-        required String categoryId,
-        required String subcategoryId}) async {
+        required double regularPrice,
+        required double discountPrice,
+        required List<String> images,
+        required String categoryId,}) async {
     final collection = FirebaseFirestore.instance.collection('products');
     await collection.add({
+      'category' : category,
+      "tags" : tags,
+      "taxRate" : taxRate,
+      "description" : description,
+      "shippingFee" : shippingFee,
+      "weight" : weight,
       'avalible' : true,
-      'name': productName,
-      'price': productPrice,
+      'brand': brand,
+      'title': productName,
+      'regularPrice': regularPrice,
       'categoryId': categoryId,
-      'subcategoryId': subcategoryId,
-      'discount': discount,
-      'image': image,
+      'discountPrice': discountPrice,
+      'images': images,
       'salesCount': 0,
-      'isbestselling' : false
+      'isbestselling' : false,
+      'favorite' : false
     });
   }
 
@@ -156,6 +187,20 @@ class ProductsService {
       'isbestselling' : false,
     });
   }
+  Future<void> addProductToFavorite(Product product) async{
+    final collection = FirebaseFirestore.instance.collection('products');
+    await collection.doc(product.id).update({
+      "favorite" : true,
+    });
+
+
+  }
+  Future<void> removeProductFromFavorite(Product product) async{
+    final collection = FirebaseFirestore.instance.collection('products');
+    await collection.doc(product.id).update({
+      'favorite' : false,
+    });
+  }
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   Future<List<String>> getAllTokens() async {
     QuerySnapshot snapshot = await _db.collection('users').where('fcm', isNotEqualTo: null).get();
@@ -168,7 +213,7 @@ class ProductsService {
   Stream<List<Product>> getProductsByCategory(String categoryId) {
     final collection = FirebaseFirestore.instance.collection('products');
     return collection
-        .where('category', isEqualTo: categoryId)
+        .where('categoryId', isEqualTo: categoryId)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((doc) => Product.fromSnapshot(doc)).toList();
@@ -228,6 +273,17 @@ class ProductsService {
     final collection = FirebaseFirestore.instance.collection('products');
     return collection
         .where('isbestselling', isEqualTo: true)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) => Product.fromSnapshot(doc)).toList();
+    });
+  }
+  // get the Favorite products
+
+  Stream<List<Product>> getFavoriteProducts() {
+    final collection = FirebaseFirestore.instance.collection('products');
+    return collection
+        .where('favorite', isEqualTo: true)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((doc) => Product.fromSnapshot(doc)).toList();

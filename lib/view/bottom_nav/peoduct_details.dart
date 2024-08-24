@@ -15,7 +15,9 @@ import 'cart.dart';
 class ProductDetails extends StatefulWidget {
   final Product product;
   final String uniqueId;
-  const ProductDetails({super.key, required this.product, required this.uniqueId});
+
+  const ProductDetails(
+      {super.key, required this.product, required this.uniqueId});
 
   @override
   State<ProductDetails> createState() => _ProductDetailsState();
@@ -44,7 +46,11 @@ class _ProductDetailsState extends State<ProductDetails> {
         centerTitle: true,
         backgroundColor: mainColor,
         iconTheme: const IconThemeData(color: Colors.white),
-        title: const Text('تفاصيل المنتج',textDirection: TextDirection.rtl,style: TextStyle(color: Colors.white),),
+        title: const Text(
+          'تفاصيل المنتج',
+          textDirection: TextDirection.rtl,
+          style: TextStyle(color: Colors.white),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -94,32 +100,57 @@ class _ProductDetailsState extends State<ProductDetails> {
                       // edit product button
                       Row(
                         children: [
-                          provider.isAdmin ? IconButton(
-                            onPressed: () async {
-                              await Get.to(EditProduct(product: product));
-                              print('product id: ${product.id}');
-                              ProductsService()
-                                  .getProductById(product.id)
-                                  .then((event) {
-                                setState(() {
-                                  product = event;
-                                });
-                              });
-                            },
-                            icon: const Icon(Icons.edit),
-                          ): Container(),
+                          provider.isAdmin
+                              ? IconButton(
+                                  onPressed: () async {
+                                    await Get.to(EditProduct(product: product));
+                                    print('product id: ${product.id}');
+                                    ProductsService()
+                                        .getProductById(product.id)
+                                        .then((event) {
+                                      setState(() {
+                                        product = event;
+                                      });
+                                    });
+                                  },
+                                  icon: const Icon(Icons.edit),
+                                )
+                              : Container(),
                           SizedBox(width: Get.width * 0.03),
-
+                          provider.isAdmin
+                              ? IconButton(
+                                  onPressed: () async{
+                                    if (product.favorite) {
+                                      await ProductsService()
+                                          .removeProductFromFavorite(product);
+                                      Get.defaultDialog(
+                                        middleText: "",
+                                        title: product.brand.tr +
+                                            " Removed successfully from Favorite",
+                                      );
+                                    } else {
+                                      await ProductsService()
+                                          .addProductToFavorite(product);
+                                      Get.defaultDialog(
+                                        middleText: "",
+                                        title: product.brand.tr +
+                                            " Added successfully to Favorite.",
+                                      );
+                                    }
+                                  },
+                                  icon:  Icon(
+                                      product.favorite ? Icons.favorite_outlined: Icons.favorite_outline_outlined))
+                              : Container()
                           // qr code button
 
-                          provider.isAdmin ? IconButton(
-                              onPressed: () {
-                                Get.to(ProductQrImageView(
-                                    id: product.id,
-                                    productName: product.brand));
-                              },
-                              icon: const Icon(Icons.qr_code_scanner_outlined)):
-                              Container()
+                          // provider.isAdmin ? IconButton(
+                          //     onPressed: () {
+                          //       Get.to(ProductQrImageView(
+                          //           id: product.id,
+                          //           productName: product.brand));
+                          //     },
+                          //     icon: const Icon(Icons.qr_code_scanner_outlined)):
+                          //     Container()
 
                           // IconButton(
                           //   onPressed: () {
@@ -138,13 +169,12 @@ class _ProductDetailsState extends State<ProductDetails> {
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
-                      ), Text(
+                      ),
+                      Text(
                         product.brand,
                         textDirection: TextDirection.rtl,
                         style: const TextStyle(
-                          fontSize: 19,
-                          color: Colors.black45
-                        ),
+                            fontSize: 19, color: Colors.black45),
                       ),
                       SizedBox(height: Get.height * 0.03),
                       Text(
@@ -214,7 +244,75 @@ class _ProductDetailsState extends State<ProductDetails> {
             SizedBox(height: Get.height * 0.03),
             Row(
               children: [
-                provider.isAdmin ? Expanded(
+                provider.isAdmin
+                    ? Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: mainColor),
+                              onPressed: () async {
+                                await ProductsService()
+                                    .addProductToBestSelling(product);
+                                if (product.isbestselling) {
+                                  Get.defaultDialog(
+                                    middleText: "",
+                                    title: product.brand.tr +
+                                        " Already in bestSelling",
+                                  );
+                                } else {
+                                  Get.defaultDialog(
+                                    middleText: "",
+                                    title: product.brand.tr +
+                                        " Added successfully to BestSelling.",
+                                  );
+                                }
+                              },
+                              child: const Text(
+                                  textDirection: TextDirection.rtl,
+                                  style: TextStyle(color: Colors.white),
+                                  "أضافه الي الأعلي مبيعا")),
+                        ),
+                      )
+                    : Container(),
+                provider.isAdmin
+                    ? Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.black),
+                              onPressed: () async {
+                                await ProductsService()
+                                    .removeProductFromBestSelling(product);
+                                if (product.isbestselling) {
+                                  Get.defaultDialog(
+                                    middleText: "",
+                                    title: product.brand.tr +
+                                        " Removed successfully from BestSelling.",
+                                  );
+                                } else {
+                                  Get.defaultDialog(
+                                    middleText: "",
+                                    title: product.brand.tr +
+                                        " Already not in bestSelling",
+                                  );
+                                }
+                              },
+                              child: const Text(
+                                  textDirection: TextDirection.rtl,
+                                  style: TextStyle(color: Colors.white),
+                                  "حذف من الأعلي مبيعا")),
+                        ),
+                      )
+                    : Container(),
+              ],
+            ),
+            SizedBox(height: Get.height * 0.03),
+            Row(
+              children: [
+                provider.isAdmin
+                    ? Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
@@ -222,19 +320,30 @@ class _ProductDetailsState extends State<ProductDetails> {
                             backgroundColor: mainColor),
                         onPressed: () async {
                           await ProductsService()
-                              .addProductToBestSelling(product);
-                          Get.defaultDialog(
-                            title: product.brand.tr +
-                                " Added successfully to BestSelling.",
-                          );
+                              .productNotAvailable(product.id);
+                          if (!product.available) {
+                            Get.defaultDialog(
+                              middleText: "",
+                              title: product.brand.tr +
+                                  " Already in UnavialableProducts",
+                            );
+                          } else {
+                            Get.defaultDialog(
+                              middleText: "",
+                              title: product.brand.tr +
+                                  " Added successfully to UnavialableProducts.",
+                            );
+                          }
                         },
                         child: const Text(
-                          textDirection: TextDirection.rtl,
+                            textDirection: TextDirection.rtl,
                             style: TextStyle(color: Colors.white),
-                            "أضافه الي الأعلي مبيعا")),
+                            "أضافه الي غير المتاحه")),
                   ),
-                ): Container(),
-                provider.isAdmin ? Expanded(
+                )
+                    : Container(),
+                provider.isAdmin
+                    ? Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
@@ -242,25 +351,37 @@ class _ProductDetailsState extends State<ProductDetails> {
                             backgroundColor: Colors.black),
                         onPressed: () async {
                           await ProductsService()
-                              .removeProductFromBestSelling(product);
-                          Get.defaultDialog(
-                            title: product.brand.tr +
-                                " Removed successfully from BestSelling.",
-                          );
+                              .productAvailable(product.id);
+                          if (!product.available) {
+                            Get.defaultDialog(
+                              middleText: "",
+                              title: product.brand.tr +
+                                  " Removed successfully from UnavialableProducts.",
+                            );
+                          } else {
+                            Get.defaultDialog(
+                              middleText: "",
+                              title: product.brand.tr +
+                                  " Already not in UnavialableProducts",
+                            );
+                          }
                         },
                         child: const Text(
-                          textDirection: TextDirection.rtl,
+                            textDirection: TextDirection.rtl,
                             style: TextStyle(color: Colors.white),
-                            "حذف من الأعلي مبيعا")),
+                            "حذف من الغير المتاحه")),
                   ),
-                ): Container(),
+                )
+                    : Container(),
               ],
             ),
             SizedBox(height: Get.height * 0.04),
             StreamBuilder<List<CartItem>>(
                 stream: CartService().getCartItemsByProductId(
-                    FirebaseAuth.instance.currentUser != null ?
-                    FirebaseAuth.instance.currentUser!.uid: widget.uniqueId, product.id),
+                    FirebaseAuth.instance.currentUser != null
+                        ? FirebaseAuth.instance.currentUser!.uid
+                        : widget.uniqueId,
+                    product.id),
                 builder: (context, snapshot) {
                   final quantity =
                       (snapshot.data == null || snapshot.data!.isEmpty)
@@ -285,8 +406,10 @@ class _ProductDetailsState extends State<ProductDetails> {
                         ),
                         SizedBox(width: Get.width * 0.06),
                         GestureDetector(
-                          onTap: (){
-                            Get.to(Screen2(uniqueId: widget.uniqueId,));
+                          onTap: () {
+                            Get.to(Screen2(
+                              uniqueId: widget.uniqueId,
+                            ));
                           },
                           child: const Text(
                             textDirection: TextDirection.rtl,
@@ -307,17 +430,24 @@ class _ProductDetailsState extends State<ProductDetails> {
                           children: [
                             IconButton(
                                 onPressed: () {
-                                  CartService().addToCart(
-                                    productId: product.id,
-                                    userId:
-                                    FirebaseAuth.instance.currentUser != null ? FirebaseAuth.instance.currentUser!.uid: widget.uniqueId,
-                                    quantity: 0,
-                                    productName: product.brand,
-                                    image: product.images.first,
-                                    price: product.regularPrice,
+                                  if(!product.available){
+                                    Get.snackbar("لا يمكن اتمام العمليه", "هذا المنتج غير متاح حاليا");
+                                  }else{
+                                    CartService().addToCart(
+                                      productId: product.id,
+                                      userId: FirebaseAuth.instance.currentUser !=
+                                          null
+                                          ? FirebaseAuth.instance.currentUser!.uid
+                                          : widget.uniqueId,
+                                      quantity: 0,
+                                      productName: product.brand,
+                                      image: product.images.first,
+                                      price: product.regularPrice,
 
-                                    // product: product,
-                                  );
+                                      // product: product,
+                                    );
+                                  }
+
                                 },
                                 icon: const Icon(
                                   Icons.add,
@@ -335,7 +465,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                 onPressed: () {
                                   if (items != null) {
                                     CartService().updateCartItemQuantity(
-                                        items[0].id, quantity! - 1,quantity);
+                                        items[0].id, quantity! - 1, quantity);
                                   }
                                 },
                                 icon: const Icon(

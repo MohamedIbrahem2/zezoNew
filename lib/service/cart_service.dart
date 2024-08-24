@@ -89,6 +89,26 @@ class CartService {
     }
   }
 
+  void changeCartItems(String userId,String uniqueId) async {
+    // Reference to the collection
+    CollectionReference collectionRef = FirebaseFirestore.instance.collection('cart');
+
+    // Get all documents from the collection
+    QuerySnapshot querySnapshot = await collectionRef.get();
+
+    // Loop through each document and update the 'failed' field
+    for (QueryDocumentSnapshot docSnapshot in querySnapshot.docs) {
+      if(uniqueId == docSnapshot.get('userId')){
+        await docSnapshot.reference.update({
+          'userId': userId, // Set the value you want, e.g., true, false, or any other value
+        }).catchError((error) {
+          print('Error updating document ${docSnapshot.id}: $error');
+        });
+      }
+    }
+    print('All documents updated successfully');
+  }
+
 // is the product already in the cart?
   Future<int?> isProductInCart(String productId, String userId) async {
     final collection = FirebaseFirestore.instance.collection('cart');

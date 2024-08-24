@@ -146,7 +146,7 @@ class _SearchState extends State<Search> {
                   child: StreamBuilder<List<Product>>(
                       stream: ProductsService().searchForProduct(searchValue.text) ,
                       builder: (context, snapshot) {
-                        final products = snapshot.data!;
+
                         if (snapshot.hasError) {
                           return const Center(
                             child: Text('Error'),
@@ -154,8 +154,9 @@ class _SearchState extends State<Search> {
                         }
 
                         if (snapshot.connectionState == ConnectionState.waiting && searchValue.text != '') {
-                          return buildShimmer(products.length);
+                          return buildShimmer(2);
                         }
+                        final products = snapshot.data!;
                         if(searchValue.text != '') {
 
                           return GridView.builder(
