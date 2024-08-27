@@ -145,11 +145,11 @@ class _HomePageState extends State<HomePage> {
           iconTheme: const IconThemeData(color: Colors.white),
           backgroundColor: mainColor,
           title: Padding(
-            padding: const EdgeInsets.only(top: 8.0),
+            padding: const EdgeInsets.only(top: 5.0),
             child: Image.asset(
               'images/logo_zezo.png',
-              height: Get.height * .075,
-              width: Get.width * .7,
+              height: Get.height * .09,
+              width: Get.width * .9,
             ),
           ),
           centerTitle: true,
@@ -628,7 +628,7 @@ class _HomePageState extends State<HomePage> {
                                           Expanded(
                                             child: Container(
                                                 height: Get.height * 0.05,
-                                                width: Get.width * 0.1,
+                                                width: Get.width * 0.14,
                                                 child: Image.network(
                                                   category.image,
                                                   fit: BoxFit.fill,
@@ -636,17 +636,16 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                           Expanded(
                                             child: Center(
-                                                child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(6.0),
-                                              child: Text(
-                                                category.name,
-                                                style:
-                                                    TextStyle(color: mainColor),
-                                                textDirection:
-                                                    TextDirection.rtl,
-                                              ),
-                                            )),
+                                                child: Text(
+                                                  category.name,
+                                                  style:
+                                                      TextStyle(color: categoryId == category.id
+                                                          ? mainColor
+                                                          : Colors.grey,
+                                                      fontSize: 13,fontWeight: FontWeight.bold),
+                                                  textDirection:
+                                                      TextDirection.rtl,
+                                                )),
                                           ),
                                         ],
                                       ),
@@ -770,6 +769,7 @@ class _HomePageState extends State<HomePage> {
                                         borderRadius:
                                             BorderRadius.circular(13)),
                                     child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                                       //crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Padding(
@@ -827,7 +827,7 @@ class _HomePageState extends State<HomePage> {
                                                     const EdgeInsets.all(1.0),
                                                 child: Row(
                                                   mainAxisAlignment:
-                                                      MainAxisAlignment.start,
+                                                      MainAxisAlignment.spaceBetween,
                                                   children: [
                                                     if (product.discountPrice >
                                                         0)
@@ -885,7 +885,7 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                               Padding(
                                                 padding:
-                                                    const EdgeInsets.all(4.0),
+                                                    const EdgeInsets.only(left:8.0),
                                                 child: SizedBox(
                                                   width: Get.width * 0.065,
                                                   height: Get.height * 0.03,
@@ -1418,6 +1418,7 @@ class _HomePageState extends State<HomePage> {
                                         borderRadius:
                                             BorderRadius.circular(13)),
                                     child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                                       //crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Padding(
@@ -1532,7 +1533,7 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                               Padding(
                                                 padding:
-                                                    const EdgeInsets.all(5.0),
+                                                    const EdgeInsets.only(left:5.0),
                                                 child: SizedBox(
                                                   width: Get.width * 0.065,
                                                   height: Get.height * 0.03,
