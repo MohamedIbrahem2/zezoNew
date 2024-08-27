@@ -121,6 +121,11 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                   height: 20,
                 ),
                 // add button
+                if (isLoading)
+                  const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                else
                 ElevatedButton(
                   onPressed: () async {
                     if (_fromKey.currentState!.validate()) {

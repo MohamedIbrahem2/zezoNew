@@ -67,7 +67,7 @@ class AddressItem extends StatelessWidget {
                         address: address,
                       )));
         },
-        icon: const Icon(Icons.map),
+        icon: const Icon(Icons.location_on_outlined),
       ),
       // You can customize the rest of the UI for the address item as needed
       // For example, you might want to show the description or location on a map.
@@ -197,7 +197,7 @@ class _StatusTapsState extends State<StatusTaps> {
                                 context.watch<OrdersHistoryProvider>().status ==
                                         status
                                     ? mainColor
-                                    : Colors.pink.shade200,
+                                    : Colors.grey,
                             boxShadow: const [
                               BoxShadow(
                                   blurRadius: 2,
@@ -326,7 +326,7 @@ class _OrderItemState extends State<OrderItem> {
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(5),
-                    color: Colors.greenAccent.shade100,
+                    color: mainColor,
                     boxShadow: const [
                       BoxShadow(
                           blurRadius: 2, spreadRadius: 1, color: Colors.black)
@@ -350,7 +350,7 @@ class _OrderItemState extends State<OrderItem> {
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(5),
-                    color: Colors.greenAccent.shade100,
+                    color: mainColor,
                     boxShadow: const [
                       BoxShadow(
                           blurRadius: 2, spreadRadius: 1, color: Colors.black)

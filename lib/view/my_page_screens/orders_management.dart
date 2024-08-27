@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:zezo/constants.dart';
 import 'package:zezo/main.dart';
 import 'package:zezo/service/order_service.dart';
 import 'package:zezo/view/my_page_screens/orders_management_provider.dart';
@@ -32,7 +33,7 @@ class _OrdersManagementState extends State<OrdersManagement> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.blue.shade100,
+        backgroundColor: mainColor,
         iconTheme: const IconThemeData(color: Colors.black),
         title: Text(
           'orders Management'.tr,
@@ -124,8 +125,8 @@ class _StatusTapsState extends State<StatusTaps> {
                                         .watch<OrdersManagementProvider>()
                                         .status ==
                                     status
-                                ? Colors.blue.shade100
-                                : Colors.greenAccent.shade100,
+                                ? mainColor
+                                : Colors.grey,
                             boxShadow: const [
                               BoxShadow(
                                   blurRadius: 2,
@@ -153,7 +154,7 @@ class _StatusTapsState extends State<StatusTaps> {
                       separatorBuilder: (context, index) {
                         return Container(
                           height: 20,
-                          color: Colors.grey.shade300,
+                          color: mainColor,
                         );
                       },
                       itemCount: OrdersManagement.orders
@@ -233,7 +234,7 @@ class _OrderItemState extends State<OrderItem> {
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(5),
-                  color: Colors.greenAccent.shade100,
+                  color: mainColor,
                   boxShadow: const [
                     BoxShadow(
                         blurRadius: 2, spreadRadius: 1, color: Colors.black)
@@ -331,7 +332,7 @@ class _OrderItemState extends State<OrderItem> {
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(5),
-                    color: Colors.greenAccent.shade100,
+                    color: mainColor,
                     boxShadow: const [
                       BoxShadow(
                           blurRadius: 2, spreadRadius: 1, color: Colors.black)
@@ -355,7 +356,7 @@ class _OrderItemState extends State<OrderItem> {
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(5),
-                    color: Colors.greenAccent.shade100,
+                    color: mainColor,
                     boxShadow: const [
                       BoxShadow(
                           blurRadius: 2, spreadRadius: 1, color: Colors.black)
@@ -424,12 +425,14 @@ class _OrderItemState extends State<OrderItem> {
                           .read<OrdersManagementProvider>()
                           .updateOrderStatusAction(order.id, order.userId);
                     },
+                    style: ElevatedButton.styleFrom(backgroundColor: mainColor),
                     child: Text(context
                         .watch<OrdersManagementProvider>()
-                        .getActionText(order.status!))),
+                        .getActionText(order.status!),style: TextStyle(color: Colors.white),)),
               if (!context.watch<AdminProvider>().isAdmin &&
                   order.status == 'pending')
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: mainColor),
                     onPressed: () async {
                       context
                           .read<OrdersManagementProvider>()
@@ -437,19 +440,22 @@ class _OrderItemState extends State<OrderItem> {
                     },
                     child: Text(context
                         .watch<OrdersManagementProvider>()
-                        .getActionText(order.status!))),
+                        .getActionText(order.status!),style: TextStyle(color: Colors.white))),
               if (order.status == 'pending' || order.status == 'processing')
                 const SizedBox(
                   width: 10,
                 ),
               if (order.status == 'pending' || order.status == 'processing')
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white
+                  ),
                     onPressed: () async {
                       context
                           .read<OrdersManagementProvider>()
                           .cancelOrder(order.id);
                     },
-                    child: const Text('Cancel Order'))
+                    child: const Text('Cancel Order',style: TextStyle(color: Colors.black),))
             ],
           ),
         ],

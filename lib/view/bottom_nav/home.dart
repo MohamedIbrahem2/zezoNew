@@ -896,9 +896,23 @@ class _HomePageState extends State<HomePage> {
                                                       //   Get.to(const SignIn());
                                                       // }else{
                                                       if (!product.available) {
-                                                        Get.snackbar(
-                                                            "لا يمكن اتمام العمليه",
-                                                            "هذا المنتج غير متاح حاليا");
+                                                        Get.defaultDialog(
+                                                            title: "هذا المنتج غير متاح حاليا\nسيتم توفيره قريبا",
+                                                            content: ElevatedButton(
+                                                              onPressed: () {
+                                                                Navigator.pop(context);
+                                                              },
+                                                              child: Text(
+                                                                'رجوع'.tr,
+                                                                style: const TextStyle(
+                                                                    color: Colors.black),
+                                                              ),
+                                                              style: ElevatedButton
+                                                                  .styleFrom(
+                                                                  backgroundColor:
+                                                                  Colors.white,
+                                                                  elevation: 10),
+                                                            ));
                                                       } else {
                                                         final result = await CartService().isProductInCart(
                                                             product.id,
@@ -1080,6 +1094,7 @@ class _HomePageState extends State<HomePage> {
                                               borderRadius:
                                                   BorderRadius.circular(13)),
                                           child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.spaceAround,
                                             //crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               Padding(
@@ -1228,9 +1243,23 @@ class _HomePageState extends State<HomePage> {
                                                           onPressed: () async {
                                                             if (!product
                                                                 .available) {
-                                                              Get.snackbar(
-                                                                  "لا يمكن اتمام العمليه",
-                                                                  "هذا المنتج غير متاح حاليا");
+                                                              Get.defaultDialog(
+                                                                  title: "هذا المنتج غير متاح حاليا\nسيتم توفيره قريبا",
+                                                                  content: ElevatedButton(
+                                                                    onPressed: () {
+                                                                      Navigator.pop(context);
+                                                                    },
+                                                                    child: Text(
+                                                                      'رجوع'.tr,
+                                                                      style: const TextStyle(
+                                                                          color: Colors.black),
+                                                                    ),
+                                                                    style: ElevatedButton
+                                                                        .styleFrom(
+                                                                        backgroundColor:
+                                                                        Colors.white,
+                                                                        elevation: 10),
+                                                                  ));
                                                             } else {
                                                               final result = await CartService()
                                                                   .isProductInCart(
@@ -1544,9 +1573,23 @@ class _HomePageState extends State<HomePage> {
                                                       //   Get.to(const SignIn());
                                                       // }else{
                                                       if (!product.available) {
-                                                        Get.snackbar(
-                                                            "لا يمكن اتمام العمليه",
-                                                            "هذا المنتج غير متاح حاليا");
+                                                        Get.defaultDialog(
+                                                            title: "هذا المنتج غير متاح حاليا\nسيتم توفيره قريبا",
+                                                            content: ElevatedButton(
+                                                              onPressed: () {
+                                                                Navigator.pop(context);
+                                                              },
+                                                              child: Text(
+                                                                'رجوع'.tr,
+                                                                style: const TextStyle(
+                                                                    color: Colors.black),
+                                                              ),
+                                                              style: ElevatedButton
+                                                                  .styleFrom(
+                                                                  backgroundColor:
+                                                                  Colors.white,
+                                                                  elevation: 10),
+                                                            ));
                                                       } else {
                                                         final result = await CartService().isProductInCart(
                                                             product.id,
@@ -1663,7 +1706,7 @@ class _HomePageState extends State<HomePage> {
                             itemBuilder: (BuildContext context, int index) {
                               final product = products[index];
                               return Stack(
-                                alignment: Alignment.topRight,
+                                alignment: Alignment.topLeft,
                                 children: [
                                   Padding(
                                     padding: const EdgeInsets.all(4.0),
@@ -1746,6 +1789,7 @@ class _HomePageState extends State<HomePage> {
                                                 borderRadius:
                                                     BorderRadius.circular(13)),
                                             child: Column(
+                                              mainAxisAlignment: MainAxisAlignment.spaceAround,
                                               //crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Padding(
@@ -1902,9 +1946,23 @@ class _HomePageState extends State<HomePage> {
                                                               // }else{
                                                               if (!product
                                                                   .available) {
-                                                                Get.snackbar(
-                                                                    "لا يمكن اتمام العمليه",
-                                                                    "هذا المنتج غير متاح حاليا");
+                                                                Get.defaultDialog(
+                                                                    title: "هذا المنتج غير متاح حاليا\nسيتم توفيره قريبا",
+                                                                    content: ElevatedButton(
+                                                                      onPressed: () {
+                                                                        Navigator.pop(context);
+                                                                      },
+                                                                      child: Text(
+                                                                        'رجوع'.tr,
+                                                                        style: const TextStyle(
+                                                                            color: Colors.black),
+                                                                      ),
+                                                                      style: ElevatedButton
+                                                                          .styleFrom(
+                                                                          backgroundColor:
+                                                                          Colors.white,
+                                                                          elevation: 10),
+                                                                    ));
                                                               } else {
                                                                 final result = await CartService().isProductInCart(
                                                                     product.id,
@@ -1975,30 +2033,34 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                     ),
                                   ),
-                                  IconButton(
-                                    onPressed: () async {
-                                      if (product.favorite) {
-                                        await ProductsService()
-                                            .removeProductFromFavorite(product);
-                                        Get.defaultDialog(
-                                          middleText: "",
-                                          title: product.brand.tr +
-                                              " Removed successfully from Favorite",
-                                        );
-                                      } else {
-                                        await ProductsService()
-                                            .addProductToFavorite(product);
-                                        Get.defaultDialog(
-                                          middleText: "",
-                                          title: product.brand.tr +
-                                              " Added successfully to Favorite.",
-                                        );
-                                      }
-                                    },
-                                    icon: Icon(product.favorite
-                                        ? Icons.favorite_outlined
-                                        : Icons.favorite_outline_outlined),
-                                    color: mainColor,
+                                  Positioned(
+                                    top:-10,
+                                    left: -10,
+                                    child: IconButton(
+                                      onPressed: () async {
+                                        if (product.favorite) {
+                                          await ProductsService()
+                                              .removeProductFromFavorite(product);
+                                          Get.defaultDialog(
+                                            middleText: "",
+                                            title: product.brand.tr +
+                                                " Removed successfully from Favorite",
+                                          );
+                                        } else {
+                                          await ProductsService()
+                                              .addProductToFavorite(product);
+                                          Get.defaultDialog(
+                                            middleText: "",
+                                            title: product.brand.tr +
+                                                " Added successfully to Favorite.",
+                                          );
+                                        }
+                                      },
+                                      icon: Icon(product.favorite
+                                          ? Icons.favorite_outlined
+                                          : Icons.favorite_outline_outlined),
+                                      color: mainColor,
+                                    ),
                                   ),
                                 ],
                               );

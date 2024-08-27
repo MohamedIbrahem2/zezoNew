@@ -643,6 +643,7 @@ class _CheckHomeState extends State<CheckHome> {
                               totalQuantity += item.quantity;
                               totalPrice += item.price * item.quantity;
                             }
+                            double totalBeforeTax = totalPrice - (totalPrice * .15).floor();
 
                             return Container(
                               padding: const EdgeInsets.all(10),
@@ -694,7 +695,7 @@ class _CheckHomeState extends State<CheckHome> {
 
                                       Text(
                                         textDirection: TextDirection.rtl,
-                                        '$totalPrice SR',
+                                        '$totalBeforeTax SR',
                                         style:  TextStyle(
                                           fontSize: 17,
                                           color: Colors.grey.shade800,
@@ -702,7 +703,7 @@ class _CheckHomeState extends State<CheckHome> {
                                       ),
                                       const Text(
                                         textDirection: TextDirection.rtl,
-                                        'المجموع',
+                                        'المجموع قبل الضريبه',
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
@@ -728,7 +729,7 @@ class _CheckHomeState extends State<CheckHome> {
                                       ),
                                       const Text(
                                         textDirection: TextDirection.rtl,
-                                        'خدمه 15%',
+                                        'ضريبه 15%',
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
@@ -796,7 +797,7 @@ class _CheckHomeState extends State<CheckHome> {
 
                                       Text(
                                         textDirection: TextDirection.rtl,
-                                        (totalPrice + (totalPrice * .15))
+                                        totalPrice
                                                 .toString() +
                                             ' SR',
                                         style:  TextStyle(
@@ -806,7 +807,7 @@ class _CheckHomeState extends State<CheckHome> {
                                       ),
                                       const Text(
                                         textDirection: TextDirection.rtl,
-                                        'المجموع بالخدمه',
+                                        'المجموع بالضريبه',
                                         style: TextStyle(
                                           fontSize: 16,
 
