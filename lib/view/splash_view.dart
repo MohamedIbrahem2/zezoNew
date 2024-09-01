@@ -28,7 +28,7 @@ class _MyHomePageState extends State<MyHomePage> {
     Timer(
         const Duration(seconds: 4),
         () => Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) =>  first ? const OnBording() : const HomeView())));
+            context, MaterialPageRoute(builder: (context) =>  const HomeView())));
   }
 
   @override
@@ -40,7 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Container(
               width: Get.width*.4,
             color: Colors.white,
-            child: Center(child: Image.asset('images/logo_zezo.png'))),
+            child: Center(child: Image.asset('images/splash.jpeg'))),
       ),
     );
   }
