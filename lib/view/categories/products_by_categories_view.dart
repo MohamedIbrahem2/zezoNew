@@ -29,7 +29,8 @@ class _ProductsByCategoriesState extends State<ProductsByCategories> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          leading: Container(),
+          automaticallyImplyLeading: true,
+         // leading: Container(),
           backgroundColor: Colors.transparent,
           title: const Text("المنتجات"),
           centerTitle: true,
@@ -62,7 +63,7 @@ class _ProductsByCategoriesState extends State<ProductsByCategories> {
               itemBuilder: (BuildContext context, int index) {
                 final product = products[index];
                 return Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(5.0),
                   child: GestureDetector(
                     onLongPress: () {
                       final provider = Provider.of<AdminProvider>(
@@ -136,7 +137,7 @@ class _ProductsByCategoriesState extends State<ProductsByCategories> {
                           borderRadius:
                           BorderRadius.circular(13)),
                       child: Column(
-                        //crossAxisAlignment: CrossAxisAlignment.start,
+                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           Padding(
                             padding: const EdgeInsets.all(8.0),

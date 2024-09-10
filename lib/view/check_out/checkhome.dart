@@ -393,6 +393,7 @@ class _CheckHomeState extends State<CheckHome> {
                                               textDirection: TextDirection.rtl,
                                               'لا يوجد عنوان, قم بأضافه عنوان',
                                               style: TextStyle(
+                                                fontSize: 11,
                                                   color: Colors.white),
                                             ),
 

@@ -58,6 +58,7 @@ class CartService {
       required String productName,
       required String image,
       required double price,
+       double? discountPrice,
       required int quantity}) async {
     final collection = FirebaseFirestore.instance.collection('cart');
     // check if the product is already in the cart
@@ -68,6 +69,7 @@ class CartService {
         'productId': productId,
         'productName': productName,
         'price': price,
+        'discountPrice': discountPrice,
         'quantity': 1,
         'userId': userId,
         'image': image,

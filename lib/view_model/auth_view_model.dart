@@ -13,6 +13,7 @@ class AuthViewModel extends GetxController {
   final AuthService _authService = AuthService();
   late String email, password;
   String? name, phone;
+  var vatNum='لا يوجد';
   UserProfile? userProfile;
   Future<void> getUserProfile() async {
     userProfile = await _authService
@@ -67,6 +68,7 @@ class AuthViewModel extends GetxController {
         userId: data.user!.uid,
         name: name!,
         phone: phone!,
+        vatNum:vatNum
       );
 
       userProfile = await _authService.getUserProfile(data.user!.uid);
@@ -88,7 +90,7 @@ class AuthViewModel extends GetxController {
     String? name,
     String? phone,
     String? cr,
-    String? vat,
+    var vatNum,
   }) async {
     try {
       Get.snackbar(
@@ -102,6 +104,7 @@ class AuthViewModel extends GetxController {
         userId: FirebaseAuth.instance.currentUser!.uid,
         name: name!,
         phone: phone!,
+        vatNum: vatNum,
       );
 
       userProfile = await _authService

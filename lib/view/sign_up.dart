@@ -7,9 +7,10 @@ import '../view_model/auth_view_model.dart';
 
 class SignUp extends GetWidget<AuthViewModel> {
   TextEditingController name = TextEditingController();
+  TextEditingController? vatNum = TextEditingController(
+  );
   TextEditingController phone = TextEditingController();
   TextEditingController cr = TextEditingController();
-  TextEditingController vat = TextEditingController();
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
   @override
@@ -36,7 +37,7 @@ class SignUp extends GetWidget<AuthViewModel> {
                     height: Get.height * .02,
                   ),
                   SizedBox(
-                    height: Get.height* 0.3,
+                    height: Get.height* 0.15,
                     width: Get.width * 0.3,
                     child: Image.asset(
                       'images/logo2.png',
@@ -116,7 +117,33 @@ class SignUp extends GetWidget<AuthViewModel> {
                           SizedBox(
                             height: Get.height * .02,
                           ),
+                          SizedBox(
+                            height: Get.height * .02,
+                          ),
+                          TextFormField(
+                            controller: vatNum,
+                            onChanged: (value) {
+                              controller.vatNum = value;
+                            },
+                            decoration:  InputDecoration(
+                              labelText: 'الرقم الضريبي (إختياري!)',
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Colors.black,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: mainColor,width: 2.0),
+                                borderRadius:
+                                const BorderRadius.all(Radius.circular(10)),
+                              ),
+                            ),
 
+                          ),
+                          SizedBox(
+                            height: Get.height * .02,
+                          ),
                           IntlPhoneField(
                             controller: phone,
                             decoration:  InputDecoration(

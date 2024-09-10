@@ -246,11 +246,11 @@ class _OrderItemState extends State<OrderItem> {
                       const Text(
                         'Customer Name: ',
                         style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w600),
+                            fontSize: 14, fontWeight: FontWeight.w600),
                       ),
                       Text(order.userProfile!.name,
                           style: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w400)),
+                              fontSize: 14, fontWeight: FontWeight.w400)),
                     ],
                   ),
                   const SizedBox(
@@ -261,11 +261,11 @@ class _OrderItemState extends State<OrderItem> {
                       const Text(
                         'Customer Email: ',
                         style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w600),
+                            fontSize: 14, fontWeight: FontWeight.w600),
                       ),
                       Text(order.userProfile!.email ?? '',
                           style: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w400)),
+                              fontSize: 14, fontWeight: FontWeight.w400)),
                     ],
                   ),
                   const SizedBox(
@@ -276,11 +276,11 @@ class _OrderItemState extends State<OrderItem> {
                       const Text(
                         'Customer Phone: ',
                         style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w600),
+                            fontSize: 14, fontWeight: FontWeight.w600),
                       ),
                       Text(order.userProfile!.phone ?? '',
                           style: const TextStyle(
-                              fontSize: 16 , fontWeight: FontWeight.w400)),
+                              fontSize: 14 , fontWeight: FontWeight.w400)),
                     ],
                   ),
                   const SizedBox(
@@ -292,7 +292,7 @@ class _OrderItemState extends State<OrderItem> {
                       const Text(
                         'Other Phones: ',
                         style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w600),
+                            fontSize: 14, fontWeight: FontWeight.w600),
                       ),
                       order.phones != null
                           ? order.phones!.isEmpty
@@ -303,6 +303,21 @@ class _OrderItemState extends State<OrderItem> {
                                       .toList(),
                                 )
                           : const Text('Not Provided'),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    children: [
+                      const Text(
+                        'VAT Number: ',
+                        style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.w600),
+                      ),
+                      Text(order.userProfile!.vatNum,
+                          style: const TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.w400)),
                     ],
                   ),
                 ],

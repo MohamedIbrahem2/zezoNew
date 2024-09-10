@@ -23,8 +23,10 @@ class _CategoriesState extends State<Categories> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          leading: Container(),
-          backgroundColor: Colors.transparent,
+          automaticallyImplyLeading: true,
+
+         // leading: Container(),
+          backgroundColor: mainColor,
           title: const Text("جميع الأصناف"),
           centerTitle: true,
         ),

@@ -333,7 +333,7 @@ class _HomePageState extends State<HomePage> {
                   onTap: () async {
                     // Set the app link and the message to be shared
                     const String appLink =
-                        'https://play.google.com/store/apps/details?id=com.example.myapp';
+                        'https://play.google.com/store/apps/details?id=com.stockat';
                     const String message =
                         'Share our app with others: $appLink';
 
@@ -981,7 +981,7 @@ class _HomePageState extends State<HomePage> {
                       },
                     )
                   : Container(
-                      margin: const EdgeInsets.all(10),
+                      margin: const EdgeInsets.only(top: 10,bottom: 10,left: 10,right: 10),
                       width: Get.width,
                       height: Get.height * .83,
                       child: StreamBuilder<List<Product>>(
@@ -1001,326 +1001,329 @@ class _HomePageState extends State<HomePage> {
                             }
                             final products = snapshot.data!;
                             if (searchValue.text != '') {
-                              return GridView.builder(
-                                  gridDelegate:
-                                      const SliverGridDelegateWithMaxCrossAxisExtent(
-                                          maxCrossAxisExtent: 300,
-                                          childAspectRatio: .8,
-                                          crossAxisSpacing: 10,
-                                          mainAxisSpacing: 10),
-                                  itemCount: products!.length,
-                                  itemBuilder: (context, index) {
-                                    final product = products[index];
-                                    return Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: GestureDetector(
-                                        onLongPress: () {
-                                          final provider =
-                                              Provider.of<AdminProvider>(
-                                                  context,
-                                                  listen: false);
-                                          // if (provider.isAdmin) {
-                                          Get.defaultDialog(
-                                              title: 'Do you want to delete ' +
-                                                  product.brand.tr +
-                                                  " product ?",
-                                              content: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceAround,
-                                                children: [
-                                                  ElevatedButton(
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                    },
-                                                    child: Text(
-                                                      'no'.tr,
-                                                      style: const TextStyle(
-                                                          color: Colors.black),
-                                                    ),
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                            backgroundColor:
-                                                                Colors.white,
-                                                            elevation: 10),
-                                                  ),
-                                                  ElevatedButton(
-                                                    onPressed: () async {
-                                                      await ProductsService()
-                                                          .deleteProductFromBestSelling(
-                                                              product.id);
-                                                      ProductsService()
-                                                          .deleteProduct(
-                                                              product.id);
-                                                      Navigator.pop(context);
-                                                    },
-                                                    child: Text('yes'.tr,
-                                                        style: const TextStyle(
-                                                            color:
-                                                                Colors.white)),
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                            backgroundColor:
-                                                                Colors.red,
-                                                            elevation: 10),
-                                                  ),
-                                                ],
-                                              ));
-                                        },
-                                        onTap: () {
-                                          final provider =
-                                              Provider.of<AdminProvider>(
-                                                  context,
-                                                  listen: false);
-                                          // if (provider.isAdmin) {
-                                          Get.to(ProductDetails(
-                                            product: product,
-                                            uniqueId: widget.uniqueId,
-                                          ));
-                                        },
-                                        child: Container(
-                                          height: Get.height * 0.09,
-                                          width: Get.width * 0.4,
-                                          decoration: BoxDecoration(
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.grey,
-                                                  offset:
-                                                      Offset(0.0, 1.0), //(x,y)
-                                                  blurRadius: 6.0,
-                                                ),
-                                              ],
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(13)),
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                            //crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: CachedNetworkImage(
-                                                  imageUrl:
-                                                      product.images.first,
-                                                  //fit: BoxFit.fill,
-                                                  imageBuilder: (context,
-                                                          imageProvider) =>
-                                                      Container(
-                                                    //  width: Get.width * .35,
-                                                    height: Get.height * .115,
-                                                    decoration: BoxDecoration(
-                                                        image: DecorationImage(
-                                                      image: imageProvider,
-                                                    )),
-                                                  ),
-                                                ),
-                                              ),
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.all(2.0),
-                                                child: Container(
-                                                  child: Text(
-                                                    textAlign: TextAlign.center,
-                                                    textDirection:
-                                                        TextDirection.rtl,
-                                                    product.title,
-                                                    maxLines: 2,
-                                                    style: const TextStyle(
-                                                        height: .95,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.black),
-                                                  ),
-                                                ),
-                                              ),
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.all(2.0),
-                                                child: Text(
-                                                  product.brand,
-                                                  maxLines: 2,
-                                                  style: const TextStyle(
-                                                      fontSize: 12,
-                                                      color: Colors.black45),
-                                                ),
-                                              ),
-                                              Row(
+                              return Container(
+                                margin: EdgeInsets.only(bottom: 100),
+                                child: GridView.builder(
+                                    gridDelegate:
+                                        const SliverGridDelegateWithMaxCrossAxisExtent(
+                                            maxCrossAxisExtent: 300,
+                                            childAspectRatio: .8,
+                                            crossAxisSpacing: 10,
+                                            mainAxisSpacing: 10),
+                                    itemCount: products!.length,
+                                    itemBuilder: (context, index) {
+                                      final product = products[index];
+                                      return Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: GestureDetector(
+                                          onLongPress: () {
+                                            final provider =
+                                                Provider.of<AdminProvider>(
+                                                    context,
+                                                    listen: false);
+                                            // if (provider.isAdmin) {
+                                            Get.defaultDialog(
+                                                title: 'Do you want to delete ' +
+                                                    product.brand.tr +
+                                                    " product ?",
+                                                content: Row(
                                                   mainAxisAlignment:
                                                       MainAxisAlignment
-                                                          .spaceBetween,
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
+                                                          .spaceAround,
                                                   children: [
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              1.0),
-                                                      child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          if (product
-                                                                  .discountPrice >
-                                                              0)
-                                                            Stack(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .center,
-                                                              children: [
-                                                                Text(
-                                                                  product
-                                                                      .regularPrice
-                                                                      .toString(),
-                                                                  style: const TextStyle(
-                                                                      fontSize:
-                                                                          11,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      color: Colors
-                                                                          .black),
-                                                                ),
-                                                                Container(
-                                                                  width: 15,
-                                                                  height: 1.5,
-                                                                  color:
-                                                                      mainColor,
-                                                                )
-                                                              ],
-                                                            ),
-                                                          const SizedBox(
-                                                            width: 10,
-                                                          ),
-                                                          if (product
-                                                                  .discountPrice >
-                                                              0)
-                                                            Text(
-                                                              (product.regularPrice -
-                                                                      product
-                                                                          .discountPrice)
-                                                                  .toString(),
-                                                              style: TextStyle(
-                                                                  fontSize: 17,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  color:
-                                                                      mainColor),
-                                                            ),
-                                                          if (product
-                                                                  .discountPrice ==
-                                                              0)
-                                                            Text(
-                                                              product
-                                                                  .regularPrice
-                                                                  .toString(),
-                                                              style: TextStyle(
-                                                                  fontSize: 12,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  color:
-                                                                      mainColor),
-                                                            ),
-                                                        ],
+                                                    ElevatedButton(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Text(
+                                                        'no'.tr,
+                                                        style: const TextStyle(
+                                                            color: Colors.black),
                                                       ),
-                                                    ),
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              4.0),
-                                                      child: SizedBox(
-                                                        width:
-                                                            Get.width * 0.065,
-                                                        height:
-                                                            Get.height * 0.03,
-                                                        child: ElevatedButton(
-                                                          onPressed: () async {
-                                                            if (!product
-                                                                .available) {
-                                                              Get.defaultDialog(
-                                                                  title: "هذا المنتج غير متاح حاليا\nسيتم توفيره قريبا",
-                                                                  content: ElevatedButton(
-                                                                    onPressed: () {
-                                                                      Navigator.pop(context);
-                                                                    },
-                                                                    child: Text(
-                                                                      'رجوع'.tr,
-                                                                      style: const TextStyle(
-                                                                          color: Colors.black),
-                                                                    ),
-                                                                    style: ElevatedButton
-                                                                        .styleFrom(
-                                                                        backgroundColor:
-                                                                        Colors.white,
-                                                                        elevation: 10),
-                                                                  ));
-                                                            } else {
-                                                              final result = await CartService()
-                                                                  .isProductInCart(
-                                                                      product
-                                                                          .id,
-                                                                      FirebaseAuth
-                                                                          .instance
-                                                                          .currentUser!
-                                                                          .uid);
-                                                              // if (result != null && result > 0) {
-                                                              //   // remove snakebar
-
-                                                              //   Get.snackbar(
-                                                              //       'Sorry', 'Product already in cart');
-                                                              // }
-                                                              CartService()
-                                                                  .addToCart(
-                                                                productId:
-                                                                    product.id,
-                                                                productName:
-                                                                    product
-                                                                        .brand,
-                                                                price: product
-                                                                        .regularPrice -
-                                                                    product
-                                                                        .discountPrice,
-                                                                quantity: count,
-                                                                userId: FirebaseAuth
-                                                                    .instance
-                                                                    .currentUser!
-                                                                    .uid,
-                                                                image: product
-                                                                    .images
-                                                                    .first,
-                                                              );
-                                                            }
-                                                          },
-                                                          child: const Center(
-                                                            child: Icon(
-                                                              Icons.add,
-                                                              color:
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                              backgroundColor:
                                                                   Colors.white,
+                                                              elevation: 10),
+                                                    ),
+                                                    ElevatedButton(
+                                                      onPressed: () async {
+                                                        await ProductsService()
+                                                            .deleteProductFromBestSelling(
+                                                                product.id);
+                                                        ProductsService()
+                                                            .deleteProduct(
+                                                                product.id);
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Text('yes'.tr,
+                                                          style: const TextStyle(
+                                                              color:
+                                                                  Colors.white)),
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                              backgroundColor:
+                                                                  Colors.red,
+                                                              elevation: 10),
+                                                    ),
+                                                  ],
+                                                ));
+                                          },
+                                          onTap: () {
+                                            final provider =
+                                                Provider.of<AdminProvider>(
+                                                    context,
+                                                    listen: false);
+                                            // if (provider.isAdmin) {
+                                            Get.to(ProductDetails(
+                                              product: product,
+                                              uniqueId: widget.uniqueId,
+                                            ));
+                                          },
+                                          child: Container(
+                                            height: Get.height * 0.09,
+                                            width: Get.width * 0.4,
+                                            decoration: BoxDecoration(
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.grey,
+                                                    offset:
+                                                        Offset(0.0, 1.0), //(x,y)
+                                                    blurRadius: 6.0,
+                                                  ),
+                                                ],
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(13)),
+                                            child: Column(
+                                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                              //crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(2.0),
+                                                  child: CachedNetworkImage(
+                                                    imageUrl:
+                                                        product.images.first,
+                                                    //fit: BoxFit.fill,
+                                                    imageBuilder: (context,
+                                                            imageProvider) =>
+                                                        Container(
+                                                      //  width: Get.width * .35,
+                                                      height: Get.height * .115,
+                                                      decoration: BoxDecoration(
+                                                          image: DecorationImage(
+                                                        image: imageProvider,
+                                                      )),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(2.0),
+                                                  child: Container(
+                                                    child: Text(
+                                                      textAlign: TextAlign.center,
+                                                      textDirection:
+                                                          TextDirection.rtl,
+                                                      product.title,
+                                                      maxLines: 2,
+                                                      style: const TextStyle(
+                                                          height: .95,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          fontSize: 13,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Colors.black),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(2.0),
+                                                  child: Text(
+                                                    product.brand,
+                                                    maxLines: 2,
+                                                    style: const TextStyle(
+                                                        fontSize: 12,
+                                                        color: Colors.black45),
+                                                  ),
+                                                ),
+                                                Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets.all(
+                                                                1.0),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            if (product
+                                                                    .discountPrice >
+                                                                0)
+                                                              Stack(
+                                                                alignment:
+                                                                    Alignment
+                                                                        .center,
+                                                                children: [
+                                                                  Text(
+                                                                    product
+                                                                        .regularPrice
+                                                                        .toString(),
+                                                                    style: const TextStyle(
+                                                                        fontSize:
+                                                                            10,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .bold,
+                                                                        color: Colors
+                                                                            .black),
+                                                                  ),
+                                                                  Container(
+                                                                    width: 15,
+                                                                    height: 1.5,
+                                                                    color:
+                                                                        mainColor,
+                                                                  )
+                                                                ],
+                                                              ),
+                                                            const SizedBox(
+                                                              width: 10,
                                                             ),
-                                                          ),
-                                                          style: ElevatedButton
-                                                              .styleFrom(
-                                                                  padding:
-                                                                      EdgeInsets
-                                                                          .zero,
-                                                                  backgroundColor:
-                                                                      mainColor),
+                                                            if (product
+                                                                    .discountPrice >
+                                                                0)
+                                                              Text(
+                                                                (product.regularPrice -
+                                                                        product
+                                                                            .discountPrice)
+                                                                    .toString(),
+                                                                style: TextStyle(
+                                                                    fontSize: 17,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color:
+                                                                        mainColor),
+                                                              ),
+                                                            if (product
+                                                                    .discountPrice ==
+                                                                0)
+                                                              Text(
+                                                                product
+                                                                    .regularPrice
+                                                                    .toString(),
+                                                                style: TextStyle(
+                                                                    fontSize: 12,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color:
+                                                                        mainColor),
+                                                              ),
+                                                          ],
                                                         ),
                                                       ),
-                                                    )
-                                                  ])
-                                            ],
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets.all(
+                                                                4.0),
+                                                        child: SizedBox(
+                                                          width:
+                                                              Get.width * 0.065,
+                                                          height:
+                                                              Get.height * 0.03,
+                                                          child: ElevatedButton(
+                                                            onPressed: () async {
+                                                              if (!product
+                                                                  .available) {
+                                                                Get.defaultDialog(
+                                                                    title: "هذا المنتج غير متاح حاليا\nسيتم توفيره قريبا",
+                                                                    content: ElevatedButton(
+                                                                      onPressed: () {
+                                                                        Navigator.pop(context);
+                                                                      },
+                                                                      child: Text(
+                                                                        'رجوع'.tr,
+                                                                        style: const TextStyle(
+                                                                            color: Colors.black),
+                                                                      ),
+                                                                      style: ElevatedButton
+                                                                          .styleFrom(
+                                                                          backgroundColor:
+                                                                          Colors.white,
+                                                                          elevation: 10),
+                                                                    ));
+                                                              } else {
+                                                                final result = await CartService()
+                                                                    .isProductInCart(
+                                                                        product
+                                                                            .id,
+                                                                        FirebaseAuth
+                                                                            .instance
+                                                                            .currentUser!
+                                                                            .uid);
+                                                                // if (result != null && result > 0) {
+                                                                //   // remove snakebar
+
+                                                                //   Get.snackbar(
+                                                                //       'Sorry', 'Product already in cart');
+                                                                // }
+                                                                CartService()
+                                                                    .addToCart(
+                                                                  productId:
+                                                                      product.id,
+                                                                  productName:
+                                                                      product
+                                                                          .brand,
+                                                                  price: product
+                                                                          .regularPrice -
+                                                                      product
+                                                                          .discountPrice,
+                                                                  quantity: count,
+                                                                  userId: FirebaseAuth
+                                                                      .instance
+                                                                      .currentUser!
+                                                                      .uid,
+                                                                  image: product
+                                                                      .images
+                                                                      .first,
+                                                                );
+                                                              }
+                                                            },
+                                                            child: const Center(
+                                                              child: Icon(
+                                                                Icons.add,
+                                                                color:
+                                                                    Colors.white,
+                                                              ),
+                                                            ),
+                                                            style: ElevatedButton
+                                                                .styleFrom(
+                                                                    padding:
+                                                                        EdgeInsets
+                                                                            .zero,
+                                                                    backgroundColor:
+                                                                        mainColor),
+                                                          ),
+                                                        ),
+                                                      )
+                                                    ]),
+                                              ],
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    );
-                                  });
+                                      );
+                                    }),
+                              );
                             }
                             return const Center(
                               child: Text(
@@ -1362,7 +1365,7 @@ class _HomePageState extends State<HomePage> {
 
                         final products = snapshot.data!;
                         return Container(
-                          height: Get.height * .195,
+                          height: Get.height * .21,
                           width: Get.width,
                           child: GridView.builder(
                             reverse: true,
@@ -1372,7 +1375,8 @@ class _HomePageState extends State<HomePage> {
                             shrinkWrap: true,
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
-                                    childAspectRatio: 1.3, crossAxisCount: 1),
+                                    childAspectRatio: 1.25,
+                                    crossAxisCount: 1),
                             itemBuilder: (BuildContext context, int index) {
                               final product = products[index];
                               return Padding(
@@ -1451,7 +1455,7 @@ class _HomePageState extends State<HomePage> {
                                       //crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Padding(
-                                          padding: const EdgeInsets.all(4.0),
+                                          padding: const EdgeInsets.all(2.0),
                                           child: CachedNetworkImage(
                                             imageUrl: product.images.first,
                                             // fit: BoxFit.fill,
@@ -1459,7 +1463,7 @@ class _HomePageState extends State<HomePage> {
                                                 (context, imageProvider) =>
                                                     Container(
                                               width: Get.width * .4,
-                                              height: Get.height * .04,
+                                              height: Get.height * .065,
                                               decoration: BoxDecoration(
                                                   image: DecorationImage(
                                                       image: imageProvider)),
@@ -1663,9 +1667,9 @@ class _HomePageState extends State<HomePage> {
                       margin: EdgeInsets.only(top: 10, right: 15),
                       alignment: Alignment.topRight,
                       child: Text(
-                        'عناصرك المفضلة',
+                        'العروض',
                         style: TextStyle(
-                          fontSize: 19,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                           decoration: TextDecoration.underline,
                         ),
@@ -1692,7 +1696,7 @@ class _HomePageState extends State<HomePage> {
                         }
                         final products = snapshot.data;
                         return Container(
-                          height: Get.height * .195,
+                          height: Get.height * .22,
                           width: Get.width,
                           child: GridView.builder(
                             reverse: true,
@@ -1702,7 +1706,7 @@ class _HomePageState extends State<HomePage> {
                             shrinkWrap: true,
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
-                                    childAspectRatio: 1.3, crossAxisCount: 1),
+                                    childAspectRatio: 1.25, crossAxisCount: 1),
                             itemBuilder: (BuildContext context, int index) {
                               final product = products[index];
                               return Stack(
@@ -1794,7 +1798,7 @@ class _HomePageState extends State<HomePage> {
                                               children: [
                                                 Padding(
                                                   padding:
-                                                      const EdgeInsets.all(4.0),
+                                                      const EdgeInsets.all(2.0),
                                                   child: CachedNetworkImage(
                                                     imageUrl:
                                                         product.images.first,
@@ -1803,7 +1807,7 @@ class _HomePageState extends State<HomePage> {
                                                             imageProvider) =>
                                                         Container(
                                                       width: Get.width * .4,
-                                                      height: Get.height * .04,
+                                                      height: Get.height * .065,
                                                       decoration: BoxDecoration(
                                                           image: DecorationImage(
                                                               image:
@@ -2058,7 +2062,7 @@ class _HomePageState extends State<HomePage> {
                                       },
                                       icon: Icon(product.favorite
                                           ? Icons.favorite_outlined
-                                          : Icons.favorite_outline_outlined),
+                                          : Icons.favorite_outline_outlined,color: Colors.red,),
                                       color: mainColor,
                                     ),
                                   ),

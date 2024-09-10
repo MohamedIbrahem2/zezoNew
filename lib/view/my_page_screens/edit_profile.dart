@@ -52,7 +52,7 @@ class _EditprofileState extends State<Editprofile> {
         nameController.text = userProfile!.name;
         phoneController.text = userProfile!.phone;
         crController.text = userProfile!.cr;
-        vatController.text = userProfile!.vat;
+        vatNumController.text = userProfile!.vatNum;
         emailController.text = FirebaseAuth.instance.currentUser!.email!;
       }
       isLoading = false;
@@ -100,7 +100,7 @@ class _EditprofileState extends State<Editprofile> {
   TextEditingController nameController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController crController = TextEditingController();
-  TextEditingController vatController = TextEditingController();
+  TextEditingController vatNumController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   bool isPhotoLoading = false;
@@ -140,6 +140,10 @@ class _EditprofileState extends State<Editprofile> {
     return Form(
       key: _fromKey,
       child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: true,
+          elevation: 0,
+        ),
         body: isLoading
             ? const Center(
                 child: CircularProgressIndicator(),
@@ -154,7 +158,7 @@ class _EditprofileState extends State<Editprofile> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           SizedBox(
-                            height: Get.height * .07,
+                            height: Get.height * .01,
                           ),
                           Container(
                             alignment: Alignment.center,
@@ -224,6 +228,21 @@ class _EditprofileState extends State<Editprofile> {
                                     obsecure: false,
                                     decoration: InputDecoration(
                                       labelText: 'الاسم'.tr,
+                                      border: const OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.all(Radius.circular(10)),
+                                      ),
+                                    )
+                                    // hint: 'zezo',
+                                    ),
+                                const SizedBox(
+                                  height: 15,
+                                ),
+                                CustomTextForm(
+                                    controller: vatNumController,
+                                    obsecure: false,
+                                    decoration: InputDecoration(
+                                      labelText: 'الرقم الضريبي'.tr,
                                       border: const OutlineInputBorder(
                                         borderRadius:
                                             BorderRadius.all(Radius.circular(10)),
@@ -377,12 +396,13 @@ class _EditprofileState extends State<Editprofile> {
                                       }else{
                                         if (_fromKey.currentState!.validate()) {
                                           authService.updateUserProfile(
+                                            vatNum: vatNumController.text,
                                             userId: FirebaseAuth
                                                 .instance.currentUser!.uid,
                                             name: nameController.text,
                                             phone: phoneController.text,
                                             // cr: crController.text,
-                                            // vat: vatController.text,
+
                                           );
                                           // if (emailController.text.isNotEmpty) {
                                           //   authService

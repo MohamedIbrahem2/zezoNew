@@ -90,6 +90,9 @@ class _AppState extends State<App> {
                   Provider.of<LocalizationProvider>(context).textDirection,
               child: user == null ? const MyHomePage() : const HomeView());
         }),
+        theme: ThemeData(
+
+        ),
       ),
     );
   }
@@ -137,11 +140,13 @@ class AuthService {
   Future<void> createUserProfile({
     required String userId,
     required String name,
+    required String vatNum,
     required String phone,
   }) async {
     try {
       await _firestore.collection('users').doc(userId).set({
         'name': name,
+        'vatNum': vatNum,
         'phone': phone,
       });
     } catch (e) {
@@ -155,7 +160,7 @@ class AuthService {
     required String name,
     required String phone,
     // required String cr,
-    // required String vat,
+     required String vatNum,
   }) async {
     try {
       // show loading
@@ -168,6 +173,7 @@ class AuthService {
       );
       await _firestore.collection('users').doc(userId).update({
         'name': name,
+        'vatNum': vatNum,
         'phone': phone,
         // 'cr': cr,
         // 'vat': vat,
@@ -289,7 +295,7 @@ class Address2 {
 class UserProfile {
   @override
   String toString() {
-    return 'UserProfile(name: $name, phone: $phone, cr: $cr, role: $role, vat: $vat, addresses: $addresses, isAdmin: $isAdmin, email: $email)';
+    return 'UserProfile(name: $name, phone: $phone, cr: $cr, role: $role, vatNum: $vatNum, addresses: $addresses, isAdmin: $isAdmin, email: $email)';
   }
 
   final String? id;
@@ -297,7 +303,7 @@ class UserProfile {
   final String phone;
   final String cr;
   final String? role;
-  final String vat;
+  final String vatNum;
   final String? photo;
   final bool isAdmin;
   final String? email;
@@ -308,7 +314,7 @@ class UserProfile {
       'phone': phone,
       'cr': cr,
       'role': role,
-      'vat': vat,
+      'vatNum': vatNum,
       'photo': photo,
       'isAdmin': isAdmin,
       'email': email,
@@ -326,7 +332,7 @@ class UserProfile {
       this.photo,
       this.id,
       this.role,
-      required this.vat,
+      required this.vatNum,
       required this.addresses,
       this.email,
       this.isAdmin = false});
@@ -340,7 +346,7 @@ class UserProfile {
       role: map['role'],
       email: map['email'],
       cr: map['cr'] ?? '',
-      vat: map['vat'] ?? "",
+      vatNum: map['vatNum'] ?? "",
       photo: map['photo'] ?? '',
       addresses: map['addresses'] == null
           ? []

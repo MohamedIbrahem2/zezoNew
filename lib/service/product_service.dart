@@ -64,7 +64,7 @@ class Product {
       'favorite' : favorite,
       'isbestselling' : isbestselling,
       'regularPrice': regularPrice,
-      'discount': discountPrice,
+      'discountPrice': discountPrice,
       'images': images,
       'brand': brand,
       'description': description,

@@ -48,7 +48,7 @@ class _UnavailableProductState extends State<UnavailableProduct> {
                 child: GridView.builder(
                     gridDelegate:
                     const SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent: 200,
+                        maxCrossAxisExtent: 180,
                         childAspectRatio: .7,
                         crossAxisSpacing: 10,
                         mainAxisSpacing: 10),
@@ -62,7 +62,7 @@ class _UnavailableProductState extends State<UnavailableProduct> {
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Container(
-                            height: Get.height * 0.08,
+                            height: Get.height * 0.06,
                             width: Get.width * 0.4,
                             decoration: BoxDecoration(
                               boxShadow: [
@@ -79,7 +79,7 @@ class _UnavailableProductState extends State<UnavailableProduct> {
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(4.0),
                                   child: Stack(
                                     children: [
                                       Container(
@@ -96,7 +96,7 @@ class _UnavailableProductState extends State<UnavailableProduct> {
                                         ),
                                         child:
                                         SizedBox(
-                                            height: Get.height * 0.2,
+                                            height: Get.height * 0.13,
                                             width: Get.width,
                                             child: Image.network(category.images.first,fit: BoxFit.fill,)),
                                       ),
@@ -108,16 +108,17 @@ class _UnavailableProductState extends State<UnavailableProduct> {
                                 ),
                                 Center(
                                   child: Padding(
-                                    padding: const EdgeInsets.all(5.0),
+                                    padding: const EdgeInsets.all(2.0),
                                     child: Container(
                                       child: Text(
+                                        maxLines: 4,
                                         textAlign: TextAlign.center,
                                         textDirection: TextDirection.rtl,
                                         category.title,
                                         style: const TextStyle(
-                                          height: .5,
+                                         // height: .5,
                                           overflow: TextOverflow.ellipsis,
-                                          fontSize: 13,
+                                          fontSize: 16,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black,
                                         ),

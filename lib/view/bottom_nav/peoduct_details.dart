@@ -442,7 +442,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                       quantity: 0,
                                       productName: product.brand,
                                       image: product.images.first,
-                                      price: product.regularPrice,
+                                      price: product.regularPrice-product.discountPrice,
 
                                       // product: product,
                                     );

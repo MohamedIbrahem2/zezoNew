@@ -10,6 +10,7 @@ import '../../service/subcategory_service.dart';
 import '../../service/upload_image_service.dart';
 
 class EditProduct extends StatefulWidget {
+
   const EditProduct({super.key, required this.product});
   final Product product;
 
@@ -23,14 +24,15 @@ class _EditProductState extends State<EditProduct> {
   final FirebaseStorageService _storageService = FirebaseStorageService();
   final ImagePicker _imagePicker = ImagePicker();
   final nameController = TextEditingController();
-  final priceController = TextEditingController();
-  final deiscountController = TextEditingController();
+  final name2Controller = TextEditingController();
+  var priceController = TextEditingController();
+  var deiscountController = TextEditingController();
   @override
   void initState() {
-    priceController.text = '0';
-    deiscountController.text = '0';
-
-    nameController.text = widget.product.brand;
+    // priceController.text = '0';
+    // deiscountController.text = '0';
+    nameController.text = widget.product.title;
+    name2Controller.text = widget.product.brand;
     priceController.text = widget.product.regularPrice.toString();
     deiscountController.text = widget.product.discountPrice.toString();
     _imageUrl = widget.product.images.first;
@@ -182,6 +184,24 @@ class _EditProductState extends State<EditProduct> {
                       ),
                     ),
                   ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  TextFormField(
+                    controller: name2Controller,
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter products name';
+                      }
+                      return null;
+                    },
+                    decoration: const InputDecoration(
+                      labelText: 'Product Name2',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                    ),
+                  ),
 
                   const SizedBox(
                     height: 20,
@@ -206,8 +226,15 @@ class _EditProductState extends State<EditProduct> {
                     height: 20,
                   ),
                   TextFormField(
-                    keyboardType: TextInputType.number,
                     controller: deiscountController,
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter price';
+                      }
+                      return null;
+                    },
+                    keyboardType: TextInputType.number,
+
                     decoration: const InputDecoration(
                       labelText: 'discount',
                       border: OutlineInputBorder(
@@ -245,10 +272,10 @@ class _EditProductState extends State<EditProduct> {
                             if (_imageUrl.isNotEmpty) {
                               await ProductsService()
                                   .updateProduct(widget.product.copyWith(
-                                brand: nameController.text,
+                                title: nameController.text,
+                                brand: name2Controller.text,
                                 regularPrice: double.parse(priceController.text),
-                                discountPrice:
-                                    double.parse(deiscountController.text),
+                                discountPrice: double.parse(deiscountController.text),
                                 images: [_imageUrl],
                               ));
                               setState(() {
