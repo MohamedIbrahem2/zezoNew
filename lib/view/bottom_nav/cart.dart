@@ -39,7 +39,7 @@ class _Screen2State extends State<Screen2> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Center(child:  Text("العربه",style: TextStyle(color: Colors.white),)),
+        title:  Center(child:  Text("cart".tr,style: TextStyle(color: Colors.white),)),
         backgroundColor: mainColor,
         leading: const BackButton(
           color: Colors.white,
@@ -68,8 +68,8 @@ class _Screen2State extends State<Screen2> {
 
               if (cartItems.isEmpty) {
                 // no item yet go to home page to shop
-                return const Center(
-                  child: Text('لا يوجد منتجات مختاره, اذهب للصفحه الرئيسيه للتسوق',textDirection: TextDirection.rtl,),
+                return  Center(
+                  child: Text('no_products'.tr,textDirection: TextDirection.rtl,),
                 );
               }
 
@@ -185,14 +185,14 @@ class _Screen2State extends State<Screen2> {
                           borderRadius: BorderRadius.circular(25)),
                       width: Get.width,
                       height: Get.height * .07,
-                      child: const Row(
+                      child:  Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.add_shopping_cart,color: Colors.white,),
                           SizedBox(
                             width: 10,
                           ),
-                          Text('اذهب للصفحه الرئيسيه للتسوق الأن',
+                          Text('go_main_screen'.tr,
                             textDirection: TextDirection.rtl
                             ,style: TextStyle(color: Colors.white),)
                         ],
@@ -216,8 +216,8 @@ class _Screen2State extends State<Screen2> {
                   children: [
                     Column(
                       children: [
-                        const Text(
-                          'الكل',
+                         Text(
+                          'all'.tr,
                           textDirection: TextDirection.rtl,
                           style: TextStyle(fontSize: 19, color: Colors.grey),
                         ),
@@ -250,7 +250,7 @@ class _Screen2State extends State<Screen2> {
                                         Navigator.pop(context);
                                       },
                                       child: Text(
-                                        'الرجوع'.tr,
+                                        'go_back'.tr,
                                         style: const TextStyle(
                                             color: Colors.black),
                                       ),
@@ -264,7 +264,7 @@ class _Screen2State extends State<Screen2> {
                                         Navigator.pop(context);
                                         Get.to(const SignIn());
                                       },
-                                      child: Text('تسجيل الدخول'.tr,
+                                      child: Text('login'.tr,
                                           style: const TextStyle(
                                               color: Colors.white)),
                                       style: ElevatedButton.styleFrom(
@@ -283,9 +283,9 @@ class _Screen2State extends State<Screen2> {
                           backgroundColor: mainColor,
                           fixedSize: const Size(150, 45),
                         ),
-                        child: const Text(
+                        child:  Text(
                           textDirection: TextDirection.rtl,
-                          'الدفع',
+                          'checkout'.tr,
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: 17, fontWeight: FontWeight.bold),

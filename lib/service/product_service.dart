@@ -14,6 +14,7 @@ class Product {
   final bool favorite;
   final bool available;
   final List images;
+  final String categoryId;
   Product(
       {
         required this.available,
@@ -26,6 +27,7 @@ class Product {
         required this.title,
         required this.weight,
         required this.id,
+        required this.categoryId,
         required this.regularPrice,
         required this.images,
         required this.discountPrice});
@@ -55,6 +57,7 @@ class Product {
       title: data['title'],
       weight: data['weight'],
       category: 'category',
+      categoryId: 'categoryId'
     );
   }
 
@@ -71,7 +74,8 @@ class Product {
       'stock' : stock,
       'title' : title,
       'weight' : weight,
-      'category': category
+      'category': category,
+      'categoryId' : categoryId
     };
   }
 
@@ -86,7 +90,10 @@ class Product {
     String? description,
     double? stock,
     String? title,
-    String? weight
+    String? weight,
+    String? categoryId,
+    String? category,
+
   }) {
     return Product(
       available: available ?? this.available,
@@ -101,7 +108,8 @@ class Product {
       title: title ?? this.title,
       weight: weight ?? this.weight,
       images: images ?? this.images,
-      category: category,
+      category: category ?? this.category,
+      categoryId: categoryId ?? this.categoryId,
 
     );
   }
@@ -289,18 +297,33 @@ class ProductsService {
       return snapshot.docs.map((doc) => Product.fromSnapshot(doc)).toList();
     });
   }
-
+  bool isArabic(String text) {
+    final arabicRegex = RegExp(r'[\u0600-\u06FF]');
+    return arabicRegex.hasMatch(text);
+  }
   // search for a product
-  Stream<List<Product>> searchForProduct(String? productName) {
+  Stream<List<Product>> searchForProduct(String? productName, String? brandName) {
     final collection = FirebaseFirestore.instance.collection('products');
-    return collection
-        .where('title' , isGreaterThanOrEqualTo: productName)
-        .where('title' , isLessThanOrEqualTo: productName!+ '\uf7ff')
-        .snapshots()
-        .map((snapshot) {
+    Query query = collection;
+
+    // Apply the title range query if the productName is provided
+    if (isArabic(brandName!)) {
+      query = query
+          .where('title', isGreaterThanOrEqualTo: productName)
+          .where('title', isLessThanOrEqualTo: '${productName!}\uf7ff');
+    }
+    else {
+      query = query
+          .where('brand', isGreaterThanOrEqualTo: brandName)
+          .where('brand', isLessThanOrEqualTo: '$brandName\uf7ff');
+    }
+
+    // Return the stream of products based on the dynamic query
+    return query.snapshots().map((snapshot) {
       return snapshot.docs.map((doc) => Product.fromSnapshot(doc)).toList();
     });
   }
+
 
 // update product
   Future<void> updateProduct(

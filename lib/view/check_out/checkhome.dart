@@ -326,9 +326,9 @@ class _CheckHomeState extends State<CheckHome> {
                             ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: const Text(
+                              child:  Text(
                                 textDirection: TextDirection.rtl,
-                                'الأسم :',
+                                "${'name'.tr}:",
                                 style: TextStyle(
                                     fontSize: 18.0,
                                     fontWeight: FontWeight.bold,
@@ -343,9 +343,9 @@ class _CheckHomeState extends State<CheckHome> {
                         child: Container(
                           margin: const EdgeInsets.only(left: 15, top: 30),
                           alignment: Alignment.centerRight,
-                          child: const Text(
+                          child:  Text(
                             textDirection: TextDirection.rtl,
-                            'توصيل الي',
+                            'deliver to'.tr,
                             style: TextStyle(
                                 fontSize: 18.0,
                                 fontWeight: FontWeight.bold,
@@ -426,8 +426,8 @@ class _CheckHomeState extends State<CheckHome> {
                                           selectedAddress!.id ?? '';
                                     },
                                     // controller: addressController,
-                                    decoration: const InputDecoration(
-                                      labelText: 'ادخل العنوان',
+                                    decoration:  InputDecoration(
+                                      labelText: 'select_address'.tr,
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(10)),
@@ -471,9 +471,9 @@ class _CheckHomeState extends State<CheckHome> {
                         child: Container(
                           margin: const EdgeInsets.only(left: 15, top: 30),
                           alignment: Alignment.centerRight,
-                          child: const Text(
+                          child:  Text(
                             textDirection: TextDirection.rtl,
-                            'اختار موعد التوصيل',
+                            'deliver time'.tr,
                             style: TextStyle(
                                 fontSize: 18.0,
                                 fontWeight: FontWeight.bold,
@@ -493,8 +493,8 @@ class _CheckHomeState extends State<CheckHome> {
                                 onTap: () {
                                   _selectDate(context);
                                 },
-                                decoration: const InputDecoration(
-                                  labelText: 'اختار الموعد',
+                                decoration:  InputDecoration(
+                                  labelText: 'choose time'.tr,
                                   border: OutlineInputBorder(
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(10)),
@@ -508,9 +508,9 @@ class _CheckHomeState extends State<CheckHome> {
                         child: Container(
                           margin: const EdgeInsets.only(left: 15, top: 30),
                           alignment: Alignment.centerRight,
-                          child: const Text(
+                          child:  Text(
                             textDirection: TextDirection.rtl,
-                            'أرقام الهاتف',
+                            'phone'.tr,
                             style: TextStyle(
                                 fontSize: 18.0,
                                 fontWeight: FontWeight.bold,
@@ -527,8 +527,8 @@ class _CheckHomeState extends State<CheckHome> {
                               width: Get.width * .6,
                               child: TextFormField(
                                   controller: i,
-                                  decoration: const InputDecoration(
-                                    labelText: 'رقم الهاتف',
+                                  decoration:  InputDecoration(
+                                    labelText: 'phone'.tr,
                                     border: OutlineInputBorder(
                                       borderRadius:
                                           BorderRadius.all(Radius.circular(10)),
@@ -672,15 +672,15 @@ class _CheckHomeState extends State<CheckHome> {
                                     children: [
                                       Text(
                                         textDirection: TextDirection.rtl,
-                                        '$totalQuantityقطع',
+                                        '$totalQuantity${"pieces".tr}',
                                         style:  TextStyle(
                                           fontSize: 17,
                                           color: Colors.grey.shade800,
                                         ),
                                       ),
-                                      const Text(
+                                       Text(
                                         textDirection: TextDirection.rtl,
-                                        'المنتجات',
+                                        'products'.tr,
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
@@ -702,9 +702,9 @@ class _CheckHomeState extends State<CheckHome> {
                                           color: Colors.grey.shade800,
                                         ),
                                       ),
-                                      const Text(
+                                       Text(
                                         textDirection: TextDirection.rtl,
-                                        'المجموع قبل الضريبه',
+                                        'total before tax'.tr,
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
@@ -728,9 +728,9 @@ class _CheckHomeState extends State<CheckHome> {
                                           color: Colors.grey.shade800,
                                         ),
                                       ),
-                                      const Text(
+                                       Text(
                                         textDirection: TextDirection.rtl,
-                                        'ضريبه 15%',
+                                        '15%${"tax".tr}',
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
@@ -753,9 +753,9 @@ class _CheckHomeState extends State<CheckHome> {
                                           color: Colors.grey.shade800,
                                         ),
                                       ),
-                                      const Text(
+                                       Text(
                                         textDirection: TextDirection.rtl,
-                                        'تخفيض',
+                                        'discount'.tr,
                                         style: TextStyle(
                                           fontSize: 16,
 
@@ -779,9 +779,9 @@ class _CheckHomeState extends State<CheckHome> {
                                           color: Colors.grey.shade800,
                                         ),
                                       ),
-                                       const Text(
+                                        Text(
                                         textDirection: TextDirection.rtl,
-                                        'توصيل',
+                                        'deliver'.tr,
                                         style: TextStyle(
                                           fontSize: 16,
 
@@ -806,9 +806,9 @@ class _CheckHomeState extends State<CheckHome> {
                                           color: Colors.grey.shade800,
                                         ),
                                       ),
-                                      const Text(
+                                       Text(
                                         textDirection: TextDirection.rtl,
-                                        'المجموع بالضريبه',
+                                        'total with tax'.tr,
                                         style: TextStyle(
                                           fontSize: 16,
 
@@ -988,7 +988,7 @@ class _CheckHomeState extends State<CheckHome> {
                     // }
 
                     Get.defaultDialog(
-                        title: 'هل تريد تاكيد الطلب ؟',
+                        title: 'confirm order'.tr,
                         content: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
@@ -1010,9 +1010,9 @@ class _CheckHomeState extends State<CheckHome> {
                                               (element) => element.isNotEmpty)
                                           .toList());
                                 },
-                                child: const Text(
+                                child:  Text(
                                   textDirection: TextDirection.rtl,
-                                  'نعم',
+                                  'yes'.tr,
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
@@ -1025,9 +1025,9 @@ class _CheckHomeState extends State<CheckHome> {
                                 onPressed: () {
                                   Navigator.pop(context);
                                 },
-                                child: const Text(
+                                child:  Text(
                                   textDirection: TextDirection.rtl,
-                                  'ألغاء',
+                                  'no'.tr,
                                   style: TextStyle(color: Colors.black),
                                 ))
                           ],
@@ -1038,9 +1038,9 @@ class _CheckHomeState extends State<CheckHome> {
                     width: Get.width,
                     height: 50,
                     color: mainColor,
-                    child: const Text(
+                    child:  Text(
                       textDirection: TextDirection.rtl,
-                      'دفع',
+                      'confirm'.tr,
                       style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,

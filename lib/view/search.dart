@@ -144,7 +144,7 @@ class _SearchState extends State<Search> {
                   width: Get.width,
                   height: Get.height * .83,
                   child: StreamBuilder<List<Product>>(
-                      stream: ProductsService().searchForProduct(searchValue.text) ,
+                      stream: ProductsService().searchForProduct(searchValue.text,searchValue.text) ,
                       builder: (context, snapshot) {
 
                         if (snapshot.hasError) {

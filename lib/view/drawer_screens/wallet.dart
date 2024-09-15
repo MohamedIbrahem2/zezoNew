@@ -19,8 +19,8 @@ class _WalletState extends State<Wallet> {
       appBar: AppBar(
         backgroundColor: mainColor,
         iconTheme: const IconThemeData(color: Colors.black),
-        title: const Text(
-          'Your wallet',
+        title:  Text(
+          'wallet'.tr,
           style: TextStyle(fontSize: 20, color: Colors.white),
         ),
         centerTitle: true,
@@ -55,8 +55,8 @@ class _WalletState extends State<Wallet> {
               height: Get.height * .2,
               color: mainColor,
             ),
-            const Text(
-              'Your points now',
+             Text(
+              'your points'.tr,
               style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -65,8 +65,8 @@ class _WalletState extends State<Wallet> {
             const SizedBox(
               height: 20,
             ),
-            const Text(
-              'Your gift is: ',
+             Text(
+              'your gift'.tr,
               style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -78,8 +78,8 @@ class _WalletState extends State<Wallet> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  'Reach to 1000 points \n      to get your gift',
+                 Text(
+                  'reach'.tr,
                   style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,

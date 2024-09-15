@@ -95,12 +95,14 @@ class _LanguageState extends State<Language> {
             height: Get.height * .08,
           ),
           ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Get.back();
+              },
               style: ElevatedButton.styleFrom(
                   backgroundColor: mainColor,
                   fixedSize: Size.fromWidth(Get.width * .8)),
               child: Text(
-                'Ok'.tr,
+                'ok'.tr,
                 style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,

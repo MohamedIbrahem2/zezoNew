@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -15,8 +16,8 @@ class TechnicalSupport extends StatelessWidget {
         centerTitle: true,
         backgroundColor: mainColor,
         iconTheme: const IconThemeData(color: Colors.black),
-        title: const Text(
-          'Technical Support ',
+        title:  Text(
+          'technical_support'.tr,
           style: TextStyle(color: Colors.white),
         ),
       ),
@@ -29,8 +30,8 @@ class TechnicalSupport extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
-                'Contact us with',
+               Text(
+                'contact_us'.tr,
                 style: TextStyle(
                     fontSize: 19,
                     fontWeight: FontWeight.bold,
@@ -85,11 +86,13 @@ class TechnicalSupport extends StatelessWidget {
                             launch("tel://+0555808297");
                           },
                           child: const Icon(Icons.call)),
-                      const Text(
-                        'الدعم الفني',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
+                       Expanded(
+                         child: Text(
+                          'technical_support'.tr,
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                                               ),
+                       ),
                     ],
                   ),
                 ),
@@ -132,11 +135,13 @@ class TechnicalSupport extends StatelessWidget {
                             launch("tel://+0541297377");
                           },
                           child: const Icon(Icons.call)),
-                      const Text(
-                        'ادارة الحسابات',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
+                       Expanded(
+                         child: Text(
+                          'accounting management'.tr,
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                                               ),
+                       ),
                     ],
                   ),
                 ),
@@ -179,11 +184,13 @@ class TechnicalSupport extends StatelessWidget {
                             launch("tel://+0541297377");
                           },
                           child: const Icon(Icons.call)),
-                      const Text(
-                        'الادارة العامة',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
+                       Expanded(
+                         child: Text(
+                          'general management'.tr,
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                                               ),
+                       ),
                     ],
                   ),
                 ),
@@ -212,11 +219,11 @@ class TechnicalSupport extends StatelessWidget {
                               blurRadius: 3,
                               color: Colors.grey)
                         ]),
-                    child: const Row(
+                    child:  Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Text(
-                          'contact with our salesman',
+                          'contact sales'.tr,
                           style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,

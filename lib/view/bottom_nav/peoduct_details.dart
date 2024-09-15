@@ -46,8 +46,8 @@ class _ProductDetailsState extends State<ProductDetails> {
         centerTitle: true,
         backgroundColor: mainColor,
         iconTheme: const IconThemeData(color: Colors.white),
-        title: const Text(
-          'تفاصيل المنتج',
+        title:  Text(
+          'product details'.tr,
           textDirection: TextDirection.rtl,
           style: TextStyle(color: Colors.white),
         ),
@@ -268,10 +268,10 @@ class _ProductDetailsState extends State<ProductDetails> {
                                   );
                                 }
                               },
-                              child: const Text(
+                              child:  Text(
                                   textDirection: TextDirection.rtl,
                                   style: TextStyle(color: Colors.white),
-                                  "أضافه الي الأعلي مبيعا")),
+                                  "add to bestselling".tr)),
                         ),
                       )
                     : Container(),
@@ -299,10 +299,10 @@ class _ProductDetailsState extends State<ProductDetails> {
                                   );
                                 }
                               },
-                              child: const Text(
+                              child:  Text(
                                   textDirection: TextDirection.rtl,
                                   style: TextStyle(color: Colors.white),
-                                  "حذف من الأعلي مبيعا")),
+                                  "remove from bestselling".tr)),
                         ),
                       )
                     : Container(),
@@ -335,10 +335,10 @@ class _ProductDetailsState extends State<ProductDetails> {
                             );
                           }
                         },
-                        child: const Text(
+                        child:  Text(
                             textDirection: TextDirection.rtl,
                             style: TextStyle(color: Colors.white),
-                            "أضافه الي غير المتاحه")),
+                            "add to unavailable".tr)),
                   ),
                 )
                     : Container(),
@@ -366,10 +366,10 @@ class _ProductDetailsState extends State<ProductDetails> {
                             );
                           }
                         },
-                        child: const Text(
+                        child:  Text(
                             textDirection: TextDirection.rtl,
                             style: TextStyle(color: Colors.white),
-                            "حذف من الغير المتاحه")),
+                            "remove from unavailable".tr)),
                   ),
                 )
                     : Container(),
@@ -411,9 +411,9 @@ class _ProductDetailsState extends State<ProductDetails> {
                               uniqueId: widget.uniqueId,
                             ));
                           },
-                          child: const Text(
+                          child:  Text(
                             textDirection: TextDirection.rtl,
-                            'الذهاب الي عربه التسوق',
+                            'go to cart'.tr,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 16,
@@ -431,7 +431,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                             IconButton(
                                 onPressed: () {
                                   if(!product.available){
-                                    Get.snackbar("لا يمكن اتمام العمليه", "هذا المنتج غير متاح حاليا");
+                                    Get.snackbar("", "unavailable product".tr);
                                   }else{
                                     CartService().addToCart(
                                       productId: product.id,

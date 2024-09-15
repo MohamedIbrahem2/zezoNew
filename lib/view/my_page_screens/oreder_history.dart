@@ -37,8 +37,8 @@ class _OrderHistoryState extends State<OrderHistory> {
       appBar: AppBar(
         backgroundColor: mainColor,
         iconTheme: const IconThemeData(color: Colors.black),
-        title: const Text(
-          'Order history',
+        title:  Text(
+          'orders_history'.tr,
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,

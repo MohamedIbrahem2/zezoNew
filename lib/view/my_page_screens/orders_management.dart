@@ -243,8 +243,8 @@ class _OrderItemState extends State<OrderItem> {
                 children: [
                   Row(
                     children: [
-                      const Text(
-                        'Customer Name: ',
+                       Text(
+                        'customer name'.tr,
                         style: TextStyle(
                             fontSize: 14, fontWeight: FontWeight.w600),
                       ),
@@ -258,8 +258,8 @@ class _OrderItemState extends State<OrderItem> {
                   ),
                   Row(
                     children: [
-                      const Text(
-                        'Customer Email: ',
+                       Text(
+                        'customer email'.tr,
                         style: TextStyle(
                             fontSize: 14, fontWeight: FontWeight.w600),
                       ),
@@ -273,8 +273,8 @@ class _OrderItemState extends State<OrderItem> {
                   ),
                   Row(
                     children: [
-                      const Text(
-                        'Customer Phone: ',
+                       Text(
+                        'customer phone'.tr,
                         style: TextStyle(
                             fontSize: 14, fontWeight: FontWeight.w600),
                       ),
@@ -289,8 +289,8 @@ class _OrderItemState extends State<OrderItem> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Other Phones: ',
+                       Text(
+                        'other phone'.tr,
                         style: TextStyle(
                             fontSize: 14, fontWeight: FontWeight.w600),
                       ),
@@ -310,8 +310,8 @@ class _OrderItemState extends State<OrderItem> {
                   ),
                   Row(
                     children: [
-                      const Text(
-                        'VAT Number: ',
+                       Text(
+                        'vat'.tr,
                         style: TextStyle(
                             fontSize: 14, fontWeight: FontWeight.w600),
                       ),
@@ -327,9 +327,9 @@ class _OrderItemState extends State<OrderItem> {
           const SizedBox(
             height: 20,
           ),
-          const Row(
+           Row(
             children: [
-              Text('Address',
+              Text('address'.tr,
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             ],
           ),
@@ -341,7 +341,7 @@ class _OrderItemState extends State<OrderItem> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Text('Dilivery Date',
+               Text('deliver date'.tr,
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
               Container(
                 padding: const EdgeInsets.all(10),
@@ -365,7 +365,7 @@ class _OrderItemState extends State<OrderItem> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Text('Status',
+               Text('status'.tr,
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
               Container(
                 padding: const EdgeInsets.all(10),
@@ -402,7 +402,7 @@ class _OrderItemState extends State<OrderItem> {
           //   ],
           // ),
           ListTile(
-            title: const Text('Total Quantity'),
+            title:  Text('total quantity'.tr),
             trailing: Text(totalQuantity.toString()),
           ),
           // doted line
@@ -413,20 +413,20 @@ class _OrderItemState extends State<OrderItem> {
             trailing: Text(totalPrice.toString()),
           ),
           ListTile(
-            title: const Text('Discount'),
+            title:  Text('discount'.tr),
             trailing: Text(discount.toString()),
           ),
           ListTile(
-            title: const Text('Total'),
+            title:  Text('total'.tr),
             trailing: Text((totalPrice - discount).toStringAsFixed(2)),
           ),
           ListTile(
-            title: const Text('Order Date'),
+            title:  Text('order date'.tr),
             trailing: Text(formatDate(widget.order.orderDate)),
           ),
           if (widget.order.invoiceNumber != null)
             ListTile(
-              title: const Text('Invoice Number'),
+              title:  Text('invoice number'.tr),
               trailing: Text(widget.order.invoiceNumber!),
             ),
           Row(
@@ -470,7 +470,7 @@ class _OrderItemState extends State<OrderItem> {
                           .read<OrdersManagementProvider>()
                           .cancelOrder(order.id);
                     },
-                    child: const Text('Cancel Order',style: TextStyle(color: Colors.black),))
+                    child:  Text('cancel'.tr,style: TextStyle(color: Colors.black),))
             ],
           ),
         ],

@@ -29,7 +29,7 @@ class _AdminsPageState extends State<AdminsPage> {
         child: const Icon(Icons.add),
       ),
       appBar: AppBar(
-        title: const Text('Admins'),
+        title:  Text('admins'.tr),
       ),
       body: Center(
         child: Column(

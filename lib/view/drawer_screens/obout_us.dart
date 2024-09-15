@@ -11,8 +11,8 @@ class AboutUs extends StatelessWidget {
         centerTitle: true,
         backgroundColor: Colors.blue.shade50,
         iconTheme: const IconThemeData(color: Colors.black),
-        title: const Text(
-          'About us',
+        title:  Text(
+          'who_we_are'.tr,
           style: TextStyle(color: Colors.black),
         ),
       ),

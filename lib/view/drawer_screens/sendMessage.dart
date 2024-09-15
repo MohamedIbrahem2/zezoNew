@@ -48,7 +48,7 @@ class _SendMessageState extends State<SendMessage> {
         appBar: AppBar(
           backgroundColor: mainColor,
           iconTheme: const IconThemeData(color: Colors.white),
-          title: const Text('أٍرسال رساله',textDirection: TextDirection.rtl,style: TextStyle(color: Colors.white),),
+          title:  Text('send_message'.tr,textDirection: TextDirection.rtl,style: TextStyle(color: Colors.white),),
         ),
         body: SingleChildScrollView(
           child: Column(
@@ -66,8 +66,8 @@ class _SendMessageState extends State<SendMessage> {
                           }
                           return null;
                         },
-                        decoration: const InputDecoration(
-                          labelText: 'عنوان الرساله',
+                        decoration:  InputDecoration(
+                          labelText: 'title'.tr,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(10)),
                           ),
@@ -89,8 +89,8 @@ class _SendMessageState extends State<SendMessage> {
                       }
                       return null;
                     },
-                    decoration: const InputDecoration(
-                      labelText: 'محتوي الرساله',
+                    decoration:  InputDecoration(
+                      labelText: 'body'.tr,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(10)),
                       ),
@@ -105,7 +105,7 @@ class _SendMessageState extends State<SendMessage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: mainColor
                   ),
-                  child: const Text("أرسل الرساله",textDirection: TextDirection.rtl,style: TextStyle(color: Colors.white),))
+                  child:  Text("send_message".tr,textDirection: TextDirection.rtl,style: TextStyle(color: Colors.white),))
             ],
           ),
           ),

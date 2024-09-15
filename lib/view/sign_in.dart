@@ -167,8 +167,8 @@ class _SignInState extends State<SignIn> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    const Text(
-                                      'أهلا بعودتك !',
+                                     Text(
+                                      'welcome'.tr,
                                       style: TextStyle(
                                           fontSize: 25,
                                           fontWeight: FontWeight.w500,
@@ -182,8 +182,8 @@ class _SignInState extends State<SignIn> {
                                 ),
                                 Container(
                                   alignment: Alignment.topRight,
-                                  child: const Text(
-                                    'سجل دخولك للاستمرار',
+                                  child:  Text(
+                                    'login to go'.tr,
                                     style: TextStyle(
                                         fontSize: 19,
                                         fontWeight: FontWeight.w300,
@@ -198,7 +198,7 @@ class _SignInState extends State<SignIn> {
                                     controller.email = value;
                                   },
                                   decoration:  InputDecoration(
-                                    labelText: 'البريد الالكتروني',
+                                    labelText: 'email'.tr,
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(10),
                                       borderSide: BorderSide(
@@ -233,7 +233,7 @@ class _SignInState extends State<SignIn> {
                                     controller.password = value;
                                   },
                                   decoration:  InputDecoration(
-                                    labelText: 'الرقم السري',
+                                    labelText: 'password'.tr,
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(10),
                                       borderSide: BorderSide(
@@ -270,8 +270,8 @@ class _SignInState extends State<SignIn> {
                                   },
                                   child: Container(
                                     alignment: Alignment.topRight,
-                                    child: const Text(
-                                      'هل نسيت كلمة السر؟',
+                                    child:  Text(
+                                      'forget password'.tr,
                                       style: TextStyle(
                                           fontSize: 17,
                                           fontWeight: FontWeight.w700,
@@ -301,7 +301,7 @@ class _SignInState extends State<SignIn> {
                                         backgroundColor: mainColor,
                                         fixedSize:
                                             Size.fromWidth(Get.width * .8)),
-                                    child: const Text('تسجيل الدخول',style: TextStyle(color: Colors.white,fontSize: 18
+                                    child:  Text('login'.tr,style: TextStyle(color: Colors.white,fontSize: 18
                                     ,fontWeight: FontWeight.bold
                                     ),))
                               ],
@@ -309,7 +309,7 @@ class _SignInState extends State<SignIn> {
                           ),
                         ),
                       ),
-                      Text('-او سجل باستخدام-',style: TextStyle(color: Colors.black,fontSize: 17
+                      Text('or login'.tr,style: TextStyle(color: Colors.black,fontSize: 17
                           ,fontWeight: FontWeight.bold
                       ),),
                       SizedBox(
@@ -361,8 +361,8 @@ class _SignInState extends State<SignIn> {
                             backgroundColor: Colors.black,
                             fixedSize: Size.fromWidth(Get.width*.8)
                           ),
-                          child: const Text(
-                            'هل انت مستخدم جديد؟',
+                          child:  Text(
+                            'new user'.tr,
                             style: TextStyle(color: Colors.white
                             ,
                             ),

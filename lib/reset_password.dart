@@ -20,7 +20,7 @@ class ResetPasswordView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text('إعادة تعيين كلمة السر'),
+        title:  Text('Reset Password'.tr),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -31,8 +31,8 @@ class ResetPasswordView extends StatelessWidget {
               SizedBox(height: 50,),
               TextFormField(
                 controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: 'البريد الالكتروني',
+                decoration:  InputDecoration(
+                  labelText: 'email'.tr,
                 ),
               ),
               const SizedBox(
@@ -45,8 +45,7 @@ class ResetPasswordView extends StatelessWidget {
                   onPressed: () async {
                     if(FirebaseAuth.instance.currentUser == null){
                       Get.defaultDialog(
-                          title: "لا يمكن اتمام العمليه\n"
-                              "يجب تسجيل الدخول",
+                          title: "please_login".tr,
                           content: Row(
                             mainAxisAlignment:
                             MainAxisAlignment.spaceAround,
@@ -56,7 +55,7 @@ class ResetPasswordView extends StatelessWidget {
                                   Navigator.pop(context);
                                 },
                                 child: Text(
-                                  'الرجوع'.tr,
+                                  'go_back'.tr,
                                   style: const TextStyle(
                                       color: Colors.black),
                                 ),
@@ -70,7 +69,7 @@ class ResetPasswordView extends StatelessWidget {
                                   Navigator.pop(context);
                                   Get.to(const SignIn());
                                 },
-                                child: Text('تسجيل الدخول'.tr,
+                                child: Text('login'.tr,
                                     style: const TextStyle(
                                         color: Colors.white)),
                                 style: ElevatedButton.styleFrom(
@@ -86,7 +85,7 @@ class ResetPasswordView extends StatelessWidget {
                     }
 
                   },
-                  child: const Text('اعاده تعيين كلمه السر',style: TextStyle(
+                  child:  Text('Reset Password'.tr,style: TextStyle(
                     color: Colors.white
                   ),),
                 ),

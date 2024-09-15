@@ -163,7 +163,7 @@ class _EditprofileState extends State<Editprofile> {
                           Container(
                             alignment: Alignment.center,
                             child: Text(
-                              'تعديل الملف الشخصي'.tr,
+                              'Edit Profile'.tr,
                               style:  TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
@@ -227,7 +227,7 @@ class _EditprofileState extends State<Editprofile> {
                                     controller: nameController,
                                     obsecure: false,
                                     decoration: InputDecoration(
-                                      labelText: 'الاسم'.tr,
+                                      labelText: 'name'.tr,
                                       border: const OutlineInputBorder(
                                         borderRadius:
                                             BorderRadius.all(Radius.circular(10)),
@@ -242,7 +242,7 @@ class _EditprofileState extends State<Editprofile> {
                                     controller: vatNumController,
                                     obsecure: false,
                                     decoration: InputDecoration(
-                                      labelText: 'الرقم الضريبي'.tr,
+                                      labelText: 'tax number'.tr,
                                       border: const OutlineInputBorder(
                                         borderRadius:
                                             BorderRadius.all(Radius.circular(10)),
@@ -267,7 +267,7 @@ class _EditprofileState extends State<Editprofile> {
                                   controller: phoneController,
                                   obsecure: false,
                                   decoration: InputDecoration(
-                                    labelText: 'رقم الهاتف'.tr,
+                                    labelText: 'phone'.tr,
                                     border: const OutlineInputBorder(
                                       borderRadius:
                                           BorderRadius.all(Radius.circular(10)),
@@ -305,7 +305,7 @@ class _EditprofileState extends State<Editprofile> {
                                   controller: emailController,
                                   obsecure: false,
                                   decoration: InputDecoration(
-                                    labelText: 'البريد الالكتروني'.tr,
+                                    labelText: 'email'.tr,
                                     border: const OutlineInputBorder(
                                       borderRadius:
                                           BorderRadius.all(Radius.circular(10)),
@@ -358,8 +358,7 @@ class _EditprofileState extends State<Editprofile> {
                                     onPressed: () async {
                                       if(FirebaseAuth.instance.currentUser == null){
                                         Get.defaultDialog(
-                                            title: "لا يمكن اتمام العمليه\n"
-                                                "يجب تسجيل الدخول",
+                                            title: "please_login".tr,
                                             content: Row(
                                               mainAxisAlignment:
                                               MainAxisAlignment.spaceAround,
@@ -369,7 +368,7 @@ class _EditprofileState extends State<Editprofile> {
                                                     Navigator.pop(context);
                                                   },
                                                   child: Text(
-                                                    'الرجوع'.tr,
+                                                    'go_back'.tr,
                                                     style: const TextStyle(
                                                         color: Colors.black),
                                                   ),
@@ -384,7 +383,7 @@ class _EditprofileState extends State<Editprofile> {
                                                     Get.to(const SignIn());
 
                                                   },
-                                                  child: Text('تسجيل الدخول'.tr,
+                                                  child: Text('login'.tr,
                                                       style: const TextStyle(
                                                           color: Colors.white)),
                                                   style: ElevatedButton.styleFrom(
@@ -417,8 +416,8 @@ class _EditprofileState extends State<Editprofile> {
                                         backgroundColor: mainColor,
                                         fixedSize:
                                             Size.fromWidth(Get.width * .8)),
-                                    child: const Text(
-                                      'تعديل',
+                                    child:  Text(
+                                      'edit'.tr,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 20,color: Colors.white),

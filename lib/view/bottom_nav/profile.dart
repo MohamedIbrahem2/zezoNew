@@ -142,7 +142,7 @@ class _SettingsState extends State<Settings> {
                             FirebaseAuth.instance.currentUser != null
                                 ? FirebaseAuth.instance.currentUser!.email!
                                     .toString()
-                                : "لا يوجد بريد الكتروني",
+                                : "no email".tr,
                             style: TextStyle(fontSize: 15, color: mainColor),
                           ),
 
@@ -159,11 +159,11 @@ class _SettingsState extends State<Settings> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "الرقم الضريبي:  ",
+                    "tax number".tr,
                     style: TextStyle(fontSize: 16, color: Colors.black),
                   ),
                   Text(
-                    data['vatNum']==null?  'لا يوجد رقم ضريبي':data['vatNum'].toString(),
+                    data['vatNum']==null?  'no tax number'.tr:data['vatNum'].toString(),
                     style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 19,
@@ -183,7 +183,7 @@ class _SettingsState extends State<Settings> {
                   )));
                 },
                 child: customListTile(
-                    icon: Icons.edit, title: 'تعديل الملف الشخصي'.tr),
+                    icon: Icons.edit, title: 'Edit Profile'.tr),
               ),
 
               // reset password
@@ -193,7 +193,7 @@ class _SettingsState extends State<Settings> {
                 },
                 child: customListTile(
                     icon: Icons.lock_outline,
-                    title: 'إعادة تعيين كلمة السر'.tr),
+                    title: 'Reset Password'.tr),
               ),
               GestureDetector(
                 onTap: () {
@@ -203,20 +203,20 @@ class _SettingsState extends State<Settings> {
                 },
                 child: customListTile(
                     icon: Icons.location_on_outlined,
-                    title: 'عنوان التوصيل'.tr),
+                    title: 'shipping_address'.tr),
               ),
 
               GestureDetector(
                 onTap: () {
                   if (FirebaseAuth.instance.currentUser == null) {
-                    Get.snackbar("لا يمكن اتمام العمليه",
-                        "لأتمام العمليه يجب تسجيل الدخول");
+                    Get.snackbar("",
+                        "please_login".tr);
                     Get.to(const SignIn());
                   } else {
                     Get.to(const OrderHistory());
                   }
                 },
-                child: customListTile(icon: Icons.history, title: 'طلباتي'.tr),
+                child: customListTile(icon: Icons.history, title: 'Order History'.tr),
               ),
               // GestureDetector(
               //   onTap: () {
@@ -228,8 +228,8 @@ class _SettingsState extends State<Settings> {
               GestureDetector(
                 onTap: () {
                   if (FirebaseAuth.instance.currentUser == null) {
-                    Get.snackbar("لا يمكن اتمام العمليه",
-                        "لأتمام العمليه يجب تسجيل الدخول");
+                    Get.snackbar("",
+                        "please_login".tr);
                     Get.to(const SignIn());
                   } else {
                     Get.to(NotificationsPage(
@@ -238,13 +238,13 @@ class _SettingsState extends State<Settings> {
                 },
                 child: customListTile(
                     icon: Icons.notification_important_outlined,
-                    title: 'الاشعارات'.tr),
+                    title: 'notifications'.tr),
               ),
               GestureDetector(
                 onTap: () {
                   if (FirebaseAuth.instance.currentUser == null) {
-                    Get.snackbar("لا يمكن اتمام العمليه",
-                        "لأتمام العمليه يجب تسجيل الدخول");
+                    Get.snackbar("",
+                        "please_login".tr);
                     Get.to(const SignIn());
                   } else {
                     Get.defaultDialog(
@@ -277,7 +277,7 @@ class _SettingsState extends State<Settings> {
                   }
                 },
                 child: customListTile(
-                    icon: Icons.logout, title: 'تسجيل الخروج'.tr),
+                    icon: Icons.logout, title: 'logout'.tr),
               ),
             ],
           ),

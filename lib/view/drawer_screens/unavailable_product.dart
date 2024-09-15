@@ -26,7 +26,7 @@ class _UnavailableProductState extends State<UnavailableProduct> {
         appBar: AppBar(
           iconTheme: const IconThemeData(color: Colors.black),
           backgroundColor: Colors.transparent,
-          title: const Text("المنتجات الغير متاحه"),
+          title:  Text("unavailable_products".tr),
           centerTitle: true,
         ),
         body: StreamBuilder<List<Product>>(
@@ -49,7 +49,7 @@ class _UnavailableProductState extends State<UnavailableProduct> {
                     gridDelegate:
                     const SliverGridDelegateWithMaxCrossAxisExtent(
                         maxCrossAxisExtent: 180,
-                        childAspectRatio: .7,
+                        childAspectRatio: .5,
                         crossAxisSpacing: 10,
                         mainAxisSpacing: 10),
                     itemCount: categories.length,
@@ -62,7 +62,7 @@ class _UnavailableProductState extends State<UnavailableProduct> {
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Container(
-                            height: Get.height * 0.06,
+                            height: Get.height * 0.08,
                             width: Get.width * 0.4,
                             decoration: BoxDecoration(
                               boxShadow: [

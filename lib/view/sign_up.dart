@@ -62,8 +62,8 @@ class SignUp extends GetWidget<AuthViewModel> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
-                                'أهلا بك !',
+                               Text(
+                                'welcome new'.tr,
                                 style: TextStyle(
                                     fontSize: 30,
                                     fontWeight: FontWeight.w500,
@@ -77,8 +77,8 @@ class SignUp extends GetWidget<AuthViewModel> {
                           ),
                           Container(
                             alignment: Alignment.topRight,
-                            child: const Text(
-                              'أنشأ حسابك للاستمرار',
+                            child:  Text(
+                              'new acc'.tr,
                               style: TextStyle(
                                   fontSize: 17,
                                   fontWeight: FontWeight.w300,
@@ -94,7 +94,7 @@ class SignUp extends GetWidget<AuthViewModel> {
                               controller.name = value;
                             },
                             decoration:  InputDecoration(
-                              labelText: 'الاسم',
+                              labelText: 'name'.tr,
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                                 borderSide: BorderSide(
@@ -126,7 +126,7 @@ class SignUp extends GetWidget<AuthViewModel> {
                               controller.vatNum = value;
                             },
                             decoration:  InputDecoration(
-                              labelText: 'الرقم الضريبي (إختياري!)',
+                              labelText: 'tax number'.tr,
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                                 borderSide: BorderSide(
@@ -147,7 +147,7 @@ class SignUp extends GetWidget<AuthViewModel> {
                           IntlPhoneField(
                             controller: phone,
                             decoration:  InputDecoration(
-                              labelText: 'رقم الهاتف',
+                              labelText: 'phone'.tr,
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                                 borderSide: BorderSide(
@@ -203,7 +203,7 @@ class SignUp extends GetWidget<AuthViewModel> {
                               controller.email = value;
                             },
                             decoration:  InputDecoration(
-                              labelText: 'البريد الالكتروني',
+                              labelText: 'email'.tr,
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                                 borderSide: BorderSide(
@@ -240,7 +240,7 @@ class SignUp extends GetWidget<AuthViewModel> {
                               controller.password = value;
                             },
                             decoration:  InputDecoration(
-                              labelText: 'الرقم السري',
+                              labelText: 'password'.tr,
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                                 borderSide: BorderSide(
@@ -283,7 +283,7 @@ class SignUp extends GetWidget<AuthViewModel> {
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: mainColor,
                                   fixedSize: Size.fromWidth(Get.width * .8)),
-                              child: const Text('إنشاء حساب',style: TextStyle(color: Colors.white,fontSize: 18,
+                              child:  Text('register'.tr,style: TextStyle(color: Colors.white,fontSize: 18,
                               fontWeight: FontWeight.bold
                               ),))
                         ],
@@ -301,7 +301,7 @@ class SignUp extends GetWidget<AuthViewModel> {
                         fixedSize: Size.fromWidth(Get.width*.8),
                         backgroundColor: Colors.black,
                       ),
-                      child: const Text('هل لديك حساب بالفعل؟',style: TextStyle(color: Colors.white),))
+                      child:  Text('current user'.tr,style: TextStyle(color: Colors.white),))
                 ],
               ),
             ),

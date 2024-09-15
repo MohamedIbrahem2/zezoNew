@@ -93,7 +93,7 @@ class _EditProductState extends State<EditProduct> {
 
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Edit Product'),
+          title:  Text('edit product'.tr),
         ),
         body: Form(
           key: _fromKey,
@@ -177,8 +177,8 @@ class _EditProductState extends State<EditProduct> {
                       }
                       return null;
                     },
-                    decoration: const InputDecoration(
-                      labelText: 'Product Name',
+                    decoration:  InputDecoration(
+                      labelText: 'product name'.tr,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(10)),
                       ),
@@ -195,8 +195,8 @@ class _EditProductState extends State<EditProduct> {
                       }
                       return null;
                     },
-                    decoration: const InputDecoration(
-                      labelText: 'Product Name2',
+                    decoration:  InputDecoration(
+                      labelText: 'product name'.tr,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(10)),
                       ),
@@ -215,8 +215,8 @@ class _EditProductState extends State<EditProduct> {
                       }
                       return null;
                     },
-                    decoration: const InputDecoration(
-                      labelText: 'Price',
+                    decoration:  InputDecoration(
+                      labelText: 'price'.tr,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(10)),
                       ),
@@ -235,8 +235,8 @@ class _EditProductState extends State<EditProduct> {
                     },
                     keyboardType: TextInputType.number,
 
-                    decoration: const InputDecoration(
-                      labelText: 'discount',
+                    decoration:  InputDecoration(
+                      labelText: 'discount'.tr,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(10)),
                       ),
@@ -277,6 +277,7 @@ class _EditProductState extends State<EditProduct> {
                                 regularPrice: double.parse(priceController.text),
                                 discountPrice: double.parse(deiscountController.text),
                                 images: [_imageUrl],
+                                categoryId: category!.id
                               ));
                               setState(() {
                                 isLoading = false;
@@ -293,7 +294,7 @@ class _EditProductState extends State<EditProduct> {
                           }
                         }
                       },
-                      child: const Text('Update Category'),
+                      child:  Text('update category'.tr),
                     ),
                 ],
               ),
