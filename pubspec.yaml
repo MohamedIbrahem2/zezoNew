@@ -59,7 +59,7 @@ dependencies:
   http: ^1.2.1
   overlay_support: ^2.1.0
   font_awesome_flutter: ^10.4.0
-  intl: ^0.18.1
+  intl:
   qr_flutter: ^4.1.0
   path: ^1.8.3
   path_provider: ^2.1.1
@@ -77,7 +77,7 @@ dependencies:
   googleapis_auth: ^1.6.0
   firebase_app_check: ^0.3.0+5
   flutter_local_notifications: ^17.2.2
-  win32: null
+  win32:
   icons_plus: ^5.0.0
 
 dev_dependencies:
