@@ -79,6 +79,7 @@ dependencies:
   flutter_local_notifications: ^17.2.2
   win32:
   icons_plus: ^5.0.0
+  change_app_package_name: ^1.4.0
 
 dev_dependencies:
   flutter_test:
@@ -136,7 +137,7 @@ flutter:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "images/logo_zezo.png"
+  image_path: "images/logo zezopng.png"
   min_sdk_android: 21
 flutter_native_splash:
   # This package generates native code to customize Flutter's default white native splash screen
@@ -188,7 +189,7 @@ flutter_native_splash:
   # 640 pixels in diameter.
   # App icon without an icon background: This should be 1152×1152 pixels, and fit within a circle
   # 768 pixels in diameter.
-  image: images/logo_zezo.png
+  image: images/logo zezopng.png
 
   # Splash screen background color.
   color: "#ffffff"
@@ -200,7 +201,7 @@ flutter_native_splash:
   # The image_dark, color_dark, icon_background_color_dark, and branding_dark set values that
   # apply when the device is in dark mode. If they are not specified, the app will use the
   # parameters from above.
-  image_dark: images/logo_zezo.png
+  image_dark: images/logo zezopng.png
   color_dark: "#000000"
   #icon_background_color_dark: "#eeeeee"
   # The android, ios and web parameters can be used to disable generating a splash screen on a given

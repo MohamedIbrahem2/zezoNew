@@ -114,7 +114,7 @@ class _CheckHomeState extends State<CheckHome> {
               appBar: AppBar(
                 centerTitle: true,
                 backgroundColor: mainColor,
-                iconTheme:  const IconThemeData(color: Colors.white),
+                iconTheme: const IconThemeData(color: Colors.white),
                 title: const Text(
                   textDirection: TextDirection.rtl,
                   'الدفع',
@@ -126,19 +126,22 @@ class _CheckHomeState extends State<CheckHome> {
                   alignment: Alignment.center,
                   child: Column(
                     children: [
-                       SizedBox(
+                      SizedBox(
                         height: Get.height * .03,
                       ),
                       // cart items
                       SizedBox(
-                        height: Get.height  * .16,
+                        height: Get.height * .16,
                         child: StreamBuilder<List<CartItem>>(
                             stream: CartService().getCartItems(
                                 FirebaseAuth.instance.currentUser!.uid),
                             builder: (context, snapshot) {
                               if (snapshot.hasError) {
                                 return const Center(
-                                  child: Text('حدث خطأ ما',textDirection: TextDirection.rtl,),
+                                  child: Text(
+                                    'حدث خطأ ما',
+                                    textDirection: TextDirection.rtl,
+                                  ),
                                 );
                               }
                               if (snapshot.connectionState ==
@@ -149,7 +152,10 @@ class _CheckHomeState extends State<CheckHome> {
                               }
                               if (snapshot.data!.isEmpty) {
                                 return const Center(
-                                  child: Text('لا يوجد منتجات في عربة التسوق',textDirection: TextDirection.rtl,),
+                                  child: Text(
+                                    'لا يوجد منتجات في عربة التسوق',
+                                    textDirection: TextDirection.rtl,
+                                  ),
                                 );
                               }
                               final quantity = (snapshot.data == null ||
@@ -215,7 +221,7 @@ class _CheckHomeState extends State<CheckHome> {
                                                 (item.quantity * item.price)
                                                         .toString() +
                                                     ' SR',
-                                                style:  TextStyle(
+                                                style: TextStyle(
                                                     fontSize: 20.0,
                                                     fontWeight: FontWeight.bold,
                                                     color: mainColor),
@@ -237,7 +243,7 @@ class _CheckHomeState extends State<CheckHome> {
                                                         .removeCartItem(
                                                             item.id);
                                                   },
-                                                  child:  Icon(
+                                                  child: Icon(
                                                     Icons.delete,
                                                     color: mainColor,
                                                   ),
@@ -260,7 +266,8 @@ class _CheckHomeState extends State<CheckHome> {
                                                             .updateCartItemQuantity(
                                                                 item.id,
                                                                 item.quantity +
-                                                                    1,item.quantity);
+                                                                    1,
+                                                                item.quantity);
                                                       },
                                                     ),
                                                     Text(item.quantity
@@ -278,7 +285,8 @@ class _CheckHomeState extends State<CheckHome> {
                                                               .updateCartItemQuantity(
                                                                   item.id,
                                                                   item.quantity -
-                                                                      1,item.quantity);
+                                                                      1,
+                                                                  item.quantity);
                                                         },
                                                         child: const Icon(Icons
                                                             .remove_outlined))
@@ -326,7 +334,7 @@ class _CheckHomeState extends State<CheckHome> {
                             ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child:  Text(
+                              child: Text(
                                 textDirection: TextDirection.rtl,
                                 "${'name'.tr}:",
                                 style: TextStyle(
@@ -343,7 +351,7 @@ class _CheckHomeState extends State<CheckHome> {
                         child: Container(
                           margin: const EdgeInsets.only(left: 15, top: 30),
                           alignment: Alignment.centerRight,
-                          child:  Text(
+                          child: Text(
                             textDirection: TextDirection.rtl,
                             'deliver to'.tr,
                             style: TextStyle(
@@ -368,35 +376,34 @@ class _CheckHomeState extends State<CheckHome> {
                                     return Container(
                                         padding: const EdgeInsets.all(10),
                                         decoration: BoxDecoration(
-                                            color:
-                                                mainColor,
+                                            color: mainColor,
                                             borderRadius:
                                                 BorderRadius.circular(10),
                                             border:
                                                 Border.all(color: Colors.grey)),
                                         child: Row(
                                           children: [
-
                                             GestureDetector(
                                               onTap: () {
-                                                Get.to(AddressesPage(uniqueId: widget.unique,));
+                                                Get.to(AddressesPage(
+                                                  uniqueId: widget.unique,
+                                                ));
                                               },
                                               child: const Icon(
                                                 Icons.add,
                                                 color: Colors.white,
                                               ),
                                             ),
-                                             SizedBox(
-                                              width:Get.width * .04,
+                                            SizedBox(
+                                              width: Get.width * .04,
                                             ),
                                             const Text(
                                               textDirection: TextDirection.rtl,
                                               'لا يوجد عنوان, قم بأضافه عنوان',
                                               style: TextStyle(
-                                                fontSize: 11,
+                                                  fontSize: 11,
                                                   color: Colors.white),
                                             ),
-
                                           ],
                                         ));
                                   }
@@ -426,7 +433,7 @@ class _CheckHomeState extends State<CheckHome> {
                                           selectedAddress!.id ?? '';
                                     },
                                     // controller: addressController,
-                                    decoration:  InputDecoration(
+                                    decoration: InputDecoration(
                                       labelText: 'select_address'.tr,
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.all(
@@ -471,7 +478,7 @@ class _CheckHomeState extends State<CheckHome> {
                         child: Container(
                           margin: const EdgeInsets.only(left: 15, top: 30),
                           alignment: Alignment.centerRight,
-                          child:  Text(
+                          child: Text(
                             textDirection: TextDirection.rtl,
                             'deliver time'.tr,
                             style: TextStyle(
@@ -493,7 +500,7 @@ class _CheckHomeState extends State<CheckHome> {
                                 onTap: () {
                                   _selectDate(context);
                                 },
-                                decoration:  InputDecoration(
+                                decoration: InputDecoration(
                                   labelText: 'choose time'.tr,
                                   border: OutlineInputBorder(
                                     borderRadius:
@@ -508,7 +515,7 @@ class _CheckHomeState extends State<CheckHome> {
                         child: Container(
                           margin: const EdgeInsets.only(left: 15, top: 30),
                           alignment: Alignment.centerRight,
-                          child:  Text(
+                          child: Text(
                             textDirection: TextDirection.rtl,
                             'phone'.tr,
                             style: TextStyle(
@@ -527,7 +534,7 @@ class _CheckHomeState extends State<CheckHome> {
                               width: Get.width * .6,
                               child: TextFormField(
                                   controller: i,
-                                  decoration:  InputDecoration(
+                                  decoration: InputDecoration(
                                     labelText: 'phone'.tr,
                                     border: OutlineInputBorder(
                                       borderRadius:
@@ -546,7 +553,7 @@ class _CheckHomeState extends State<CheckHome> {
                                     .add(TextEditingController());
                                 setState(() {});
                               },
-                              icon:  Icon(
+                              icon: Icon(
                                 Icons.add,
                                 color: mainColor,
                               )),
@@ -644,7 +651,8 @@ class _CheckHomeState extends State<CheckHome> {
                               totalQuantity += item.quantity;
                               totalPrice += item.price * item.quantity;
                             }
-                            double totalBeforeTax = totalPrice - (totalPrice * .15).floor();
+                            double totalBeforeTax =
+                                totalPrice - (totalPrice * .15).floor();
 
                             return Container(
                               padding: const EdgeInsets.all(10),
@@ -673,12 +681,12 @@ class _CheckHomeState extends State<CheckHome> {
                                       Text(
                                         textDirection: TextDirection.rtl,
                                         '$totalQuantity${"pieces".tr}',
-                                        style:  TextStyle(
+                                        style: TextStyle(
                                           fontSize: 17,
                                           color: Colors.grey.shade800,
                                         ),
                                       ),
-                                       Text(
+                                      Text(
                                         textDirection: TextDirection.rtl,
                                         'products'.tr,
                                         style: TextStyle(
@@ -693,23 +701,21 @@ class _CheckHomeState extends State<CheckHome> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-
                                       Text(
                                         textDirection: TextDirection.rtl,
                                         '$totalBeforeTax SR',
-                                        style:  TextStyle(
+                                        style: TextStyle(
                                           fontSize: 17,
                                           color: Colors.grey.shade800,
                                         ),
                                       ),
-                                       Text(
+                                      Text(
                                         textDirection: TextDirection.rtl,
                                         'total before tax'.tr,
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black,
-
                                         ),
                                       ),
                                     ],
@@ -719,23 +725,21 @@ class _CheckHomeState extends State<CheckHome> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-
                                       Text(
                                         textDirection: TextDirection.rtl,
                                         '${(totalPrice * .15).toStringAsFixed(1)} SR',
-                                        style:  TextStyle(
+                                        style: TextStyle(
                                           fontSize: 17,
                                           color: Colors.grey.shade800,
                                         ),
                                       ),
-                                       Text(
+                                      Text(
                                         textDirection: TextDirection.rtl,
                                         '15%${"tax".tr}',
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black,
-
                                         ),
                                       ),
                                     ],
@@ -744,8 +748,7 @@ class _CheckHomeState extends State<CheckHome> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-
-                                       Text(
+                                      Text(
                                         textDirection: TextDirection.rtl,
                                         '0 SR',
                                         style: TextStyle(
@@ -753,12 +756,11 @@ class _CheckHomeState extends State<CheckHome> {
                                           color: Colors.grey.shade800,
                                         ),
                                       ),
-                                       Text(
+                                      Text(
                                         textDirection: TextDirection.rtl,
                                         'discount'.tr,
                                         style: TextStyle(
                                           fontSize: 16,
-
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black,
                                         ),
@@ -770,8 +772,7 @@ class _CheckHomeState extends State<CheckHome> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-
-                                       Text(
+                                      Text(
                                         textDirection: TextDirection.rtl,
                                         '0 SR',
                                         style: TextStyle(
@@ -779,12 +780,11 @@ class _CheckHomeState extends State<CheckHome> {
                                           color: Colors.grey.shade800,
                                         ),
                                       ),
-                                        Text(
+                                      Text(
                                         textDirection: TextDirection.rtl,
                                         'deliver'.tr,
                                         style: TextStyle(
                                           fontSize: 16,
-
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black,
                                         ),
@@ -795,23 +795,19 @@ class _CheckHomeState extends State<CheckHome> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-
                                       Text(
                                         textDirection: TextDirection.rtl,
-                                        totalPrice
-                                                .toString() +
-                                            ' SR',
-                                        style:  TextStyle(
+                                        totalPrice.toString() + ' SR',
+                                        style: TextStyle(
                                           fontSize: 17,
                                           color: Colors.grey.shade800,
                                         ),
                                       ),
-                                       Text(
+                                      Text(
                                         textDirection: TextDirection.rtl,
                                         'total with tax'.tr,
                                         style: TextStyle(
                                           fontSize: 16,
-
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black,
                                         ),
@@ -949,7 +945,7 @@ class _CheckHomeState extends State<CheckHome> {
                       //       borderRadius: BorderRadius.circular(5)),
                       // ),
                       ,
-                       SizedBox(
+                      SizedBox(
                         height: Get.height * .1,
                       )
                     ],
@@ -990,13 +986,22 @@ class _CheckHomeState extends State<CheckHome> {
                     Get.defaultDialog(
                         title: 'confirm order'.tr,
                         content: Row(
+
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                    elevation: 10,
-                                    backgroundColor: mainColor),
+                                    elevation: 10, backgroundColor: mainColor),
                                 onPressed: () async {
+                                  Navigator.pop(context);
+                                  Get.snackbar(
+                                    leftBarIndicatorColor:Colors.white ,
+                                      showProgressIndicator: true,
+                                      backgroundColor: Colors.green,
+                                      colorText: Colors.white,
+                                      duration: Duration(seconds: 8),
+                                      'please wait',
+                                      'تاكد من تشغيل الانترنت وانتظر لحظات  !');
                                   await OrderService().placeOrder(
                                       FirebaseAuth.instance.currentUser!.uid,
                                       cartItems,
@@ -1010,7 +1015,7 @@ class _CheckHomeState extends State<CheckHome> {
                                               (element) => element.isNotEmpty)
                                           .toList());
                                 },
-                                child:  Text(
+                                child: Text(
                                   textDirection: TextDirection.rtl,
                                   'yes'.tr,
                                   style: TextStyle(
@@ -1025,7 +1030,7 @@ class _CheckHomeState extends State<CheckHome> {
                                 onPressed: () {
                                   Navigator.pop(context);
                                 },
-                                child:  Text(
+                                child: Text(
                                   textDirection: TextDirection.rtl,
                                   'no'.tr,
                                   style: TextStyle(color: Colors.black),
@@ -1038,7 +1043,7 @@ class _CheckHomeState extends State<CheckHome> {
                     width: Get.width,
                     height: 50,
                     color: mainColor,
-                    child:  Text(
+                    child: Text(
                       textDirection: TextDirection.rtl,
                       'confirm'.tr,
                       style: TextStyle(

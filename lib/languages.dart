@@ -1,9 +1,16 @@
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:zezo/service/product_service.dart';
+import 'package:zezo/service/products_service.dart';
+import 'package:zezo/view/bottom_nav/peoduct_details.dart';
 
 class Languages extends Translations {
+
+
   @override
   Map<String, Map<String, String>> get keys => {
         'en': {
+          ""
           "categories": "Categories",
           "status" : "Status",
           "category" : "Category",
@@ -187,7 +194,7 @@ class Languages extends Translations {
           "total quantity" : "مجموع البنود",
           "brand name" : "اسم البراند",
           "status" : "الحالة",
-          "categories": "جميع الأصناف",
+          "All categories": "جميع الأصناف",
           "category" : "الأصناف",
           "what_ever_you_want" : "كل ما تريد !",
           "home": "الرئيسية",

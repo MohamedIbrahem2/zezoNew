@@ -40,7 +40,7 @@ class FcmProvider {
       },
     };
 
-    const String senderId = '970646820738'; // Replace with your project ID
+    const String senderId = 'zezo-6778a'; //970646820738 Replace with your project ID
     final response = await client.post(
       Uri.parse('https://fcm.googleapis.com/v1/projects/$senderId/messages:send'),
       headers: {

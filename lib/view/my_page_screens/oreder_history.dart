@@ -67,7 +67,7 @@ class AddressItem extends StatelessWidget {
                         address: address,
                       )));
         },
-        icon: const Icon(Icons.location_on_outlined),
+        icon: const Icon(Icons.location_on_outlined,size: 30,),
       ),
       // You can customize the rest of the UI for the address item as needed
       // For example, you might want to show the description or location on a map.

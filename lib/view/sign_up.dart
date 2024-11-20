@@ -34,7 +34,7 @@ class SignUp extends GetWidget<AuthViewModel> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   SizedBox(
-                    height: Get.height * .02,
+                    height: Get.height * .015,
                   ),
                   SizedBox(
                     height: Get.height* 0.15,
@@ -42,7 +42,7 @@ class SignUp extends GetWidget<AuthViewModel> {
                     child: Image.asset(
                       'images/logo2.png',
                       width: Get.width * .9,
-                      height: Get.height * .2,
+                      height: Get.height * .17,
                     ),
                   ),
                   Container(
@@ -115,35 +115,35 @@ class SignUp extends GetWidget<AuthViewModel> {
                             },
                           ),
                           SizedBox(
-                            height: Get.height * .02,
+                            height: Get.height * .009,
                           ),
                           SizedBox(
                             height: Get.height * .02,
                           ),
-                          TextFormField(
-                            controller: vatNum,
-                            onChanged: (value) {
-                              controller.vatNum = value;
-                            },
-                            decoration:  InputDecoration(
-                              labelText: 'tax number'.tr,
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide(
-                                  color: Colors.black,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: mainColor,width: 2.0),
-                                borderRadius:
-                                const BorderRadius.all(Radius.circular(10)),
-                              ),
-                            ),
-
-                          ),
-                          SizedBox(
-                            height: Get.height * .02,
-                          ),
+                          // TextFormField(
+                          //   controller: vatNum,
+                          //   onChanged: (value) {
+                          //     controller.vatNum = value;
+                          //   },
+                          //   decoration:  InputDecoration(
+                          //     labelText: 'tax number'.tr,
+                          //     enabledBorder: OutlineInputBorder(
+                          //       borderRadius: BorderRadius.circular(10),
+                          //       borderSide: BorderSide(
+                          //         color: Colors.black,
+                          //       ),
+                          //     ),
+                          //     focusedBorder: OutlineInputBorder(
+                          //       borderSide: BorderSide(color: mainColor,width: 2.0),
+                          //       borderRadius:
+                          //       const BorderRadius.all(Radius.circular(10)),
+                          //     ),
+                          //   ),
+                          //
+                          // ),
+                          // SizedBox(
+                          //   height: Get.height * .02,
+                          // ),
                           IntlPhoneField(
                             controller: phone,
                             decoration:  InputDecoration(

@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:zezo/constants.dart';
 import 'package:zezo/main.dart';
 import 'package:zezo/service/order_service.dart';
@@ -223,7 +224,7 @@ class _OrderItemState extends State<OrderItem> {
                       errorWidget: (context, url, error) =>
                           const Icon(Icons.error),
                     ),
-                    title: Text(cartItem.productName),
+                    title: Text(cartItem.productName.toString()),
                     subtitle: Text('${cartItem.price} SAR'),
                     trailing: CircleAvatar(
                         radius: 15, child: Text(cartItem.quantity.toString())),
@@ -261,11 +262,11 @@ class _OrderItemState extends State<OrderItem> {
                        Text(
                         'customer email'.tr,
                         style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.w600),
+                            fontSize: 13, fontWeight: FontWeight.w600),
                       ),
                       Text(order.userProfile!.email ?? '',
                           style: const TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.w400)),
+                              fontSize: 13, fontWeight: FontWeight.w400)),
                     ],
                   ),
                   const SizedBox(
@@ -305,21 +306,7 @@ class _OrderItemState extends State<OrderItem> {
                           : const Text('Not Provided'),
                     ],
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Row(
-                    children: [
-                       Text(
-                        'vat'.tr,
-                        style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.w600),
-                      ),
-                      Text(order.userProfile!.vatNum,
-                          style: const TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.w400)),
-                    ],
-                  ),
+
                 ],
               ),
             ),
@@ -328,9 +315,38 @@ class _OrderItemState extends State<OrderItem> {
             height: 20,
           ),
            Row(
+             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('address'.tr,
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: (){
+                      launch('https://wa.me/${order.userProfile!.phone}');
+                    },
+                    child: Container(
+                      margin: EdgeInsets.only(right: 20),
+                        width: 30,height: 30,
+                        child: Image.asset('images/whatsapp.png')),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(right: 15),
+                    alignment: Alignment.topRight,
+                    child: IconButton(
+                        onPressed: () {
+                          launchUrl(Uri.parse(
+                              'tel:${order.userProfile!.phone}'));
+                        },
+                        icon: const Icon(
+                          Icons.phone,
+                          color: Colors.blue,
+                          size: 30,
+                        )),
+                  ),
+                ],
+              ),
+
             ],
           ),
 

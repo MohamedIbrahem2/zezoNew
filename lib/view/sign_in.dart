@@ -141,7 +141,7 @@ class _SignInState extends State<SignIn> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       SizedBox(
-                        height: Get.height* 0.3,
+                        height: Get.height* 0.28,
                         width: Get.width * 0.3,
                         child: Padding(
                           padding: const EdgeInsets.only(top: 8),
@@ -178,7 +178,7 @@ class _SignInState extends State<SignIn> {
                                   ],
                                 ),
                                 const SizedBox(
-                                  height: 10,
+                                  height: 8,
                                 ),
                                 Container(
                                   alignment: Alignment.topRight,
@@ -262,7 +262,7 @@ class _SignInState extends State<SignIn> {
                                   },
                                 ),
                                 const SizedBox(
-                                  height: 7,
+                                  height: 5,
                                 ),
                                 InkWell(
                                   onTap: () {
@@ -283,7 +283,7 @@ class _SignInState extends State<SignIn> {
                                   ),
                                 ),
                                 SizedBox(
-                                  height: Get.height * .035,
+                                  height: Get.height * .03,
                                 ),
                                 ElevatedButton(
                                     onPressed: () {
@@ -309,49 +309,49 @@ class _SignInState extends State<SignIn> {
                           ),
                         ),
                       ),
-                      Text('or login'.tr,style: TextStyle(color: Colors.black,fontSize: 17
-                          ,fontWeight: FontWeight.bold
-                      ),),
+                      // Text('or login'.tr,style: TextStyle(color: Colors.black,fontSize: 17
+                      //     ,fontWeight: FontWeight.bold
+                      // ),),
+                      // SizedBox(
+                      //   height: Get.height * .08,
+                      // ),
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.center,
+                      //   children: [
+                      //   GestureDetector(
+                      //     onTap:() async {
+                      //        _signInWithGoogle();
+                      //       // Get.off(const HomeView());
+                      //     },
+                      //     child: Container(
+                      //       margin: EdgeInsets.all(10),
+                      //       width: 50,
+                      //       height: 35,
+                      //      // color: Colors.grey,
+                      //       child: Image.asset('images/google (1).png'),
+                      //     ),
+                      //   ) ,
+                      //     // GestureDetector(
+                      //     //   onTap: ()async {
+                      //     //     try {
+                      //     //       UserCredential userCredential = await signInWithFacebook();
+                      //     //       print(userCredential.user);
+                      //     //     } catch (e) {
+                      //     //       print(e);
+                      //     //     }
+                      //     //   },
+                      //     //   child: Container(
+                      //     //     child: Image.asset('images/facebook.png'),
+                      //     //     margin: EdgeInsets.all(10),
+                      //     //   width: 50,
+                      //     //   height: 35,
+                      //     //                            // color: Colors.white,
+                      //     //                           ),
+                      //     // )
+                      //   ],
+                      // ),
                       SizedBox(
-                        height: Get.height * .01,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                        GestureDetector(
-                          onTap:() async {
-                             _signInWithGoogle();
-                            // Get.off(const HomeView());
-                          },
-                          child: Container(
-                            margin: EdgeInsets.all(10),
-                            width: 50,
-                            height: 35,
-                           // color: Colors.grey,
-                            child: Image.asset('images/google (1).png'),
-                          ),
-                        ) ,
-                          // GestureDetector(
-                          //   onTap: ()async {
-                          //     try {
-                          //       UserCredential userCredential = await signInWithFacebook();
-                          //       print(userCredential.user);
-                          //     } catch (e) {
-                          //       print(e);
-                          //     }
-                          //   },
-                          //   child: Container(
-                          //     child: Image.asset('images/facebook.png'),
-                          //     margin: EdgeInsets.all(10),
-                          //   width: 50,
-                          //   height: 35,
-                          //                            // color: Colors.white,
-                          //                           ),
-                          // )
-                        ],
-                      ),
-                      SizedBox(
-                        height: Get.height * .035,
+                        height: Get.height * .04,
                       ),
                       ElevatedButton(
                           onPressed: () {

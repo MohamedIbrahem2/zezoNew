@@ -48,11 +48,11 @@ class _CategoriesState extends State<Categories> {
                 textDirection: TextDirection.rtl,
                 child: GridView.builder(
                     gridDelegate:
-                        const SliverGridDelegateWithMaxCrossAxisExtent(
-                            maxCrossAxisExtent: 200,
-                            childAspectRatio: .7,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10),
+                        SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: Get.height*.25,
+                            childAspectRatio: .8,
+                            crossAxisSpacing: 8,
+                            mainAxisSpacing: 8),
                     itemCount: categories.length,
                     itemBuilder: (BuildContext context, int index) {
                       final category = categories[index];
@@ -63,7 +63,7 @@ class _CategoriesState extends State<Categories> {
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Container(
-                            height: Get.height * 0.08,
+                            height: Get.height * 0.1,
                             width: Get.width * 0.4,
                             decoration: BoxDecoration(
                               boxShadow: [
@@ -77,48 +77,46 @@ class _CategoriesState extends State<Categories> {
                               borderRadius: BorderRadius.circular(13),
                             ),
                             child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Stack(
-                                    children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.grey,
-                                              offset: Offset(0.0, 1.0), //(x,y)
-                                              blurRadius: 3.0,
-                                            ),
-                                          ],
-                                          color: mainColor,
-                                          borderRadius: BorderRadius.circular(10),
+                                  padding: const EdgeInsets.all(6.0),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey,
+                                          offset: Offset(0.0, 1.0), //(x,y)
+                                          blurRadius: 3.0,
                                         ),
-                                        child:
-                                            SizedBox(
-                                              height: Get.height * 0.2,
-                                                width: Get.width,
-                                                child: Image.network(category.image,fit: BoxFit.fill,)),
-                                      ),
-                                    ],
+                                      ],
+                                      color: mainColor,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child:
+                                        SizedBox(
+                                          height: Get.height * 0.1,
+                                            width: Get.width*.4,
+                                            child: Image.network(category.image,fit: BoxFit.fill,)),
                                   ),
                                 ),
-                                SizedBox(
-                                  height: Get.height * 0.02,
-                                ),
-                                Center(
+                                // SizedBox(
+                                //   height: Get.height * 0.01,
+                                // ),
+                                Container(
+                                  alignment: Alignment.center,
                                   child: Padding(
-                                    padding: const EdgeInsets.all(5.0),
+                                    padding: const EdgeInsets.all(3.0),
                                     child: Container(
                                       child: Text(
                                         textAlign: TextAlign.center,
                                         textDirection: TextDirection.rtl,
                                         category.name,
                                         style: const TextStyle(
-                                          height: .5,
+                                        //  height: .5,
                                           overflow: TextOverflow.ellipsis,
-                                          fontSize: 13,
+                                          fontSize: 14,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black,
                                         ),

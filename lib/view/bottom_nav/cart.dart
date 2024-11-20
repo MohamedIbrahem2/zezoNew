@@ -41,10 +41,17 @@ class _Screen2State extends State<Screen2> {
       appBar: AppBar(
         title:  Center(child:  Text("cart".tr,style: TextStyle(color: Colors.white),)),
         backgroundColor: mainColor,
-        leading: const BackButton(
-          color: Colors.white,
-
-        ),
+         // leading: IconButton(
+         // icon: Icon(Icons.arrow_back),
+         //   onPressed: (){
+         //   Navigator.pop(context);
+         //   },
+         // )
+        //
+        // const BackButton(
+        //   color: Colors.white,
+        //
+        // ),
       ),
       body: Container(
         margin:

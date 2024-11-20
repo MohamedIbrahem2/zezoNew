@@ -37,6 +37,7 @@ import '../drawer_screens/add_category_screen.dart';
 import '../drawer_screens/add_products_screen.dart';
 import '../drawer_screens/language.dart';
 import '../drawer_screens/obout_us.dart';
+import '../drawer_screens/prfile_screen.dart';
 import '../drawer_screens/technical_support.dart';
 import '../drawer_screens/wallet.dart';
 import '../my_page_screens/qr_scanner.dart';
@@ -146,13 +147,13 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
           iconTheme: const IconThemeData(color: Colors.white),
-          backgroundColor: mainColor,
+          backgroundColor: Colors.blue.shade200,
           title: Padding(
             padding: const EdgeInsets.only(top: 5.0),
             child: Image.asset(
-              'images/logo_zezo.png',
-              height: Get.height * .09,
-              width: Get.width * .9,
+              'images/logo2.png',
+              height: Get.height * .05,
+              width: Get.width * .5,
             ),
           ),
           centerTitle: true,
@@ -206,18 +207,18 @@ class _HomePageState extends State<HomePage> {
                 //     },
                 //   ),
                 // ),
-                // GestureDetector(
-                //   child: ListTile(
-                //     title: Text(
-                //       'profile'.tr,
-                //       style: const TextStyle(
-                //           fontSize: 18, fontWeight: FontWeight.bold),
-                //     ),
-                //     onTap: () {
-                //       Get.to(const PrfileScreen());
-                //     },
-                //   ),
-                // ),
+                GestureDetector(
+                  child: ListTile(
+                    title: Text(
+                      'profile'.tr,
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    onTap: () {
+                      Get.to(const PrfileScreen());
+                    },
+                  ),
+                ),
                 ListTile(
                   title: Text(
                     'language'.tr,
@@ -510,30 +511,43 @@ class _HomePageState extends State<HomePage> {
                               ));
                             },
                             child: Container(
-                              margin: EdgeInsets.only(top: 15, left: 15),
-                              alignment: Alignment.topLeft,
-                              child: Text(
-                                'categories'.tr,
-                                style: TextStyle(
-                                  fontSize: 19,
-                                  fontWeight: FontWeight.bold,
-                                  decoration: TextDecoration.underline,
-                                ),
+                              width: Get.width*.4,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: mainColor
+                              ),
+                              margin: EdgeInsets.only(top: 15, left: 15,bottom: 8,right: 15),
+                              alignment: Alignment.center,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                children: [
+
+                                  Text(
+                                    'All categories'.tr,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                     // fontWeight: FontWeight.bold,
+                                      //decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                  Icon(Icons.arrow_forward_ios_outlined,size: 15,color: Colors.white,),
+                                ],
                               ),
                             ),
                           ),
-                          Container(
-                            margin: EdgeInsets.only(top: 15, right: 15),
-                            alignment: Alignment.topRight,
-                            child: Text(
-                              'category'.tr,
-                              style: TextStyle(
-                                fontSize: 19,
-                                fontWeight: FontWeight.bold,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
-                          ),
+                          // Container(
+                          //   margin: EdgeInsets.only(top: 15, right: 15),
+                          //   alignment: Alignment.topRight,
+                          //   child: Text(
+                          //     'category'.tr,
+                          //     style: TextStyle(
+                          //       fontSize: 19,
+                          //       fontWeight: FontWeight.bold,
+                          //       decoration: TextDecoration.underline,
+                          //     ),
+                          //   ),
+                          // ),
                         ],
                       )
                     : Container(),

@@ -155,23 +155,23 @@ class _SettingsState extends State<Settings> {
               SizedBox(
                 height: Get.height * .02,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "tax number".tr,
-                    style: TextStyle(fontSize: 16, color: Colors.black),
-                  ),
-                  Text(
-                    data['vatNum']==null?  'no tax number'.tr:data['vatNum'].toString(),
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 19,
-                        color: Colors.black54),
-                  ),
-
-                ],
-              ),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.center,
+              //   children: [
+              //     Text(
+              //       "tax number".tr,
+              //       style: TextStyle(fontSize: 16, color: Colors.black),
+              //     ),
+              //     Text(
+              //       data['vatNum']==null?  'no tax number'.tr:data['vatNum'].toString(),
+              //       style: const TextStyle(
+              //           fontWeight: FontWeight.bold,
+              //           fontSize: 19,
+              //           color: Colors.black54),
+              //     ),
+              //
+              //   ],
+              // ),
               SizedBox(
                 height: Get.height * .1,
               ),

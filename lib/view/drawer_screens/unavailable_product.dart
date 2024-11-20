@@ -47,11 +47,11 @@ class _UnavailableProductState extends State<UnavailableProduct> {
                 textDirection: TextDirection.rtl,
                 child: GridView.builder(
                     gridDelegate:
-                    const SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent: 180,
-                        childAspectRatio: .5,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10),
+                    SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: Get.height*.3,
+                        childAspectRatio: .6,
+                        crossAxisSpacing: 5,
+                        mainAxisSpacing: 5),
                     itemCount: categories.length,
                     itemBuilder: (BuildContext context, int index) {
                       final category = categories[index];
@@ -62,8 +62,8 @@ class _UnavailableProductState extends State<UnavailableProduct> {
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Container(
-                            height: Get.height * 0.08,
-                            width: Get.width * 0.4,
+                            // height: Get.height * 0.05,
+                            // width: Get.width * 0.4,
                             decoration: BoxDecoration(
                               boxShadow: [
                                 BoxShadow(
@@ -76,52 +76,47 @@ class _UnavailableProductState extends State<UnavailableProduct> {
                               borderRadius: BorderRadius.circular(13),
                             ),
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.all(4.0),
-                                  child: Stack(
-                                    children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.grey,
-                                              offset: Offset(0.0, 1.0), //(x,y)
-                                              blurRadius: 3.0,
-                                            ),
-                                          ],
-                                          color: mainColor,
-                                          borderRadius: BorderRadius.circular(10),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey,
+                                          offset: Offset(0.0, 1.0), //(x,y)
+                                          blurRadius: 3.0,
                                         ),
-                                        child:
-                                        SizedBox(
-                                            height: Get.height * 0.13,
-                                            width: Get.width,
-                                            child: Image.network(category.images.first,fit: BoxFit.fill,)),
-                                      ),
-                                    ],
+                                      ],
+                                      color: mainColor,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child:
+                                    SizedBox(
+                                        height: Get.height * 0.15,
+                                        width: Get.width*.4,
+                                        child: Image.network(category.images.first,fit: BoxFit.fill,)),
                                   ),
                                 ),
-                                SizedBox(
-                                  height: Get.height * 0.02,
-                                ),
-                                Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(2.0),
-                                    child: Container(
-                                      child: Text(
-                                        maxLines: 4,
-                                        textAlign: TextAlign.center,
-                                        textDirection: TextDirection.rtl,
-                                        category.title,
-                                        style: const TextStyle(
-                                         // height: .5,
-                                          overflow: TextOverflow.ellipsis,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
+                                // SizedBox(
+                                //   height: Get.height * 0.02,
+                                // ),
+                                Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: Container(
+                                    child: Text(
+                                      maxLines: 4,
+                                      textAlign: TextAlign.center,
+                                      textDirection: TextDirection.rtl,
+                                      category.title,
+                                      style: const TextStyle(
+                                       // height: .5,
+                                        overflow: TextOverflow.ellipsis,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
                                       ),
                                     ),
                                   ),

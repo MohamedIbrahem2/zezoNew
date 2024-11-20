@@ -55,11 +55,11 @@ class _ProductsByCategoriesState extends State<ProductsByCategories> {
               itemCount: products.length,
               shrinkWrap: true,
               gridDelegate:
-              const SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 200,
-                  childAspectRatio: .7,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10),
+              SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: Get.height*.32,
+                  childAspectRatio: .6,
+                  crossAxisSpacing: 5,
+                  mainAxisSpacing: 5),
               itemBuilder: (BuildContext context, int index) {
                 final product = products[index];
                 return Padding(
@@ -140,15 +140,15 @@ class _ProductsByCategoriesState extends State<ProductsByCategories> {
                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.all(6.0),
                             child: CachedNetworkImage(
                               imageUrl: product.images.first,
                               //fit: BoxFit.fill,
                               imageBuilder:
                                   (context, imageProvider) =>
                                   Container(
-                                    //  width: Get.width * .35,
-                                    height: Get.height * .115,
+                                     width: Get.width * .35,
+                                    height: Get.height * .1,
                                     decoration: BoxDecoration(
                                         image: DecorationImage(
                                           image: imageProvider,
@@ -165,7 +165,7 @@ class _ProductsByCategoriesState extends State<ProductsByCategories> {
                                 product.title,
                                 maxLines: 2,
                                 style: const TextStyle(
-                                    height: .95,
+                                   // height: .95,
                                     overflow:
                                     TextOverflow.ellipsis,
                                     fontSize: 14,
@@ -186,8 +186,8 @@ class _ProductsByCategoriesState extends State<ProductsByCategories> {
                           ),
                           Row(
                               mainAxisAlignment:
-                              MainAxisAlignment.spaceBetween,
-                              mainAxisSize: MainAxisSize.min,
+                              MainAxisAlignment.spaceAround,
+                              //mainAxisSize: MainAxisSize.min,
                               children: [
                                 Padding(
                                   padding:

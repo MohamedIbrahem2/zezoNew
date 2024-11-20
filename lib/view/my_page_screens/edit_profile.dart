@@ -238,21 +238,21 @@ class _EditprofileState extends State<Editprofile> {
                                 const SizedBox(
                                   height: 15,
                                 ),
-                                CustomTextForm(
-                                    controller: vatNumController,
-                                    obsecure: false,
-                                    decoration: InputDecoration(
-                                      labelText: 'tax number'.tr,
-                                      border: const OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.all(Radius.circular(10)),
-                                      ),
-                                    )
-                                    // hint: 'zezo',
-                                    ),
-                                const SizedBox(
-                                  height: 15,
-                                ),
+                                // CustomTextForm(
+                                //     controller: vatNumController,
+                                //     obsecure: false,
+                                //     decoration: InputDecoration(
+                                //       labelText: 'tax number'.tr,
+                                //       border: const OutlineInputBorder(
+                                //         borderRadius:
+                                //             BorderRadius.all(Radius.circular(10)),
+                                //       ),
+                                //     )
+                                //     // hint: 'zezo',
+                                //     ),
+                                // const SizedBox(
+                                //   height: 15,
+                                // ),
                                 // Container(
                                 //   alignment: Alignment.topLeft,
                                 //   child: const Text(
@@ -283,9 +283,7 @@ class _EditprofileState extends State<Editprofile> {
                                     return null;
                                   },
                                 ),
-                                const SizedBox(
-                                  height: 15,
-                                ),
+
 
                                 const SizedBox(
                                   height: 15,
