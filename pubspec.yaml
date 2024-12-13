@@ -76,10 +76,12 @@ dependencies:
   flutter_facebook_auth: ^7.0.1
   googleapis_auth: ^1.6.0
   firebase_app_check: ^0.3.0+5
-  flutter_local_notifications: ^17.2.2
   win32:
   icons_plus: ^5.0.0
   change_app_package_name: ^1.4.0
+  flutter_local_notifications: ^18.0.1
+  animated_text_kit: ^4.2.2
+  auto_scroll: ^0.2.0
 
 dev_dependencies:
   flutter_test:

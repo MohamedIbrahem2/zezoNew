@@ -1,3 +1,4 @@
+import 'package:auto_scroll/auto_scroll.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -42,6 +43,8 @@ import '../drawer_screens/technical_support.dart';
 import '../drawer_screens/wallet.dart';
 import '../my_page_screens/qr_scanner.dart';
 import '../search.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
+
 
 class HomePage extends StatefulWidget {
   final String uniqueId;
@@ -75,12 +78,27 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  var colorizeColors = [
+    Colors.black,
+    Colors.blue,
+    Colors.orange,
+    Colors.red,
+  ];
+
+  var colorizeTextStyle = TextStyle(
+    fontSize: 50.0,
+    fontWeight: FontWeight.bold,
+  );
   @override
   void initState() {
     super.initState();
     _saveProfile();
-  }
+    _itemCount = _initialItemCount;
 
+  }
+  static const _initialItemCount = 20;
+  var _itemCount = _initialItemCount;
+  final _controller = AutoScrollController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -426,43 +444,7 @@ class _HomePageState extends State<HomePage> {
                 SizedBox(
                   height: Get.height * .02,
                 ),
-                Directionality(
-                  textDirection: TextDirection.rtl,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: TextFormField(
-                      controller: searchValue,
-                      onChanged: (value) {
-                        if (value.isEmpty) {
-                          setState(() {
-                            searchValue.text = "";
-                            return;
-                          });
-                        }
-                        setState(() {
-                          searchValue.text = value;
-                        });
-                      },
-                      decoration: InputDecoration(
-                        hintText: 'what_ever_you_want'.tr,
-                        filled: true,
-                        fillColor: Colors.white,
-                        prefixIcon: const Icon(
-                          Icons.search_rounded,
-                          color: Colors.black,
-                          size: 25,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(vertical: 1),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(width: 2, color: mainColor),
-                            borderRadius: BorderRadius.circular(25)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(width: 3, color: mainColor),
-                            borderRadius: BorderRadius.circular(25)),
-                      ),
-                    ),
-                  ),
-                ),
+
                 // Directionality(
                 //   textDirection: TextDirection.rtl,
                 //   child: Padding(
@@ -500,6 +482,83 @@ class _HomePageState extends State<HomePage> {
                 //   ),
                 // ),
 
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Image.asset('images/Rectangle 2.png',height: Get.height*.23,),
+                        // Row(
+                        //   mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        //   children: [
+                        //     Image.asset('images/Rectangle 45.png',width: Get.width*.6),
+                        //
+                        //     //SizedBox(width: 5,)
+                        //   ],
+                        // ),
+
+                        AnimatedTextKit(
+
+                          //  displayFullTextOnTap: true,
+                            //pause: Duration(seconds: 3),
+                            repeatForever: true,
+                            //isRepeatingAnimation: true,
+                            animatedTexts: [
+                              WavyAnimatedText(
+
+                                  'Welcome to',speed: Duration(seconds: 4),textStyle: TextStyle(
+                                letterSpacing: 5,
+                                  fontSize: 32,fontWeight: FontWeight.bold,color: Colors.blue.shade900
+                              )
+
+                              ),
+                              WavyAnimatedText('ZEZO',speed: Duration(seconds: 4),textStyle: TextStyle(
+                                  letterSpacing: 20,
+                                  fontSize: 35,fontWeight: FontWeight.bold,color:Colors.blue.shade900
+                              )),
+                            ],
+                        ),
+
+                      ],
+                    ),
+                SizedBox(height: 18,),
+                Directionality(
+                  textDirection: TextDirection.rtl,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: TextFormField(
+                      controller: searchValue,
+                      onChanged: (value) {
+                        if (value.isEmpty) {
+                          setState(() {
+                            searchValue.text = "";
+                            return;
+                          });
+                        }
+                        setState(() {
+                          searchValue.text = value;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'what_ever_you_want'.tr,
+                        filled: true,
+                        fillColor: Colors.white,
+                        prefixIcon: const Icon(
+                          Icons.search_rounded,
+                          color: Colors.black,
+                          size: 25,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 1),
+                        enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(width: .5, color: mainColor),
+                            borderRadius: BorderRadius.circular(25)),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(width: .5, color: mainColor),
+                            borderRadius: BorderRadius.circular(20)),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10,),
+
                 searchValue.text == ""
                     ? Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -512,11 +571,12 @@ class _HomePageState extends State<HomePage> {
                             },
                             child: Container(
                               width: Get.width*.4,
+                              height: 35,
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
                                   color: mainColor
                               ),
-                              margin: EdgeInsets.only(top: 15, left: 15,bottom: 8,right: 15),
+                              margin: EdgeInsets.only(top: 15, left: 20,bottom: 8,right: 15),
                               alignment: Alignment.center,
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -569,153 +629,170 @@ class _HomePageState extends State<HomePage> {
                           return SizedBox(
                             width: Get.width,
                             height: Get.height * 0.16, // Set a fixed height for the list
-                            child: ListView.builder(
-                              reverse: true,
-                              scrollDirection: Axis.horizontal,
-                              padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                              itemCount: categories!.length,
-                              itemBuilder: (context, index) {
-                                final category = categories[index];
+                            child: AutoScroller(
+                              controller: _controller,
+                              scrollAxis: Axis.horizontal,
+                              duration: Duration(seconds: 1),
+                              lengthIdentifier: categories!.length,
+                              anchorThreshold: 24,
+                              startAnchored: true, 
+                              builder: (context,controller) {
+                                return ListView.builder(
+                                  controller: controller,
+                                  reverse: true,
+                                  scrollDirection: Axis.horizontal,
+                                  padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                                  itemCount: categories.length,
+                                  itemBuilder: (context, index) {
+                                    final category = categories[index];
 
-                                return Column(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(5.0),
-                                      child: InkWell(
-                                        onLongPress: () {
-                                          final provider = Provider.of<AdminProvider>(context, listen: false);
-                                          if (provider.isAdmin) {
-                                            Get.defaultDialog(
-                                              title: 'Do you want to delete'.tr + category.name.tr + "category".tr + " ?",
-                                              content: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                children: [
-                                                  IconButton(onPressed: (){
-                                                    Get.defaultDialog(
-                                                      title: "edit category".tr,
-                                                      content: Column(
-                                                        children: [
-                                                          TextFormField(
-                                                            controller: categoryController,
-                                                            validator: (value) {
-                                                              if (value!.isEmpty) {
-                                                                return 'Please enter category name';
-                                                              }
-                                                              return null;
-                                                            },
-                                                            decoration:  InputDecoration(
-                                                              labelText: 'category name'.tr,
-                                                              border: OutlineInputBorder(
-                                                                borderRadius: BorderRadius.all(Radius.circular(10)),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          if (isLoading)
-                                                            const Center(
-                                                              child: CircularProgressIndicator(),
-                                                            )
-                                                          else
-                                                            ElevatedButton(
-                                                              onPressed: () async {
-                                                                if (_fromKey.currentState!.validate()) {
-                                                                  try {
-                                                                    setState(() {
-                                                                      isLoading = true;
-                                                                    });
-                                                                      await CategoryService()
-                                                                          .updateCategory(category.copyWith(
-                                                                        name: categoryController.text
-                                                                      ));
-                                                                      setState(() {
-                                                                        isLoading = false;
-                                                                      });
-                                                                      Get.back();
-                                                                      Get.snackbar(
-                                                                          'Success', 'Category Edited successfully');
-                                                                  } catch (e) {
-                                                                    setState(() {
-                                                                      isLoading = false;
-                                                                      error = e.toString();
-                                                                    });
+                                    return Column(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(5.0),
+                                          child: InkWell(
+                                            onLongPress: () {
+                                              final provider = Provider.of<AdminProvider>(context, listen: false);
+                                              if (provider.isAdmin) {
+                                                Get.defaultDialog(
+                                                  title: 'Do you want to delete'.tr + category.name.tr + "category".tr + " ?",
+                                                  content: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                    children: [
+                                                      IconButton(onPressed: (){
+                                                        Get.defaultDialog(
+                                                          title: "edit category".tr,
+                                                          content: Column(
+                                                            children: [
+                                                              TextFormField(
+                                                                controller: categoryController,
+                                                                validator: (value) {
+                                                                  if (value!.isEmpty) {
+                                                                    return 'Please enter category name';
                                                                   }
-                                                                }
-                                                              },
-                                                              child:  Text('update category'.tr),
-                                                            ),
-                                                        ],
+                                                                  return null;
+                                                                },
+                                                                decoration:  InputDecoration(
+                                                                  labelText: 'category name'.tr,
+                                                                  border: OutlineInputBorder(
+                                                                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              if (isLoading)
+                                                                const Center(
+                                                                  child: CircularProgressIndicator(),
+                                                                )
+                                                              else
+                                                                ElevatedButton(
+                                                                  onPressed: () async {
+                                                                    if (_fromKey.currentState!.validate()) {
+                                                                      try {
+                                                                        setState(() {
+                                                                          isLoading = true;
+                                                                        });
+                                                                        await CategoryService()
+                                                                            .updateCategory(category.copyWith(
+                                                                            name: categoryController.text
+                                                                        ));
+                                                                        setState(() {
+                                                                          isLoading = false;
+                                                                        });
+                                                                        Get.back();
+                                                                        Get.snackbar(
+                                                                            'Success', 'Category Edited successfully');
+                                                                      } catch (e) {
+                                                                        setState(() {
+                                                                          isLoading = false;
+                                                                          error = e.toString();
+                                                                        });
+                                                                      }
+                                                                    }
+                                                                  },
+                                                                  child:  Text('update category'.tr),
+                                                                ),
+                                                            ],
+                                                          ),
+                                                        );
+                                                      }, icon: const Icon(Icons.edit)),
+                                                      ElevatedButton(
+                                                        onPressed: () {
+                                                          Navigator.pop(context);
+                                                        },
+                                                        child: Text(
+                                                          'no'.tr,
+                                                          style: const TextStyle(color: Colors.black),
+                                                        ),
+                                                        style: ElevatedButton.styleFrom(
+                                                            backgroundColor: Colors.white, elevation: 10),
                                                       ),
-                                                    );
-                                                  }, icon: const Icon(Icons.edit)),
-                                                  ElevatedButton(
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                    },
-                                                    child: Text(
-                                                      'no'.tr,
-                                                      style: const TextStyle(color: Colors.black),
-                                                    ),
-                                                    style: ElevatedButton.styleFrom(
-                                                        backgroundColor: Colors.white, elevation: 10),
+                                                      ElevatedButton(
+                                                        onPressed: () async {
+                                                          await ProductsService().deleteCategory(category.id);
+                                                          Navigator.pop(context);
+                                                        },
+                                                        child: Text('yes'.tr,
+                                                            style: const TextStyle(color: Colors.white)),
+                                                        style: ElevatedButton.styleFrom(
+                                                            backgroundColor: Colors.red, elevation: 10),
+                                                      ),
+                                                    ],
                                                   ),
-                                                  ElevatedButton(
-                                                    onPressed: () async {
-                                                      await ProductsService().deleteCategory(category.id);
-                                                      Navigator.pop(context);
-                                                    },
-                                                    child: Text('yes'.tr,
-                                                        style: const TextStyle(color: Colors.white)),
-                                                    style: ElevatedButton.styleFrom(
-                                                        backgroundColor: Colors.red, elevation: 10),
+                                                );
+                                              }
+                                            },
+                                            onTap: () {
+                                              setState(() {
+                                                _selectedIndex = index;
+                                                categoryId = category.id;
+                                              });
+                                            },
+                                            child: Container(
+
+
+                                                decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                        width: 2,
+                                                        color: categoryId == category.id ? mainColor : Colors.grey),
+                                                    borderRadius: const BorderRadius.all(Radius.circular(20))),
+                                                height: Get.height * 0.12,
+
+
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(8.0),
+                                                  child: Image.network(
+                                                    category.image,
+                                                    fit: BoxFit.fill, // Ensure the image fits within bounds
                                                   ),
-                                                ],
+                                                ),
+                                                width:130
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: SizedBox(
+                                            width: Get.width * 0.2,
+                                            child: Center(
+                                              child: Text(
+                                                category.name,
+                                                style: TextStyle(
+                                                  color: categoryId == category.id ? mainColor : Colors.grey,
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 2, // Allow text to wrap on two lines
                                               ),
-                                            );
-                                          }
-                                        },
-                                        onTap: () {
-                                          setState(() {
-                                            _selectedIndex = index;
-                                            categoryId = category.id;
-                                          });
-                                        },
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                              border: Border.all(
-                                                  width: 2,
-                                                  color: categoryId == category.id ? mainColor : Colors.grey),
-                                              borderRadius: const BorderRadius.all(Radius.circular(20))),
-                                          height: Get.height * 0.1,
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Image.network(
-                                              category.image,
-                                              fit: BoxFit.fill, // Ensure the image fits within bounds
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: SizedBox(
-                                        width: Get.width * 0.2,
-                                        child: Center(
-                                          child: Text(
-                                            category.name,
-                                            style: TextStyle(
-                                              color: categoryId == category.id ? mainColor : Colors.grey,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                            textAlign: TextAlign.center,
-                                            overflow: TextOverflow.ellipsis,
-                                            maxLines: 2, // Allow text to wrap on two lines
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                      ],
+                                    );
+                                  },
                                 );
                               },
+
                             ),
                           );
 
