@@ -59,6 +59,7 @@ class _DepositsInfoState extends State<DepositsInfo> {
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Text(' النوع:  ${number['type']}',textDirection: TextDirection.rtl,),
+                                Text(' اسم المندوب:  ${number['representativeName']}',textDirection: TextDirection.rtl,),
                                 Text(' ملحوظه:  ${number['description']}',textDirection: TextDirection.rtl,),
                                 Text(' التاريخ:  $formattedDate',textDirection: TextDirection.rtl,),
                               ],

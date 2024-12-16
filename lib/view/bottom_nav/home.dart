@@ -214,7 +214,7 @@ class _HomePageState extends State<HomePage> {
                     Get.to(const TechnicalSupport());
                   },
                 ),
-                if (context.watch<AdminProvider>().isAdmin)
+                 if (context.watch<AdminProvider>().isAdmin)
                 GestureDetector(
                   child: ListTile(
                     title: Text(

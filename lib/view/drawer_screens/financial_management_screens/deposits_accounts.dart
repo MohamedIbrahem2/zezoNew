@@ -97,106 +97,196 @@ class _DepositsAccountsState extends State<DepositsAccounts> {
       ),
     );
   }
-  void _showDialogAndUpdateCostMines(String action, String clientId, int currentCost) {
+  void _showDialogAndUpdateCostMines(String action, String clientId, int currentCost) async{
     final TextEditingController amountController = TextEditingController();
     final TextEditingController descriptionController = TextEditingController();
+    String? selectedRepresentative;
 
+    // Fetch representative names from Firebase
+    List<String> representativeNames = [];
+
+    try {
+      // Assuming you're using Firestore to fetch representative names
+      final snapshot = await FirebaseFirestore.instance
+          .collection('representativeName') // Your collection
+          .get();
+
+      // Populate the list of names
+      representativeNames = snapshot.docs
+          .map((doc) => doc['name'] as String) // Assuming 'name' is the field holding the representative name
+          .toList();
+    } catch (e) {
+      print("Error fetching representative names: $e");
+      // You can handle errors here if needed
+    }
     // Show the dialog to enter the number
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('$action - إدخال المبلغ'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: amountController,
-              decoration: const InputDecoration(labelText: 'المبلغ'),
-              keyboardType: TextInputType.number,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: Text('$action - إدخال المبلغ'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: amountController,
+                  decoration: const InputDecoration(labelText: 'المبلغ'),
+                  keyboardType: TextInputType.number,
+                ),
+                TextField(
+                  controller: descriptionController,
+                  decoration: const InputDecoration(labelText: 'ملحوظه'),
+                ),
+                // Dropdown to select representative name
+                if (representativeNames.isNotEmpty)
+                  DropdownButton<String>(
+                    value: selectedRepresentative,
+                    hint:  Text("اختار اسم المندوب"),
+                    onChanged: (String? newValue) {
+                      setState(() {
+
+                        selectedRepresentative = newValue;
+                        print(selectedRepresentative);
+                      });
+                    },
+                    items: representativeNames.map((String representative) {
+                      return DropdownMenuItem<String>(
+                        value: representative,
+                        child: Text(representative),
+                      );
+                    }).toList(),
+                  ),
+              ],
             ),
-            TextField(
-              controller: descriptionController,
-              decoration: const InputDecoration(labelText: 'ملحوظه'),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text('الغاء'),
-          ),
-          TextButton(
-            onPressed: () {
-              final amount = int.tryParse(amountController.text.trim());
-              if (amount != null && amount > 0) {
-                _updateCostInFirestore(clientId, currentCost - amount,descriptionController.text,action,amount);
-                Navigator.pop(context);
-              } else {
-                // Show an error message if the amount is invalid
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('يرجى إدخال مبلغ صالح')),
-                );
-              }
-            },
-            child: const Text('اضافة'),
-          ),
-        ],
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('الغاء'),
+              ),
+              TextButton(
+                onPressed: () {
+                  final amount = int.tryParse(amountController.text.trim());
+                  if (amount != null && amount > 0) {
+                    _updateCostInFirestore(clientId, currentCost - amount,
+                        descriptionController.text,action,amount,selectedRepresentative!,);
+                    Navigator.pop(context);
+                  } else {
+                    // Show an error message if the amount is invalid
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('يرجى إدخال مبلغ صالح')),
+                    );
+                  }
+                },
+                child: const Text('اضافة'),
+              ),
+            ],
+          );
+        }
       ),
     );
   }
-  void _showDialogAndUpdateCostPLus(String action, String clientId, int currentCost) {
+  void _showDialogAndUpdateCostPLus(String action, String clientId, int currentCost) async {
     final TextEditingController amountController = TextEditingController();
     final TextEditingController descriptionController = TextEditingController();
+    String? selectedRepresentative;
 
-    // Show the dialog to enter the number
+    // Fetch representative names from Firebase
+    List<String> representativeNames = [];
+
+    try {
+      // Assuming you're using Firestore to fetch representative names
+      final snapshot = await FirebaseFirestore.instance
+          .collection('representativeName') // Your collection
+          .get();
+
+      // Populate the list of names
+      representativeNames = snapshot.docs
+          .map((doc) => doc['name'] as String) // Assuming 'name' is the field holding the representative name
+          .toList();
+    } catch (e) {
+      print("Error fetching representative names: $e");
+      // You can handle errors here if needed
+    }
+
+    // Show the dialog
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('$action - إدخال المبلغ'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: amountController,
-              decoration: const InputDecoration(labelText: 'المبلغ'),
-              keyboardType: TextInputType.number,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: Text('$action - إدخال المبلغ'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: amountController,
+                  decoration: const InputDecoration(labelText: 'المبلغ'),
+                  keyboardType: TextInputType.number,
+                ),
+                TextField(
+                  controller: descriptionController,
+                  decoration: const InputDecoration(labelText: 'ملحوظه'),
+                ),
+                // Dropdown to select representative name
+                if (representativeNames.isNotEmpty)
+                  DropdownButton<String>(
+                    value: selectedRepresentative,
+                    hint: const Text('اختار اسم المندوب'),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedRepresentative = newValue;
+                      });
+                    },
+                    items: representativeNames.map((String representative) {
+                      return DropdownMenuItem<String>(
+                        value: representative,
+                        child: Text(representative),
+                      );
+                    }).toList(),
+                  ),
+              ],
             ),
-            TextField(
-              controller: descriptionController,
-              decoration: const InputDecoration(labelText: 'ملحوظه'),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text('الغاء'),
-          ),
-          TextButton(
-            onPressed: () {
-              final amount = int.tryParse(amountController.text.trim());
-              if (amount != null && amount > 0) {
-                _updateCostInFirestore(clientId, currentCost + amount,descriptionController.text,action,amount);
-                Navigator.pop(context);
-              } else {
-                // Show an error message if the amount is invalid
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('يرجى إدخال مبلغ صالح')),
-                );
-              }
-            },
-            child: const Text('اضافة'),
-          ),
-        ],
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('الغاء'),
+              ),
+              TextButton(
+                onPressed: () {
+                  final amount = int.tryParse(amountController.text.trim());
+                  if (amount != null && amount > 0 && selectedRepresentative != null) {
+                    _updateCostInFirestore(
+                      clientId,
+                      currentCost + amount,
+                      descriptionController.text,
+                      action,
+                      amount,
+                      selectedRepresentative!,
+                    );
+                    Navigator.pop(context);
+                  } else {
+                    // Show an error message if the amount is invalid or no representative is selected
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('يرجى إدخال مبلغ صالح واختيار المندوب')),
+                    );
+                  }
+                },
+                child: const Text('اضافة'),
+              ),
+            ],
+          );
+        }
       ),
     );
   }
 
-  void _updateCostInFirestore(String clientId, int newCost,String description,String type,int currentCost) async {
+
+  void _updateCostInFirestore(String clientId, int newCost,String description,String type,int currentCost,String representativeName) async {
     try {
       await _firestore.collection('depsitsClients').doc(clientId).update({
         'cost': newCost,
@@ -206,6 +296,7 @@ class _DepositsAccountsState extends State<DepositsAccounts> {
     }
     try {
       await _firestore.collection('depsitsClients').doc(clientId).collection('transactions').add({
+        'representativeName' : representativeName,
         'type' : type,
         'number': currentCost,
         'description': description,
