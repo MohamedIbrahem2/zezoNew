@@ -36,6 +36,7 @@ import '../../service/offer_service.dart';
 import '../../widgets/shimmer.dart';
 import '../drawer_screens/add_category_screen.dart';
 import '../drawer_screens/add_products_screen.dart';
+import '../drawer_screens/financial_management_screens/financial_manegment.dart';
 import '../drawer_screens/language.dart';
 import '../drawer_screens/obout_us.dart';
 import '../drawer_screens/prfile_screen.dart';
@@ -213,18 +214,19 @@ class _HomePageState extends State<HomePage> {
                     Get.to(const TechnicalSupport());
                   },
                 ),
-                // GestureDetector(
-                //   child: ListTile(
-                //     title: Text(
-                //       'offers'.tr,
-                //       style: const TextStyle(
-                //           fontSize: 18, fontWeight: FontWeight.bold),
-                //     ),
-                //     onTap: () {
-                //       Get.to(const OffersHome());
-                //     },
-                //   ),
-                // ),
+                if (context.watch<AdminProvider>().isAdmin)
+                GestureDetector(
+                  child: ListTile(
+                    title: Text(
+                      "financial management".tr,
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    onTap: () {
+                      Get.to(const FinancialManegment());
+                    },
+                  ),
+                ),
                 GestureDetector(
                   child: ListTile(
                     title: Text(
