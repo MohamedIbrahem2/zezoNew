@@ -319,6 +319,48 @@ class _DepositsAccountsState extends State<DepositsAccounts> {
         child: Column(
           children: [
             SizedBox(height: Get.height * 0.04),
+            StreamBuilder<QuerySnapshot>(
+              stream: _firestore.collection("depsitsClients").where("cost").snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return const Center(child: Text('No data available'));
+                }
+
+                // Calculate the total cost
+                double totalCost = 0.0;
+                for (var doc in snapshot.data!.docs) {
+                  // Assuming the cost field is a double
+                  totalCost += doc['cost']?.toDouble() ?? 0.0; // Handle any null or non-numeric values
+                }
+
+                return Container(
+                  width: 200,
+                  height: Get.height * 0.1,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 10,
+                        offset: Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Text(
+                      'مجموع الأرصده: ${totalCost.toString()}', // Display the total cost with 2 decimal places
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                );
+              },
+            ),
+            SizedBox(height: Get.height * 0.04),
             Directionality(
               textDirection: TextDirection.rtl,
               child: Padding(
@@ -365,7 +407,7 @@ class _DepositsAccountsState extends State<DepositsAccounts> {
                     return const Center(child: Text('No data available'));
                   }
                   final numbers = snapshot.data!.docs;
-                  allNumbers = numbers; // Store all numbers for search filtering
+                  allNumbers = numbers;
                   List<QueryDocumentSnapshot> filteredNumbers = numbers.where((element) {
                     var name = element['name'].toString().toLowerCase();
                     return name.contains(searchValue.text.toLowerCase());
@@ -402,7 +444,8 @@ class _DepositsAccountsState extends State<DepositsAccounts> {
                                     children: [
                                       IconButton(
                                         onPressed: () {
-                                          Navigator.push(context, MaterialPageRoute(builder: (context)=>DepositsInfo(clientId: number.id,
+                                          Navigator.push(context, MaterialPageRoute(builder:
+                                              (context)=>DepositsInfo(clientId: number.id,
                                             name: number['name'],)));
                                         },
                                         icon: Icon(Icons.info_outline_rounded, color: Colors.red),
