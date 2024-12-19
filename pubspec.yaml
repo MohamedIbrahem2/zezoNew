@@ -82,6 +82,10 @@ dependencies:
   flutter_local_notifications: ^18.0.1
   animated_text_kit: ^4.2.2
   auto_scroll: ^0.2.0
+  rxdart: ^0.28.0
+  syncfusion_flutter_datagrid_export: ^28.1.33
+  pdf: ^3.11.1
+  printing: ^5.13.4
 
 dev_dependencies:
   flutter_test:
@@ -109,6 +113,7 @@ flutter:
     - images/
     - images/whatsapp.png
     - videos/
+    - assets/fonts/NotoSansArabic-Regular.ttf
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

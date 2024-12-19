@@ -1,10 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:pdf/pdf.dart';
+import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:zezo/constants.dart';
 import 'package:zezo/main.dart';
+import 'package:pdf/widgets.dart' as pw;
 import 'package:zezo/service/order_service.dart';
 import 'package:zezo/view/my_page_screens/orders_management_provider.dart';
 
@@ -14,8 +18,10 @@ String formatDate(DateTime date) => '${date.day}/${date.month}/${date.year}';
 
 class OrdersManagement extends StatefulWidget {
   const OrdersManagement({super.key});
+
   static _OrdersManagementState of(BuildContext context) =>
       context.findAncestorStateOfType<_OrdersManagementState>()!;
+
   @override
   State<OrdersManagement> createState() => _OrdersManagementState();
 }
@@ -183,6 +189,7 @@ class _StatusTapsState extends State<StatusTaps> {
 
 class OrderItem extends StatefulWidget {
   const OrderItem({super.key, required this.order});
+
   final Order order;
 
   @override
@@ -190,7 +197,373 @@ class OrderItem extends StatefulWidget {
 }
 
 class _OrderItemState extends State<OrderItem> {
+  double totalPrice = 0;
+  double totalQuantity = 0;
+  Future<void> generateAndPrintPDF() async {
+    final pdf = pw.Document();
+
+    // Load Arabic font
+    final font = await rootBundle.load("assets/fonts/NotoSansArabic-Regular.ttf");
+    final arabicFont = pw.Font.ttf(font);
+
+    // Fetch the order items
+    final items = widget.order.items
+        .where((element) => element.image.isNotEmpty)
+        .toList();
+
+    const maxRowsPerPage = 9; // Rows per page
+    final totalPages = (items.length / maxRowsPerPage).ceil(); // Total pages needed
+
+    for (int pageIndex = 0; pageIndex < totalPages; pageIndex++) {
+      final startIndex = pageIndex * maxRowsPerPage;
+      final endIndex = (startIndex + maxRowsPerPage) < items.length
+          ? (startIndex + maxRowsPerPage)
+          : items.length;
+      final pageItems = items.sublist(startIndex, endIndex);
+
+      pdf.addPage(
+        pw.Page(
+          pageFormat: PdfPageFormat.a4,
+          build: (pw.Context context) {
+            List<pw.Widget> pageContent = [];
+
+            // Add header content
+            pageContent.add(
+              pw.Directionality(
+                textDirection: pw.TextDirection.rtl,
+                child: pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Container(
+                      padding: pw.EdgeInsets.all(10),
+                      color: PdfColor.fromHex("#d5f0e8"),
+                      child: pw.Text(
+                        widget.order.userProfile!.name,
+                        style: pw.TextStyle(
+                          fontSize: 24,
+                          fontWeight: pw.FontWeight.bold,
+                          color: PdfColors.black,
+                          font: arabicFont, // Ensure you're using the correct Arabic font
+                        ),
+                      ),
+                    ),
+                    pw.Column(
+                      children: [
+                    pw.Container(
+                      padding: const pw.EdgeInsets.all(10),
+                      color:  PdfColor.fromHex("#007d8b"),
+                      child:
+                      pw.Text(
+                        'اذن تسليم بضاعه',
+                        style: pw.TextStyle(
+                          fontSize: 24,
+                          fontWeight: pw.FontWeight.bold,
+                          color: PdfColors.white,
+                          font: arabicFont, // Ensure you're using the correct Arabic font
+                        ),
+                      ),
+                    ),
+                          pw.Text(
+                            'التاريخ: ${formatDate(widget.order.deliveryDate)}',
+                            style: pw.TextStyle(
+                              fontSize: 24,
+                              fontWeight: pw.FontWeight.bold,
+                              color: PdfColors.black,
+                              font: arabicFont, // Ensure you're using the correct Arabic font
+                            ),
+                          ),
+                            pw.Text(
+                              'اسم العميل: ${widget.order.userProfile!.name}',
+                              style: pw.TextStyle(
+                                fontSize: 24,
+                                fontWeight: pw.FontWeight.bold,
+                                color: PdfColors.black,
+                                font: arabicFont, // Ensure you're using the correct Arabic font
+                              ),
+                            ),
+
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+
+            pageContent.add(pw.SizedBox(height: 10));
+
+            pageContent.add(pw.SizedBox(height: 10));
+
+            // Add table header separately (This should not mix with rows)
+            pageContent.add(
+              pw.Table(
+                tableWidth: pw.TableWidth.max,
+                border: pw.TableBorder.all(color: PdfColors.grey),
+                columnWidths: {
+                  0: pw.FixedColumnWidth(300),
+                  1: pw.FixedColumnWidth(80),
+                  2: pw.FixedColumnWidth(100),
+                  3: pw.FixedColumnWidth(100),
+                },
+                children: [
+                  pw.TableRow(
+                    decoration: pw.BoxDecoration(
+                      color: PdfColor.fromHex("#007d8b"),
+                    ),
+                    children: [
+                      pw.Directionality(
+                        textDirection: pw.TextDirection.rtl,
+                        child: pw.Padding(
+                          padding: pw.EdgeInsets.all(8),
+                          child: pw.Text(
+                            'الصنف',
+                            style: pw.TextStyle(
+                              font: arabicFont,
+                              fontWeight: pw.FontWeight.bold,
+                              color: PdfColors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                      pw.Directionality(
+                        textDirection: pw.TextDirection.rtl,
+                        child: pw.Padding(
+                          padding: pw.EdgeInsets.all(8),
+                          child: pw.Text(
+                            'الكمية',
+                            style: pw.TextStyle(
+                              font: arabicFont,
+                              fontWeight: pw.FontWeight.bold,
+                              color: PdfColors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                      pw.Directionality(
+                        textDirection: pw.TextDirection.rtl,
+                        child: pw.Padding(
+                          padding: pw.EdgeInsets.all(8),
+                          child: pw.Text(
+                            'سعر الوحدة',
+                            style: pw.TextStyle(
+                              font: arabicFont,
+                              fontWeight: pw.FontWeight.bold,
+                              color: PdfColors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                      pw.Directionality(
+                        textDirection: pw.TextDirection.rtl,
+                        child: pw.Padding(
+                          padding: pw.EdgeInsets.all(8),
+                          child: pw.Text(
+                            'الإجمالي',
+                            style: pw.TextStyle(
+                              font: arabicFont,
+                              fontWeight: pw.FontWeight.bold,
+                              color: PdfColors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+            // Add table rows for the current page
+            pageContent.add(
+              pw.Table(
+                border: pw.TableBorder.all(color: PdfColors.grey),
+                columnWidths: {
+                  0: const pw.FixedColumnWidth(300),
+                  1: const pw.FixedColumnWidth(80),
+                  2: const pw.FixedColumnWidth(100),
+                  3: const pw.FixedColumnWidth(100),
+                },
+                children: pageItems.map<pw.TableRow>((cartItem) {
+                  totalQuantity += cartItem.quantity;
+                  return pw.TableRow(
+                    decoration: pw.BoxDecoration(
+                      color: (pageItems.indexOf(cartItem) % 2 == 0)
+                          ? PdfColors.white
+                          : PdfColor.fromHex("#d5f0e8"),
+                    ),
+                    children: [
+                          pw.Padding(
+                            padding: pw.EdgeInsets.all(8),
+                            child: pw.Text(
+                              cartItem.productName,
+                              style: pw.TextStyle(font: arabicFont),
+                            ),
+                          ),
+
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8),
+                        child: pw.Text(
+                          cartItem.quantity.toString(),
+                          style: pw.TextStyle(font: arabicFont),
+                        ),
+                      ),
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8),
+                        child: pw.Text(
+                          textDirection: pw.TextDirection.rtl,
+                          "${cartItem.price.toString()} رس",
+                          style: pw.TextStyle(font: arabicFont),
+                        ),
+                      ),
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8),
+                        child: pw.Text(
+                          textDirection: pw.TextDirection.rtl,
+                          "${(cartItem.quantity * cartItem.price).toString()} رس",
+                          style: pw.TextStyle(font: arabicFont),
+                        ),
+                      ),
+                    ],
+                  );
+                }).toList(),
+
+              ),
+            );
+            pageContent.add(
+              pw.Table(
+                border: pw.TableBorder.all(color: PdfColors.grey),
+                children: [
+                  // First Row
+                  pw.TableRow(
+                    children: [
+                      pw.Container(
+                        color: const PdfColor.fromInt(0xffc5e1a5), // Light green
+                        padding: const pw.EdgeInsets.all(8),
+                        child: pw.Text(
+                          'خصم',
+                          style: pw.TextStyle(
+                            font: arabicFont,
+                            fontWeight: pw.FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                          textDirection: pw.TextDirection.rtl,
+                        ),
+                      ),
+                      pw.Container(
+                        color: PdfColor.fromInt(0xffc5e1a5),
+                        padding: pw.EdgeInsets.all(8),
+                        child: pw.Text(
+                          '0.00 رس',
+                          style: pw.TextStyle(
+                            font: arabicFont,
+                            fontSize: 14,
+                          ),
+                          textDirection: pw.TextDirection.rtl,
+                        ),
+                      ),
+                      pw.Container(
+                        color: PdfColor.fromInt(0xff80deea), // Light blue
+                        padding: pw.EdgeInsets.all(8),
+                        child: pw.Text(
+                          'WITH OUR BEST WISHES',
+                          style: pw.TextStyle(
+                            fontWeight: pw.FontWeight.bold,
+                            fontSize: 14,
+                            font: arabicFont
+                          ),
+                          textAlign: pw.TextAlign.center,
+                          textDirection: pw.TextDirection.rtl
+                        ),
+                      ),
+                      pw.Container(
+                        color: PdfColor.fromInt(0xfff8bbd0), // Light pink
+                        padding: pw.EdgeInsets.all(8),
+                        child: pw.Text(
+                          'شكراً لتعاملكم معنا',
+                          style: pw.TextStyle(
+                            font: arabicFont,
+                            fontSize: 14,
+                            fontWeight: pw.FontWeight.bold,
+                          ),
+                          textDirection: pw.TextDirection.rtl,
+                        ),
+                      ),
+                    ],
+                  ),
+                  // Second Row
+                  pw.TableRow(
+                    children: [
+                      pw.Container(
+                        color: PdfColor.fromInt(0xffffff00), // Yellow
+                        padding: pw.EdgeInsets.all(8),
+                        child: pw.Text(
+                          'اجمالي المبلغ',
+                          style: pw.TextStyle(
+                            font: arabicFont,
+                            fontWeight: pw.FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                          textDirection: pw.TextDirection.rtl,
+                        ),
+                      ),
+                      pw.Container(
+                        color: PdfColor.fromInt(0xffffff00), // Yellow
+                        padding: pw.EdgeInsets.all(8),
+                        child: pw.Text(
+                          '${widget.order.totalAmount} رس',
+                          style: pw.TextStyle(
+                            font: arabicFont,
+                            fontSize: 14,
+                          ),
+                          textDirection: pw.TextDirection.rtl,
+                        ),
+                      ),
+                      pw.Container(
+                        color: PdfColor.fromInt(0xffffff00), // Yellow
+                        padding: pw.EdgeInsets.all(8),
+                        child: pw.Text(
+                          'اجمالي الكميه',
+                          style: pw.TextStyle(
+                            font: arabicFont,
+                            fontWeight: pw.FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                          textDirection: pw.TextDirection.rtl,
+                        ),
+                      ),
+                      pw.Container(
+                        color: PdfColor.fromInt(0xffffff00), // Yellow
+                        padding: pw.EdgeInsets.all(8),
+                        child: pw.Text(
+                          totalQuantity.toString(),
+                          style: pw.TextStyle(
+                            font: arabicFont,
+                            fontSize: 14,
+                          ),
+                          textDirection: pw.TextDirection.rtl,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+
+
+            return pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: pageContent,
+            );
+          },
+        ),
+      );
+    }
+
+    await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => pdf.save(),
+    );
+  }
+
   late Order order;
+
   @override
   void initState() {
     order = widget.order;
@@ -200,8 +573,6 @@ class _OrderItemState extends State<OrderItem> {
   @override
   Widget build(BuildContext context) {
     int totalQuantity = 0;
-
-    double totalPrice = 0;
     double discount = 0;
 
     // Calculate total quantity and price
@@ -244,7 +615,7 @@ class _OrderItemState extends State<OrderItem> {
                 children: [
                   Row(
                     children: [
-                       Text(
+                      Text(
                         'customer name'.tr,
                         style: TextStyle(
                             fontSize: 14, fontWeight: FontWeight.w600),
@@ -259,7 +630,7 @@ class _OrderItemState extends State<OrderItem> {
                   ),
                   Row(
                     children: [
-                       Text(
+                      Text(
                         'customer email'.tr,
                         style: TextStyle(
                             fontSize: 13, fontWeight: FontWeight.w600),
@@ -274,14 +645,14 @@ class _OrderItemState extends State<OrderItem> {
                   ),
                   Row(
                     children: [
-                       Text(
+                      Text(
                         'customer phone'.tr,
                         style: TextStyle(
                             fontSize: 14, fontWeight: FontWeight.w600),
                       ),
                       Text(order.userProfile!.phone ?? '',
                           style: const TextStyle(
-                              fontSize: 14 , fontWeight: FontWeight.w400)),
+                              fontSize: 14, fontWeight: FontWeight.w400)),
                     ],
                   ),
                   const SizedBox(
@@ -290,7 +661,7 @@ class _OrderItemState extends State<OrderItem> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                       Text(
+                      Text(
                         'other phone'.tr,
                         style: TextStyle(
                             fontSize: 14, fontWeight: FontWeight.w600),
@@ -306,7 +677,6 @@ class _OrderItemState extends State<OrderItem> {
                           : const Text('Not Provided'),
                     ],
                   ),
-
                 ],
               ),
             ),
@@ -314,20 +684,21 @@ class _OrderItemState extends State<OrderItem> {
           const SizedBox(
             height: 20,
           ),
-           Row(
-             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('address'.tr,
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               Row(
                 children: [
                   GestureDetector(
-                    onTap: (){
+                    onTap: () {
                       launch('https://wa.me/${order.userProfile!.phone}');
                     },
                     child: Container(
-                      margin: EdgeInsets.only(right: 20),
-                        width: 30,height: 30,
+                        margin: EdgeInsets.only(right: 20),
+                        width: 30,
+                        height: 30,
                         child: Image.asset('images/whatsapp.png')),
                   ),
                   Container(
@@ -335,8 +706,8 @@ class _OrderItemState extends State<OrderItem> {
                     alignment: Alignment.topRight,
                     child: IconButton(
                         onPressed: () {
-                          launchUrl(Uri.parse(
-                              'tel:${order.userProfile!.phone}'));
+                          launchUrl(
+                              Uri.parse('tel:${order.userProfile!.phone}'));
                         },
                         icon: const Icon(
                           Icons.phone,
@@ -346,7 +717,6 @@ class _OrderItemState extends State<OrderItem> {
                   ),
                 ],
               ),
-
             ],
           ),
 
@@ -357,7 +727,7 @@ class _OrderItemState extends State<OrderItem> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-               Text('deliver date'.tr,
+              Text('deliver date'.tr,
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
               Container(
                 padding: const EdgeInsets.all(10),
@@ -381,7 +751,7 @@ class _OrderItemState extends State<OrderItem> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-               Text('status'.tr,
+              Text('status'.tr,
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
               Container(
                 padding: const EdgeInsets.all(10),
@@ -418,7 +788,7 @@ class _OrderItemState extends State<OrderItem> {
           //   ],
           // ),
           ListTile(
-            title:  Text('total quantity'.tr),
+            title: Text('total quantity'.tr),
             trailing: Text(totalQuantity.toString()),
           ),
           // doted line
@@ -429,20 +799,20 @@ class _OrderItemState extends State<OrderItem> {
             trailing: Text(totalPrice.toString()),
           ),
           ListTile(
-            title:  Text('discount'.tr),
+            title: Text('discount'.tr),
             trailing: Text(discount.toString()),
           ),
           ListTile(
-            title:  Text('total'.tr),
+            title: Text('total'.tr),
             trailing: Text((totalPrice - discount).toStringAsFixed(2)),
           ),
           ListTile(
-            title:  Text('order date'.tr),
+            title: Text('order date'.tr),
             trailing: Text(formatDate(widget.order.orderDate)),
           ),
           if (widget.order.invoiceNumber != null)
             ListTile(
-              title:  Text('invoice number'.tr),
+              title: Text('invoice number'.tr),
               trailing: Text(widget.order.invoiceNumber!),
             ),
           Row(
@@ -457,38 +827,54 @@ class _OrderItemState extends State<OrderItem> {
                           .updateOrderStatusAction(order.id, order.userId);
                     },
                     style: ElevatedButton.styleFrom(backgroundColor: mainColor),
-                    child: Text(context
-                        .watch<OrdersManagementProvider>()
-                        .getActionText(order.status!),style: TextStyle(color: Colors.white),)),
+                    child: Text(
+                      context
+                          .watch<OrdersManagementProvider>()
+                          .getActionText(order.status!),
+                      style: TextStyle(color: Colors.white),
+                    )),
               if (!context.watch<AdminProvider>().isAdmin &&
                   order.status == 'pending')
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: mainColor),
+                    style: ElevatedButton.styleFrom(backgroundColor: mainColor),
                     onPressed: () async {
                       context
                           .read<OrdersManagementProvider>()
                           .updateOrderStatusAction(order.id, order.userId);
                     },
-                    child: Text(context
-                        .watch<OrdersManagementProvider>()
-                        .getActionText(order.status!),style: TextStyle(color: Colors.white))),
+                    child: Text(
+                        context
+                            .watch<OrdersManagementProvider>()
+                            .getActionText(order.status!),
+                        style: TextStyle(color: Colors.white))),
               if (order.status == 'pending' || order.status == 'processing')
                 const SizedBox(
                   width: 10,
                 ),
               if (order.status == 'pending' || order.status == 'processing')
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white
-                  ),
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.white),
                     onPressed: () async {
                       context
                           .read<OrdersManagementProvider>()
                           .cancelOrder(order.id);
                     },
-                    child:  Text('cancel'.tr,style: TextStyle(color: Colors.black),))
+                    child: Text(
+                      'cancel'.tr,
+                      style: TextStyle(color: Colors.black),
+                    ))
             ],
           ),
+          ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
+              onPressed: () {
+                generateAndPrintPDF();
+              },
+              child: Text(
+                'استخراج أذن توصيل'.tr,
+                style: TextStyle(color: Colors.black),
+              ))
         ],
       ),
     );

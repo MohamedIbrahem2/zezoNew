@@ -73,6 +73,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.9.3+1"
+  barcode:
+    dependency: transitive
+    description:
+      name: barcode
+      sha256: ab180ce22c6555d77d45f0178a523669db67f95856e3378259ef2ffeb43e6003
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.8"
+  bidi:
+    dependency: transitive
+    description:
+      name: bidi
+      sha256: "9a712c7ddf708f7c41b1923aa83648a3ed44cfd75b04f72d598c45e5be287f9d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.12"
   boolean_selector:
     dependency: transitive
     description:
@@ -185,6 +201,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.18.0"
+  convert:
+    dependency: transitive
+    description:
+      name: convert
+      sha256: b30acd5944035672bc15c6b7a8b47d773e41e2f17de064350988c5d02adb1c68
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.2"
   cross_file:
     dependency: transitive
     description:
@@ -933,6 +957,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
+  jiffy:
+    dependency: transitive
+    description:
+      name: jiffy
+      sha256: "1c1b86459969ff9f32dc5b0ffe392f1e08181e66396cf9dd8fa7c90552a691af"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.3.2"
   js:
     dependency: transitive
     description:
@@ -1109,6 +1141,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.0"
+  pdf:
+    dependency: "direct main"
+    description:
+      name: pdf
+      sha256: "05df53f8791587402493ac97b9869d3824eccbc77d97855f4545cf72df3cae07"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.11.1"
+  pdf_widget_wrapper:
+    dependency: transitive
+    description:
+      name: pdf_widget_wrapper
+      sha256: c930860d987213a3d58c7ec3b7ecf8085c3897f773e8dc23da9cae60a5d6d0f5
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.4"
   permission_handler:
     dependency: "direct main"
     description:
@@ -1181,6 +1229,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.8"
+  printing:
+    dependency: "direct main"
+    description:
+      name: printing
+      sha256: b535d177fc6e8f8908e19b0ff5c1d4a87e3c4d0bf675e05aa2562af1b7853906
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.13.4"
   provider:
     dependency: "direct main"
     description:
@@ -1206,7 +1262,7 @@ packages:
     source: hosted
     version: "4.1.0"
   rxdart:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: rxdart
       sha256: "5c3004a4a8dbb94bd4bf5412a4def4acdaa12e12f269737a5751369e12d1a962"
@@ -1354,6 +1410,54 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+  syncfusion_flutter_core:
+    dependency: transitive
+    description:
+      name: syncfusion_flutter_core
+      sha256: b1071c698b502e7d55f91352a8b82d42f49f4c96e523d43b6fade5d5af710048
+      url: "https://pub.dev"
+    source: hosted
+    version: "28.1.33"
+  syncfusion_flutter_datagrid:
+    dependency: transitive
+    description:
+      name: syncfusion_flutter_datagrid
+      sha256: "2949bf434f5c29ae3dff62681234aabcb0db900b10a2feaf3ea5a539ed6deffc"
+      url: "https://pub.dev"
+    source: hosted
+    version: "28.1.33"
+  syncfusion_flutter_datagrid_export:
+    dependency: "direct main"
+    description:
+      name: syncfusion_flutter_datagrid_export
+      sha256: "8f948663820f1c987430df9243b48e83d1e4ba3823ed3fb8c054f5d6b6ade2f8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "28.1.33"
+  syncfusion_flutter_pdf:
+    dependency: transitive
+    description:
+      name: syncfusion_flutter_pdf
+      sha256: bdd6b6c085fc39fbcfbf641efbf7f97d9c39b58e57accc47fca4f9db592b2294
+      url: "https://pub.dev"
+    source: hosted
+    version: "28.1.33"
+  syncfusion_flutter_xlsio:
+    dependency: transitive
+    description:
+      name: syncfusion_flutter_xlsio
+      sha256: dfe4ab39ae2c3fad1b2e9696e69d30099a54913bcc78c17df39c44c517de72b0
+      url: "https://pub.dev"
+    source: hosted
+    version: "28.1.33"
+  syncfusion_officecore:
+    dependency: transitive
+    description:
+      name: syncfusion_officecore
+      sha256: c771b542eeb8ed90344e32dadc5ae8a54292ce159c1f98db1a8b16c71a7c2f37
+      url: "https://pub.dev"
+    source: hosted
+    version: "28.1.33"
   synchronized:
     dependency: transitive
     description:

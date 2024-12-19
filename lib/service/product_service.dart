@@ -53,7 +53,7 @@ class Product {
       images: data['images'],
       brand: data['brand'],
       description: data['description'],
-      stock: parseDouble(data['stock']),
+      stock: parseDouble(data['stock'] ?? 0.0),
       title: data['title'],
       weight: data['weight'],
       category: 'category',
@@ -306,16 +306,15 @@ class ProductsService {
     final collection = FirebaseFirestore.instance.collection('products');
     Query query = collection;
 
-    // Apply the title range query if the productName is provided
-    if (isArabic(brandName!)) {
-      query = query
-          .where('title', isGreaterThanOrEqualTo: productName)
-          .where('title', isLessThanOrEqualTo: '${productName!}\uf7ff');
+    // Apply the query for substrings
+    if (productName != null && productName.isNotEmpty) {
+      // If product name is provided, search in substrings
+      query = query.where('title', arrayContains: productName.toLowerCase());
     }
-    else {
-      query = query
-          .where('brand', isGreaterThanOrEqualTo: brandName)
-          .where('brand', isLessThanOrEqualTo: '$brandName\uf7ff');
+
+    if (brandName != null && brandName.isNotEmpty) {
+      // If brand name is provided, search in substrings
+      query = query.where('brand', arrayContains: brandName.toLowerCase());
     }
 
     // Return the stream of products based on the dynamic query
@@ -323,6 +322,7 @@ class ProductsService {
       return snapshot.docs.map((doc) => Product.fromSnapshot(doc)).toList();
     });
   }
+
 
 
 // update product

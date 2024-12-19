@@ -61,6 +61,7 @@ class _HomePageState extends State<HomePage> {
   final categoryController = TextEditingController();
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   bool isLoading = false;
+  List<QueryDocumentSnapshot> allNumbers = [];
   String error = '';
   final _fromKey = GlobalKey<FormState>();
   Future<void> _handleSignOut() => _googleSignIn.disconnect();
@@ -578,12 +579,11 @@ class _HomePageState extends State<HomePage> {
                                   borderRadius: BorderRadius.circular(10),
                                   color: mainColor
                               ),
-                              margin: EdgeInsets.only(top: 15, left: 20,bottom: 8,right: 15),
+                              margin: const EdgeInsets.only(top: 15, left: 20,bottom: 8,right: 15),
                               alignment: Alignment.center,
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                 children: [
-
                                   Text(
                                     'All categories'.tr,
                                     style: TextStyle(
@@ -1125,9 +1125,8 @@ class _HomePageState extends State<HomePage> {
                         margin: const EdgeInsets.only(top: 10,bottom: 10,left: 10,right: 10),
                         width: Get.width,
                         height: Get.height * .83,
-                        child: StreamBuilder<List<Product>>(
-                            stream: ProductsService()
-                                .searchForProduct(searchValue.text,searchValue.text),
+                        child: StreamBuilder<QuerySnapshot>(
+                            stream: _firestore.collection("products").snapshots(),
                             builder: (context, snapshot) {
                               if (snapshot.hasError) {
                                 return const Center(
@@ -1140,8 +1139,23 @@ class _HomePageState extends State<HomePage> {
                                   searchValue.text != '') {
                                 return buildShimmer(1);
                               }
-                              final products = snapshot.data!;
                               if (searchValue.text != '') {
+                                final numbers = snapshot.data!.docs;
+                                allNumbers = numbers;
+                                List<QueryDocumentSnapshot> filteredNumbers = numbers.where((element) {
+                                  var nameEng = element['brand'].toString().toLowerCase();
+                                  var nameArabic = element['title'].toString().toLowerCase();
+                                  bool containsOnlyEnglishCharacters(String input) {
+                                    RegExp regExp = RegExp(r'^[A-Za-z\s]+$');
+                                    return regExp.hasMatch(input);
+                                  }
+                                  bool isEnglish = containsOnlyEnglishCharacters(searchValue.text);
+
+                                  return isEnglish ?
+                                  nameEng.contains(searchValue.text.toLowerCase()) : nameArabic.contains(searchValue.text.toLowerCase())
+                                  ;
+                                }).toList();
+                                print(filteredNumbers);
                                 return Container(
                                   margin: EdgeInsets.only(bottom: 100),
                                   child: GridView.builder(
@@ -1151,9 +1165,22 @@ class _HomePageState extends State<HomePage> {
                                               childAspectRatio: .8,
                                               crossAxisSpacing: 10,
                                               mainAxisSpacing: 10),
-                                      itemCount: products!.length,
+                                      itemCount: filteredNumbers.length,
                                       itemBuilder: (context, index) {
-                                        final product = products[index];
+                                        final Product product = Product(available: filteredNumbers[index]['avalible'] ?? true,
+                                            favorite: filteredNumbers[index]['favorite'] ?? false,
+                                            isbestselling: filteredNumbers[index]['isbestselling'] ?? false,
+                                            category: filteredNumbers[index]['category'] ?? "",
+                                            brand: filteredNumbers[index]['brand'] ?? "",
+                                            description: filteredNumbers[index]['description'] ?? "",
+                                            stock: 0.0,
+                                            title: filteredNumbers[index]['title'] ?? "",
+                                            weight: filteredNumbers[index]['weight'] ?? "",
+                                            id: filteredNumbers[index].id,
+                                            categoryId:filteredNumbers[index]['categoryId'] ?? 0 ,
+                                            regularPrice: filteredNumbers[index]['regularPrice'] ?? 0.0,
+                                            images: filteredNumbers[index]['images'] ?? '',
+                                            discountPrice: filteredNumbers[index]['discountPrice'] ?? 0.0);
                                         return Padding(
                                           padding: const EdgeInsets.all(8.0),
                                           child: GestureDetector(

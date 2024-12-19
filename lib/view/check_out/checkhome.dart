@@ -71,22 +71,28 @@ class _CheckHomeState extends State<CheckHome> {
 
   double count = 1.0;
   Future<void> _selectDate(BuildContext context) async {
-    // all dayes except friday
+    // Function to disable Fridays
+    bool _isSelectableDate(DateTime date) {
+      // Return false if the day is Friday (weekday == 5)
+      return date.weekday != DateTime.friday;
+    }
 
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now().add(const Duration(days: 1)),
       firstDate: DateTime.now().add(const Duration(days: 1)),
       lastDate: DateTime(2025),
+      selectableDayPredicate: _isSelectableDate, // Disabling Fridays
     );
+
     if (picked != null) {
       setState(() {
         finalDate = picked;
         dateController.text = formatDate(finalDate);
-        finalDate.toString();
       });
     }
   }
+
 
   final AddressService _addressService = AddressService(
     FirebaseAuth.instance.currentUser!.uid,
