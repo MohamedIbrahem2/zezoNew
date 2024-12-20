@@ -288,7 +288,7 @@ class _ProductsByCategoriesState extends State<ProductsByCategories> {
                                           CartService().addToCart(
                                             productId: product.id,
                                             productName:
-                                            product.brand,
+                                            product.title,
                                             price: product
                                                 .regularPrice -
                                                 product

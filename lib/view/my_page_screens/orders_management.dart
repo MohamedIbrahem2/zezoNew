@@ -211,7 +211,7 @@ class _OrderItemState extends State<OrderItem> {
         .where((element) => element.image.isNotEmpty)
         .toList();
 
-    const maxRowsPerPage = 9; // Rows per page
+    const maxRowsPerPage = 11; // Rows per page
     final totalPages = (items.length / maxRowsPerPage).ceil(); // Total pages needed
 
     for (int pageIndex = 0; pageIndex < totalPages; pageIndex++) {
@@ -288,10 +288,6 @@ class _OrderItemState extends State<OrderItem> {
                 ),
               ),
             );
-
-            pageContent.add(pw.SizedBox(height: 10));
-
-            pageContent.add(pw.SizedBox(height: 10));
 
             // Add table header separately (This should not mix with rows)
             pageContent.add(
