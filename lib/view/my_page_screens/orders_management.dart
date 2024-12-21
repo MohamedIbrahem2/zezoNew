@@ -386,14 +386,16 @@ class _OrderItemState extends State<OrderItem> {
                           : PdfColor.fromHex("#d5f0e8"),
                     ),
                     children: [
-                          pw.Padding(
+                  pw.Directionality(
+                  textDirection: pw.TextDirection.rtl,
+                         child:  pw.Padding(
                             padding: pw.EdgeInsets.all(8),
                             child: pw.Text(
                               cartItem.productName,
                               style: pw.TextStyle(font: arabicFont),
                             ),
                           ),
-
+                  ),
                       pw.Padding(
                         padding: const pw.EdgeInsets.all(8),
                         child: pw.Text(

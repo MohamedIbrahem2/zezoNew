@@ -355,7 +355,7 @@ class _SearchState extends State<Search> {
                                                         // }
                                                         CartService().addToCart(
                                                           productId: product.id,
-                                                          productName: product.brand,
+                                                          productName: product.title,
                                                           price: product.regularPrice -
                                                               product.discountPrice,
                                                           quantity: count,

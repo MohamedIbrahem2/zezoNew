@@ -440,7 +440,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                           ? FirebaseAuth.instance.currentUser!.uid
                                           : widget.uniqueId,
                                       quantity: 0,
-                                      productName: product.brand,
+                                      productName: product.title,
                                       image: product.images.first,
                                       price: product.regularPrice-product.discountPrice,
 

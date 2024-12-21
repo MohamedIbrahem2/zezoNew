@@ -1075,7 +1075,7 @@ class _HomePageState extends State<HomePage> {
                                                           CartService().addToCart(
                                                             productId: product.id,
                                                             productName:
-                                                                product.brand,
+                                                                product.title,
                                                             price: product
                                                                     .regularPrice -
                                                                 product
@@ -1451,7 +1451,7 @@ class _HomePageState extends State<HomePage> {
                                                                         product.id,
                                                                     productName:
                                                                         product
-                                                                            .brand,
+                                                                            .title,
                                                                     price: product
                                                                             .regularPrice -
                                                                         product
@@ -1783,7 +1783,7 @@ class _HomePageState extends State<HomePage> {
                                                           CartService().addToCart(
                                                             productId: product.id,
                                                             productName:
-                                                                product.brand,
+                                                                product.title,
                                                             price: product
                                                                     .regularPrice -
                                                                 product
@@ -2159,7 +2159,7 @@ class _HomePageState extends State<HomePage> {
                                                                             .id,
                                                                     productName:
                                                                         product
-                                                                            .brand,
+                                                                            .title,
                                                                     price: product
                                                                             .regularPrice -
                                                                         product
