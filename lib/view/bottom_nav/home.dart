@@ -1073,6 +1073,7 @@ class _HomePageState extends State<HomePage> {
                                                           //       'Sorry', 'Product already in cart');
                                                           // }
                                                           CartService().addToCart(
+                                                            productNameEng: product.brand,
                                                             productId: product.id,
                                                             productName:
                                                                 product.title,
@@ -1447,6 +1448,7 @@ class _HomePageState extends State<HomePage> {
                                                                   // }
                                                                   CartService()
                                                                       .addToCart(
+                                                                    productNameEng: product.brand,
                                                                     productId:
                                                                         product.id,
                                                                     productName:
@@ -1781,6 +1783,7 @@ class _HomePageState extends State<HomePage> {
                                                           //       'Sorry', 'Product already in cart');
                                                           // }
                                                           CartService().addToCart(
+                                                            productNameEng: product.brand,
                                                             productId: product.id,
                                                             productName:
                                                                 product.title,
@@ -2154,6 +2157,7 @@ class _HomePageState extends State<HomePage> {
                                                                   // }
                                                                   CartService()
                                                                       .addToCart(
+                                                                    productNameEng: product.brand,
                                                                     productId:
                                                                         product
                                                                             .id,

@@ -361,6 +361,7 @@ class _SearchState extends State<Search> {
                                                           quantity: count,
                                                           userId: FirebaseAuth
                                                               .instance.currentUser!.uid, image: product.images.first,
+                                                          productNameEng: product.brand,
                                                         );
                                                       },
                                                       child: const Center(

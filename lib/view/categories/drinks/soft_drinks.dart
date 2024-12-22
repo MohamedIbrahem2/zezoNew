@@ -282,6 +282,7 @@ class _DrinksItemsState extends State<SubCategoriesProducts> {
                                         //       'Sorry', 'Product already in cart');
                                         // }
                                         CartService().addToCart(
+                                          productNameEng: product.brand,
                                           productId: product.id,
                                           productName: product.title,
                                           price: product.regularPrice -

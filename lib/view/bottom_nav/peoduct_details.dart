@@ -434,6 +434,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                     Get.snackbar("", "unavailable product".tr);
                                   }else{
                                     CartService().addToCart(
+                                      productNameEng: product.brand,
                                       productId: product.id,
                                       userId: FirebaseAuth.instance.currentUser !=
                                           null

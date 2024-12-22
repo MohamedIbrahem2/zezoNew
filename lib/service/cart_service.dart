@@ -8,6 +8,7 @@ class CartItem {
   final String id;
   final String productId;
   final String productName;
+  final String productNameEng;
   final String image;
   final double price;
   final int quantity;
@@ -17,6 +18,7 @@ class CartItem {
       'id': id,
       'productId': productId,
       'productName': productName,
+      'productNameEng': productNameEng,
       'price': price,
       'quantity': quantity,
       'image': image,
@@ -27,6 +29,7 @@ class CartItem {
       : id = map['id'],
         productId = map['productId'],
         productName = map['productName'],
+        productNameEng = map['productNameEng'] ?? "",
         price = map['price'],
         image = map['image'] ?? '',
         quantity = map['quantity'];
@@ -36,11 +39,13 @@ class CartItem {
       required this.productName,
       required this.price,
       required this.image,
-      required this.quantity});
+      required this.quantity,
+        required this.productNameEng});
 
   factory CartItem.fromSnapshot(DocumentSnapshot snapshot) {
     final data = snapshot.data() as Map<String, dynamic>;
     return CartItem(
+      productNameEng: data['productNameEng'],
       id: snapshot.id,
       productId: data['productId'],
       productName: data['productName'],
@@ -56,6 +61,7 @@ class CartService {
       {required String productId,
       required String userId,
       required String productName,
+        required String productNameEng,
       required String image,
       required double price,
        double? discountPrice,
@@ -68,6 +74,7 @@ class CartService {
       await collection.doc(productId).set({
         'productId': productId,
         'productName': productName,
+        'productNameEng': productNameEng,
         'price': price,
         'discountPrice': discountPrice,
         'quantity': 1,

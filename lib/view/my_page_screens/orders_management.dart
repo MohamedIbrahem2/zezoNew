@@ -199,11 +199,13 @@ class OrderItem extends StatefulWidget {
 class _OrderItemState extends State<OrderItem> {
   double totalPrice = 0;
   double totalQuantity = 0;
+
   Future<void> generateAndPrintPDF() async {
     final pdf = pw.Document();
 
     // Load Arabic font
-    final font = await rootBundle.load("assets/fonts/NotoSansArabic-Regular.ttf");
+    final font =
+        await rootBundle.load("assets/fonts/NotoSansArabic-Regular.ttf");
     final arabicFont = pw.Font.ttf(font);
 
     // Fetch the order items
@@ -212,7 +214,8 @@ class _OrderItemState extends State<OrderItem> {
         .toList();
 
     const maxRowsPerPage = 11; // Rows per page
-    final totalPages = (items.length / maxRowsPerPage).ceil(); // Total pages needed
+    final totalPages =
+        (items.length / maxRowsPerPage).ceil(); // Total pages needed
 
     for (int pageIndex = 0; pageIndex < totalPages; pageIndex++) {
       final startIndex = pageIndex * maxRowsPerPage;
@@ -223,6 +226,7 @@ class _OrderItemState extends State<OrderItem> {
 
       pdf.addPage(
         pw.Page(
+          margin: const pw.EdgeInsets.all(15),
           pageFormat: PdfPageFormat.a4,
           build: (pw.Context context) {
             List<pw.Widget> pageContent = [];
@@ -231,59 +235,51 @@ class _OrderItemState extends State<OrderItem> {
             pageContent.add(
               pw.Directionality(
                 textDirection: pw.TextDirection.rtl,
-                child: pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.center,
                   children: [
                     pw.Container(
-                      padding: pw.EdgeInsets.all(10),
-                      color: PdfColor.fromHex("#d5f0e8"),
-                      child: pw.Text(
-                        widget.order.userProfile!.name,
-                        style: pw.TextStyle(
-                          fontSize: 24,
-                          fontWeight: pw.FontWeight.bold,
-                          color: PdfColors.black,
-                          font: arabicFont, // Ensure you're using the correct Arabic font
-                        ),
-                      ),
-                    ),
-                    pw.Column(
-                      children: [
-                    pw.Container(
                       padding: const pw.EdgeInsets.all(10),
-                      color:  PdfColor.fromHex("#007d8b"),
-                      child:
-                      pw.Text(
+                      color: PdfColor.fromHex("#007d8b"),
+                      child: pw.Text(
                         'اذن تسليم بضاعه',
                         style: pw.TextStyle(
                           fontSize: 24,
                           fontWeight: pw.FontWeight.bold,
                           color: PdfColors.white,
-                          font: arabicFont, // Ensure you're using the correct Arabic font
+                          font:
+                              arabicFont, // Ensure you're using the correct Arabic font
                         ),
                       ),
                     ),
-                          pw.Text(
-                            'التاريخ: ${formatDate(widget.order.deliveryDate)}',
+                    pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Container(
+                          padding: pw.EdgeInsets.all(10),
+                          color: PdfColor.fromHex("#d5f0e8"),
+                          child: pw.Text(
+                            widget.order.userProfile!.name,
                             style: pw.TextStyle(
                               fontSize: 24,
                               fontWeight: pw.FontWeight.bold,
                               color: PdfColors.black,
-                              font: arabicFont, // Ensure you're using the correct Arabic font
+                              font: arabicFont,
                             ),
                           ),
-                            pw.Text(
-                              'اسم العميل: ${widget.order.userProfile!.name}',
-                              style: pw.TextStyle(
-                                fontSize: 24,
-                                fontWeight: pw.FontWeight.bold,
-                                color: PdfColors.black,
-                                font: arabicFont, // Ensure you're using the correct Arabic font
-                              ),
-                            ),
-
+                        ),
+                        pw.Text(
+                          'التاريخ: ${formatDate(widget.order.deliveryDate)}',
+                          style: pw.TextStyle(
+                            fontSize: 24,
+                            fontWeight: pw.FontWeight.bold,
+                            color: PdfColors.black,
+                            font:
+                                arabicFont, // Ensure you're using the correct Arabic font
+                          ),
+                        ),
                       ],
-                    ),
+                    )
                   ],
                 ),
               ),
@@ -295,10 +291,11 @@ class _OrderItemState extends State<OrderItem> {
                 tableWidth: pw.TableWidth.max,
                 border: pw.TableBorder.all(color: PdfColors.grey),
                 columnWidths: {
-                  0: pw.FixedColumnWidth(300),
-                  1: pw.FixedColumnWidth(80),
-                  2: pw.FixedColumnWidth(100),
-                  3: pw.FixedColumnWidth(100),
+                  0: const pw.FixedColumnWidth(200),
+                  1: const pw.FixedColumnWidth(200),
+                  2: const pw.FixedColumnWidth(80),
+                  3: const pw.FixedColumnWidth(100),
+                  4: const pw.FixedColumnWidth(100),
                 },
                 children: [
                   pw.TableRow(
@@ -312,6 +309,20 @@ class _OrderItemState extends State<OrderItem> {
                           padding: pw.EdgeInsets.all(8),
                           child: pw.Text(
                             'الصنف',
+                            style: pw.TextStyle(
+                              font: arabicFont,
+                              fontWeight: pw.FontWeight.bold,
+                              color: PdfColors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                      pw.Directionality(
+                        textDirection: pw.TextDirection.rtl,
+                        child: pw.Padding(
+                          padding: pw.EdgeInsets.all(8),
+                          child: pw.Text(
+                            'item',
                             style: pw.TextStyle(
                               font: arabicFont,
                               fontWeight: pw.FontWeight.bold,
@@ -372,10 +383,11 @@ class _OrderItemState extends State<OrderItem> {
               pw.Table(
                 border: pw.TableBorder.all(color: PdfColors.grey),
                 columnWidths: {
-                  0: const pw.FixedColumnWidth(300),
-                  1: const pw.FixedColumnWidth(80),
-                  2: const pw.FixedColumnWidth(100),
+                  0: const pw.FixedColumnWidth(200),
+                  1: const pw.FixedColumnWidth(200),
+                  2: const pw.FixedColumnWidth(80),
                   3: const pw.FixedColumnWidth(100),
+                  4: const pw.FixedColumnWidth(100),
                 },
                 children: pageItems.map<pw.TableRow>((cartItem) {
                   totalQuantity += cartItem.quantity;
@@ -386,16 +398,24 @@ class _OrderItemState extends State<OrderItem> {
                           : PdfColor.fromHex("#d5f0e8"),
                     ),
                     children: [
-                  pw.Directionality(
-                  textDirection: pw.TextDirection.rtl,
-                         child:  pw.Padding(
-                            padding: pw.EdgeInsets.all(8),
-                            child: pw.Text(
-                              cartItem.productName,
-                              style: pw.TextStyle(font: arabicFont),
+                      pw.Directionality(
+                        textDirection: pw.TextDirection.rtl,
+                        child:
+                            pw.Padding(
+                              padding: pw.EdgeInsets.all(4),
+                              child: pw.Text(
+                                cartItem.productName,
+                                style: pw.TextStyle(font: arabicFont),
+                              ),
                             ),
-                          ),
-                  ),
+
+                      ),
+                      pw.Padding(
+                        padding: pw.EdgeInsets.all(4),
+                        child: pw.Text(
+                          cartItem.productNameEng,
+                        ),
+                      ),
                       pw.Padding(
                         padding: const pw.EdgeInsets.all(8),
                         child: pw.Text(
@@ -422,7 +442,6 @@ class _OrderItemState extends State<OrderItem> {
                     ],
                   );
                 }).toList(),
-
               ),
             );
             pageContent.add(
@@ -433,7 +452,8 @@ class _OrderItemState extends State<OrderItem> {
                   pw.TableRow(
                     children: [
                       pw.Container(
-                        color: const PdfColor.fromInt(0xffc5e1a5), // Light green
+                        color: const PdfColor.fromInt(0xffc5e1a5),
+                        // Light green
                         padding: const pw.EdgeInsets.all(8),
                         child: pw.Text(
                           'خصم',
@@ -460,16 +480,13 @@ class _OrderItemState extends State<OrderItem> {
                       pw.Container(
                         color: PdfColor.fromInt(0xff80deea), // Light blue
                         padding: pw.EdgeInsets.all(8),
-                        child: pw.Text(
-                          'WITH OUR BEST WISHES',
-                          style: pw.TextStyle(
-                            fontWeight: pw.FontWeight.bold,
-                            fontSize: 14,
-                            font: arabicFont
-                          ),
-                          textAlign: pw.TextAlign.center,
-                          textDirection: pw.TextDirection.rtl
-                        ),
+                        child: pw.Text('WITH OUR BEST WISHES',
+                            style: pw.TextStyle(
+                                fontWeight: pw.FontWeight.bold,
+                                fontSize: 14,
+                                font: arabicFont),
+                            textAlign: pw.TextAlign.center,
+                            textDirection: pw.TextDirection.rtl),
                       ),
                       pw.Container(
                         color: PdfColor.fromInt(0xfff8bbd0), // Light pink
@@ -544,7 +561,6 @@ class _OrderItemState extends State<OrderItem> {
                 ],
               ),
             );
-
 
             return pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,

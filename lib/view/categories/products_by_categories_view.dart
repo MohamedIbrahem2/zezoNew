@@ -6,9 +6,8 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:provider/provider.dart';
+import 'package:zezo/constants.dart';
 import 'package:zezo/service/category_service.dart';
-
-import '../../../constants.dart';
 import '../../main.dart';
 import '../../service/cart_service.dart';
 import '../../service/product_service.dart';
@@ -286,6 +285,7 @@ class _ProductsByCategoriesState extends State<ProductsByCategories> {
                                           //       'Sorry', 'Product already in cart');
                                           // }
                                           CartService().addToCart(
+                                            productNameEng: product.brand,
                                             productId: product.id,
                                             productName:
                                             product.title,
