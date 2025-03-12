@@ -6,7 +6,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_share/flutter_share.dart';
 import 'package:get/get.dart';
 import 'package:get/get_navigation/src/routes/get_transition_mixin.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -40,6 +39,7 @@ import '../drawer_screens/financial_management_screens/financial_manegment.dart'
 import '../drawer_screens/language.dart';
 import '../drawer_screens/obout_us.dart';
 import '../drawer_screens/prfile_screen.dart';
+import '../drawer_screens/sendMessageWhatsapp.dart';
 import '../drawer_screens/technical_support.dart';
 import '../drawer_screens/wallet.dart';
 import '../my_page_screens/qr_scanner.dart';
@@ -72,6 +72,45 @@ class _HomePageState extends State<HomePage> {
   String categoryId = "6GtrTH5CBa4CgQfPTRM4";
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  // final String targetEmail = "البريد الألكتروني"; // Replace with actual email
+  //
+  // Future<void> deleteUsers() async {
+  //   try {
+  //     FirebaseFirestore firestore = FirebaseFirestore.instance;
+  //     QuerySnapshot querySnapshot = await firestore
+  //         .collection('users')
+  //         .where('email', isEqualTo: targetEmail)
+  //         .get();
+  //
+  //     for (var doc in querySnapshot.docs) {
+  //       await doc.reference.delete();
+  //     }
+  //
+  //     print("Deleted ${querySnapshot.docs.length} users with email: $targetEmail");
+  //   } catch (e) {
+  //     print("Error deleting users: $e");
+  //   }
+  // }
+  // Future<void> updateAllDocuments() async {
+  //   try {
+  //     QuerySnapshot querySnapshot =
+  //     await _firestore.collection('depsitsClients').get();
+  //
+  //     for (var doc in querySnapshot.docs) {
+  //       await _firestore.collection('depsitsClients').doc(doc.id).update({
+  //         'phone': '',
+  //       });
+  //     }
+  //
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('All documents updated successfully')),
+  //     );
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Error updating documents: $e')),
+  //     );
+  //   }
+  // }
   Future<void> _saveProfile() async {
     await _firestore.collection('users').doc(widget.uniqueId).set({
       'name': "الأسم",
@@ -195,6 +234,10 @@ class _HomePageState extends State<HomePage> {
                   alignment: Alignment.center,
                   color: Colors.blue.shade50,
                 ),
+          // ElevatedButton(
+          //   onPressed: updateAllDocuments,
+          //   child: Text("Delete Users"),
+          // ),
                 ListTile(
                   title: Text(
                     'account_points'.tr,
@@ -317,6 +360,17 @@ class _HomePageState extends State<HomePage> {
                       Get.to(const SendMessage());
                     },
                   ),
+                // if (context.watch<AdminProvider>().isAdmin)
+                //   ListTile(
+                //     title: Text(
+                //       'sendMessageWhatsApp'.tr,
+                //       style: const TextStyle(
+                //           fontSize: 18, fontWeight: FontWeight.bold),
+                //     ),
+                //     onTap: () {
+                //       Get.to(WhatsAppSenderScreen());
+                //     },
+                //   ),
                 if (context.watch<AdminProvider>().isAdmin)
                   ListTile(
                     title: Text(
@@ -364,10 +418,10 @@ class _HomePageState extends State<HomePage> {
                         'Share our app with others: $appLink';
 
                     // Share the app link and message using the share dialog
-                    await FlutterShare.share(
-                        title: 'مشاركة التطبيق',
-                        text: message,
-                        linkUrl: appLink);
+                    // await FlutterShare.share(
+                    //     title: 'مشاركة التطبيق',
+                    //     text: message,
+                    //     linkUrl: appLink);
                   },
                 ),
                 FirebaseAuth.instance.currentUser == null

@@ -81,7 +81,7 @@ class _CheckHomeState extends State<CheckHome> {
       context: context,
       initialDate: DateTime.now().add(const Duration(days: 1)),
       firstDate: DateTime.now().add(const Duration(days: 1)),
-      lastDate: DateTime(2025),
+      lastDate: DateTime(2026),
       selectableDayPredicate: _isSelectableDate, // Disabling Fridays
     );
 

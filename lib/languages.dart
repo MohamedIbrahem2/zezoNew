@@ -187,8 +187,10 @@ class Languages extends Translations {
           "total price" : "Total Price",
           "order date" : "Order Date",
           "invoice number" : "Invoice Number",
+          "sendMessageWhatsApp" : "Send Whats App Message",
         },
         'ar': {
+          "sendMessageWhatsApp" : "ارسال رساله واتساب",
           "invoice number" : "رقم الفاتورة",
           "order date" : "تاريخ الطلب",
           "total price" : "المبلغ الكلي",

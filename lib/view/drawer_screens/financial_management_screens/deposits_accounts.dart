@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:zezo/view/drawer_screens/financial_management_screens/deposits_info.dart';
 
 import '../../../constants.dart';
@@ -15,26 +17,40 @@ class _DepositsAccountsState extends State<DepositsAccounts> {
   final TextEditingController searchValue = TextEditingController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   List<QueryDocumentSnapshot> allNumbers = [];
+  Future<void> sendMessages(String message,String number) async {
+
+      Uri url = Uri.parse("https://wa.me/$number?text=$message");
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication); // Opens in WhatsApp
+      }// Delay between messages
+  }
   void _showAddNumberDialog() {
     final TextEditingController nameController = TextEditingController();
     final TextEditingController costController = TextEditingController();
+    final TextEditingController phoneController = TextEditingController();
 
-    Future<void> _addNumberToFirestore(String name, String cost) async {
+    Future<void> addNumberToFirestore(String name, String cost, String phone) async {
       try {
         await _firestore.collection('depsitsClients').add({
           'name': name,
           'cost': int.parse(cost),
-          'date': Timestamp.now(), // Store current date
+          'date': Timestamp.now(),
+          'phone' : phone ,// Store current date
         });
+        ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('تمت اضافة العميل')),
+              );
       } catch (e) {
         print('Error adding number: $e');
       }
     }
 
+    const String countryCode = '+966'; // Fixed Saudi country code
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('اضافه عميل'),
+        title: const Text('إضافة عميل'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -48,6 +64,19 @@ class _DepositsAccountsState extends State<DepositsAccounts> {
               controller: costController,
               decoration: const InputDecoration(labelText: 'الرصيد'),
             ),
+            Row(
+              children: [
+                const Text("+966", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: TextField(
+                    keyboardType: TextInputType.phone,
+                    controller: phoneController,
+                    decoration: const InputDecoration(labelText: 'رقم الهاتف'),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
         actions: [
@@ -55,19 +84,21 @@ class _DepositsAccountsState extends State<DepositsAccounts> {
             onPressed: () {
               Navigator.pop(context);
             },
-            child: const Text('الغاء'),
+            child: const Text('إلغاء'),
           ),
           TextButton(
             onPressed: () {
               final name = nameController.text.trim();
               final cost = costController.text.trim();
+              final phone = phoneController.text.trim();
+              final fullPhoneNumber = countryCode + phone; // Ensure it starts with +966
 
-              if (name.isNotEmpty) {
-                _addNumberToFirestore(name, cost ?? "لا يوجد");
+              if (name.isNotEmpty && phone.isNotEmpty) {
+                addNumberToFirestore(name, cost.isNotEmpty ? cost : "لا يوجد", fullPhoneNumber);
                 Navigator.pop(context);
               }
             },
-            child: const Text('اضافة'),
+            child: const Text('إضافة'),
           ),
         ],
       ),
@@ -353,7 +384,7 @@ class _DepositsAccountsState extends State<DepositsAccounts> {
                   ),
                   child: Center(
                     child: Text(
-                      'مجموع الأرصده: ${totalCost.toString()}', // Display the total cost with 2 decimal places
+                      'مجموع الأرصده: ${totalCost.toStringAsFixed(2)}',
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -422,7 +453,7 @@ class _DepositsAccountsState extends State<DepositsAccounts> {
                         child: Center(
                           child: Container(
                             width: 350,
-                            height: Get.height * 0.33,
+                            height: Get.height * 0.36,
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(20),
@@ -462,7 +493,7 @@ class _DepositsAccountsState extends State<DepositsAccounts> {
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
-                                      '${number['cost']}  : الرصيد',
+                                      '${double.parse(number['cost'].toString()).toStringAsFixed(2)}  : الرصيد',
                                       style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
                                     ),
                                   ),
@@ -522,6 +553,26 @@ class _DepositsAccountsState extends State<DepositsAccounts> {
                                       ],
                                     ),
                                   ),
+                                  number['phone'] != "" ? Center(
+                                    child: SizedBox(
+                                      height: Get.height * 0.04,
+                                      width: Get.width * 0.6,
+                                      child: ElevatedButton(
+                                        onPressed: () => sendMessages("رصيد مديونيتك الحالي هو : *${double.parse(number['cost'].toString()).toStringAsFixed(2)}*", number['phone']),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            FaIcon(FontAwesomeIcons.whatsapp,color: Colors.white,),
+                                            Text('ارسال واتساب', style: TextStyle(fontSize: 18, color: Colors.white)),
+                                          ],
+                                        ),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.green,
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                        ),
+                                      ),
+                                    ),
+                                  ) : const SizedBox(),
                                 ],
                               ),
                             ),
