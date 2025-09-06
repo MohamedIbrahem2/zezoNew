@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:flutter/services.dart';
 import 'dart:developer' as devtools show log;
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -312,7 +311,7 @@ class FcmProvider {
       token = event;
       await saveTokenToFirestore(FirebaseAuth.instance.currentUser!.uid);
     });
-    listenToNotification();
+    //listenToNotification();
   }
 
   Future<void> saveTokenToFirestore(String userId) async {
@@ -372,50 +371,50 @@ class FcmProvider {
   }
 
 // listen to notification
-  Future<void> listenToNotification() async {
-    try {
-      await FirebaseMessaging.instance
-          .getInitialMessage()
-          .then((RemoteMessage? message) {
-        if (message != null) {
-          AwesomeNotifications().createNotification(
-            content: NotificationContent(
-              id: 10,
-              channelKey: 'basic_channel',
-              title: message.notification!.title,
-              body: message.notification!.body,
-            ),
-          );
-        }
-      });
-      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-        AwesomeNotifications().createNotification(
-          content: NotificationContent(
-            id: 10,
-            channelKey: 'basic_channel',
-            title: message.notification!.title,
-            body: message.notification!.body,
-          ),
-        );
-        print('''
-********** onMessage **********
-${message.notification!.title}
-${message.notification!.body}
-${message.data}
-********** onMessage **********
-
-
-
-
-''');
-        if (message.data['orderId'] != null) {
-          NotificationsDB.instance.addNotification(
-            notification: OrderNotification.fromRemoteMessage(message),
-          );
-        }
-      });
-    } catch (e) {
-      print('Error listening to notification: $e');
-    }
-  }
+//   Future<void> listenToNotification() async {
+//     try {
+//       await FirebaseMessaging.instance
+//           .getInitialMessage()
+//           .then((RemoteMessage? message) {
+//         if (message != null) {
+//           AwesomeNotifications().createNotification(
+//             content: NotificationContent(
+//               id: 10,
+//               channelKey: 'basic_channel',
+//               title: message.notification!.title,
+//               body: message.notification!.body,
+//             ),
+//           );
+//         }
+//       });
+// //       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+// //         AwesomeNotifications().createNotification(
+// //           content: NotificationContent(
+// //             id: 10,
+// //             channelKey: 'basic_channel',
+// //             title: message.notification!.title,
+// //             body: message.notification!.body,
+// //           ),
+// //         );
+// //         print('''
+// // ********** onMessage **********
+// // ${message.notification!.title}
+// // ${message.notification!.body}
+// // ${message.data}
+// // ********** onMessage **********
+// //
+// //
+// //
+// //
+// // ''');
+// //         if (message.data['orderId'] != null) {
+// //           NotificationsDB.instance.addNotification(
+// //             notification: OrderNotification.fromRemoteMessage(message),
+// //           );
+// //         }
+// //       });
+//     } catch (e) {
+//       print('Error listening to notification: $e');
+//     }
+//   }
 }

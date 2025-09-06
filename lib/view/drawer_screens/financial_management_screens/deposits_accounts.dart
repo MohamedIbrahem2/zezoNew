@@ -19,10 +19,10 @@ class _DepositsAccountsState extends State<DepositsAccounts> {
   List<QueryDocumentSnapshot> allNumbers = [];
   Future<void> sendMessages(String message,String number) async {
 
-      Uri url = Uri.parse("https://wa.me/$number?text=$message");
-      if (await canLaunchUrl(url)) {
-        await launchUrl(url, mode: LaunchMode.externalApplication); // Opens in WhatsApp
-      }// Delay between messages
+    Uri url = Uri.parse("https://wa.me/$number?text=$message");
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication); // Opens in WhatsApp
+    }// Delay between messages
   }
   void _showAddNumberDialog() {
     final TextEditingController nameController = TextEditingController();
@@ -38,8 +38,8 @@ class _DepositsAccountsState extends State<DepositsAccounts> {
           'phone' : phone ,// Store current date
         });
         ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('تمت اضافة العميل')),
-              );
+          SnackBar(content: Text('تمت اضافة العميل')),
+        );
       } catch (e) {
         print('Error adding number: $e');
       }
@@ -120,7 +120,7 @@ class _DepositsAccountsState extends State<DepositsAccounts> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-             _showDialogAndUpdateCostMines(action, clientId, currentCost);
+              _showDialogAndUpdateCostMines(action, clientId, currentCost);
             },
             child: const Text('خصم'),
           ),
@@ -128,7 +128,7 @@ class _DepositsAccountsState extends State<DepositsAccounts> {
       ),
     );
   }
-  void _showDialogAndUpdateCostMines(String action, String clientId, int currentCost) async{
+  void _showDialogAndUpdateCostMines(var action, var clientId, var currentCost) async{
     final TextEditingController amountController = TextEditingController();
     final TextEditingController descriptionController = TextEditingController();
     String? selectedRepresentative;
@@ -154,72 +154,72 @@ class _DepositsAccountsState extends State<DepositsAccounts> {
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
-        builder: (context, setState) {
-          return AlertDialog(
-            title: Text('$action - إدخال المبلغ'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: amountController,
-                  decoration: const InputDecoration(labelText: 'المبلغ'),
-                  keyboardType: TextInputType.number,
-                ),
-                TextField(
-                  controller: descriptionController,
-                  decoration: const InputDecoration(labelText: 'ملحوظه'),
-                ),
-                // Dropdown to select representative name
-                if (representativeNames.isNotEmpty)
-                  DropdownButton<String>(
-                    value: selectedRepresentative,
-                    hint:  Text("اختار اسم المندوب"),
-                    onChanged: (String? newValue) {
-                      setState(() {
-
-                        selectedRepresentative = newValue;
-                        print(selectedRepresentative);
-                      });
-                    },
-                    items: representativeNames.map((String representative) {
-                      return DropdownMenuItem<String>(
-                        value: representative,
-                        child: Text(representative),
-                      );
-                    }).toList(),
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('$action - إدخال المبلغ'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: amountController,
+                    decoration: const InputDecoration(labelText: 'المبلغ'),
+                    keyboardType: TextInputType.number,
                   ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('الغاء'),
+                  TextField(
+                    controller: descriptionController,
+                    decoration: const InputDecoration(labelText: 'ملحوظه'),
+                  ),
+                  // Dropdown to select representative name
+                  if (representativeNames.isNotEmpty)
+                    DropdownButton<String>(
+                      value: selectedRepresentative,
+                      hint:  Text("اختار اسم المندوب"),
+                      onChanged: (String? newValue) {
+                        setState(() {
+
+                          selectedRepresentative = newValue;
+                          print(selectedRepresentative);
+                        });
+                      },
+                      items: representativeNames.map((String representative) {
+                        return DropdownMenuItem<String>(
+                          value: representative,
+                          child: Text(representative),
+                        );
+                      }).toList(),
+                    ),
+                ],
               ),
-              TextButton(
-                onPressed: () {
-                  final amount = int.tryParse(amountController.text.trim());
-                  if (amount != null && amount > 0) {
-                    _updateCostInFirestore(clientId, currentCost - amount,
-                        descriptionController.text,action,amount,selectedRepresentative!,);
+              actions: [
+                TextButton(
+                  onPressed: () {
                     Navigator.pop(context);
-                  } else {
-                    // Show an error message if the amount is invalid
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('يرجى إدخال مبلغ صالح')),
-                    );
-                  }
-                },
-                child: const Text('اضافة'),
-              ),
-            ],
-          );
-        }
+                  },
+                  child: const Text('الغاء'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    final amount = int.tryParse(amountController.text.trim());
+                    if (amount != null && amount > 0) {
+                      _updateCostInFirestore(clientId, currentCost.toInt() - amount.toInt(),
+                        descriptionController.text,action,amount,selectedRepresentative!,);
+                      Navigator.pop(context);
+                    } else {
+                      // Show an error message if the amount is invalid
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('يرجى إدخال مبلغ صالح')),
+                      );
+                    }
+                  },
+                  child: const Text('اضافة'),
+                ),
+              ],
+            );
+          }
       ),
     );
   }
-  void _showDialogAndUpdateCostPLus(String action, String clientId, int currentCost) async {
+  void _showDialogAndUpdateCostPLus(var action, var clientId, var currentCost) async {
     final TextEditingController amountController = TextEditingController();
     final TextEditingController descriptionController = TextEditingController();
     String? selectedRepresentative;
@@ -246,72 +246,72 @@ class _DepositsAccountsState extends State<DepositsAccounts> {
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
-        builder: (context, setState) {
-          return AlertDialog(
-            title: Text('$action - إدخال المبلغ'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: amountController,
-                  decoration: const InputDecoration(labelText: 'المبلغ'),
-                  keyboardType: TextInputType.number,
-                ),
-                TextField(
-                  controller: descriptionController,
-                  decoration: const InputDecoration(labelText: 'ملحوظه'),
-                ),
-                // Dropdown to select representative name
-                if (representativeNames.isNotEmpty)
-                  DropdownButton<String>(
-                    value: selectedRepresentative,
-                    hint: const Text('اختار اسم المندوب'),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedRepresentative = newValue;
-                      });
-                    },
-                    items: representativeNames.map((String representative) {
-                      return DropdownMenuItem<String>(
-                        value: representative,
-                        child: Text(representative),
-                      );
-                    }).toList(),
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('$action - إدخال المبلغ'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: amountController,
+                    decoration: const InputDecoration(labelText: 'المبلغ'),
+                    keyboardType: TextInputType.number,
                   ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('الغاء'),
+                  TextField(
+                    controller: descriptionController,
+                    decoration: const InputDecoration(labelText: 'ملحوظه'),
+                  ),
+                  // Dropdown to select representative name
+                  if (representativeNames.isNotEmpty)
+                    DropdownButton<String>(
+                      value: selectedRepresentative,
+                      hint: const Text('اختار اسم المندوب'),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          selectedRepresentative = newValue;
+                        });
+                      },
+                      items: representativeNames.map((String representative) {
+                        return DropdownMenuItem<String>(
+                          value: representative,
+                          child: Text(representative),
+                        );
+                      }).toList(),
+                    ),
+                ],
               ),
-              TextButton(
-                onPressed: () {
-                  final amount = int.tryParse(amountController.text.trim());
-                  if (amount != null && amount > 0 && selectedRepresentative != null) {
-                    _updateCostInFirestore(
-                      clientId,
-                      currentCost + amount,
-                      descriptionController.text,
-                      action,
-                      amount,
-                      selectedRepresentative!,
-                    );
+              actions: [
+                TextButton(
+                  onPressed: () {
                     Navigator.pop(context);
-                  } else {
-                    // Show an error message if the amount is invalid or no representative is selected
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('يرجى إدخال مبلغ صالح واختيار المندوب')),
-                    );
-                  }
-                },
-                child: const Text('اضافة'),
-              ),
-            ],
-          );
-        }
+                  },
+                  child: const Text('الغاء'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    final amount = int.tryParse(amountController.text.trim());
+                    if (amount != null && amount > 0 && selectedRepresentative != null) {
+                      _updateCostInFirestore(
+                        clientId,
+                        currentCost + amount,
+                        descriptionController.text,
+                        action,
+                        amount,
+                        selectedRepresentative!,
+                      );
+                      Navigator.pop(context);
+                    } else {
+                      // Show an error message if the amount is invalid or no representative is selected
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('يرجى إدخال مبلغ صالح واختيار المندوب')),
+                      );
+                    }
+                  },
+                  child: const Text('اضافة'),
+                ),
+              ],
+            );
+          }
       ),
     );
   }
@@ -383,9 +383,18 @@ class _DepositsAccountsState extends State<DepositsAccounts> {
                     ],
                   ),
                   child: Center(
-                    child: Text(
-                      'مجموع الأرصده: ${totalCost.toStringAsFixed(2)}',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'مجموع الأرصده',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          ' ${totalCost.toStringAsFixed(2)}',
+                          style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold,color: Colors.red),
+                        ),
+                      ],
                     ),
                   ),
                 );
@@ -484,8 +493,8 @@ class _DepositsAccountsState extends State<DepositsAccounts> {
                                       Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Text(
-                                          'اسم العميل:  ${number['name']}',
-                                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                          '${number['name']}',
+                                          style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold,color: Colors.green),
                                         ),
                                       ),
                                     ],
@@ -494,7 +503,7 @@ class _DepositsAccountsState extends State<DepositsAccounts> {
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
                                       '${double.parse(number['cost'].toString()).toStringAsFixed(2)}  : الرصيد',
-                                      style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
+                                      style: TextStyle(fontSize: 20, color: Colors.red, fontWeight: FontWeight.bold),
                                     ),
                                   ),
                                   Padding(
@@ -553,7 +562,8 @@ class _DepositsAccountsState extends State<DepositsAccounts> {
                                       ],
                                     ),
                                   ),
-                                  number['phone'] != "" ? Center(
+                                  (number.data() as Map<String, dynamic>).containsKey('phone') && number['phone'] != ""
+                                      ? Center(
                                     child: SizedBox(
                                       height: Get.height * 0.04,
                                       width: Get.width * 0.6,

@@ -201,6 +201,8 @@ class _OrderItemState extends State<OrderItem> {
   double totalQuantity = 0;
 
   Future<void> generateAndPrintPDF() async {
+    final ByteData imageData = await rootBundle.load('images/miftahlogo.jpeg');
+    final Uint8List imageBytes = imageData.buffer.asUint8List();
     final pdf = pw.Document();
 
     // Load Arabic font
@@ -226,7 +228,7 @@ class _OrderItemState extends State<OrderItem> {
 
       pdf.addPage(
         pw.Page(
-          margin: const pw.EdgeInsets.all(15),
+          margin: const pw.EdgeInsets.all(7),
           pageFormat: PdfPageFormat.a4,
           build: (pw.Context context) {
             List<pw.Widget> pageContent = [];
@@ -238,30 +240,46 @@ class _OrderItemState extends State<OrderItem> {
                 child: pw.Column(
                   crossAxisAlignment: pw.CrossAxisAlignment.center,
                   children: [
-                    pw.Container(
-                      padding: const pw.EdgeInsets.all(10),
-                      color: PdfColor.fromHex("#007d8b"),
-                      child: pw.Text(
-                        'اذن تسليم بضاعه',
-                        style: pw.TextStyle(
-                          fontSize: 24,
-                          fontWeight: pw.FontWeight.bold,
-                          color: PdfColors.white,
-                          font:
-                              arabicFont, // Ensure you're using the correct Arabic font
-                        ),
-                      ),
-                    ),
+                   pw.Row(
+                     mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
+                     children:[
+                       pw.Text(
+                           'اذن تسليم بضاعه',
+                           style: pw.TextStyle(
+                             fontSize: 19,
+                             fontWeight: pw.FontWeight.bold,
+                             color: PdfColors.black,
+                             font:
+                             arabicFont, // Ensure you're using the correct Arabic font
+                           ),
+                       ),
+                       pw.Text(
+                         'شركة مفتاح الوادي',
+                         style: pw.TextStyle(
+                           fontSize: 20,
+                           fontWeight: pw.FontWeight.bold,
+                           color: PdfColors.teal,
+                           font:
+                           arabicFont, // Ensure you're using the correct Arabic font
+                         ),
+                       ),
+                       pw.Image(
+                         pw.MemoryImage(imageBytes),
+                         width: 150,
+                         height: 100,
+                       ),
+                     ]
+                   ),
                     pw.Row(
-                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
                       children: [
                         pw.Container(
-                          padding: pw.EdgeInsets.all(10),
+                          padding: pw.EdgeInsets.all(5),
                           color: PdfColor.fromHex("#d5f0e8"),
                           child: pw.Text(
                             widget.order.userProfile!.name,
                             style: pw.TextStyle(
-                              fontSize: 24,
+                              fontSize: 19,
                               fontWeight: pw.FontWeight.bold,
                               color: PdfColors.black,
                               font: arabicFont,
@@ -269,9 +287,19 @@ class _OrderItemState extends State<OrderItem> {
                           ),
                         ),
                         pw.Text(
+                          '0555808297',
+                          style: pw.TextStyle(
+                            fontSize: 19,
+                            fontWeight: pw.FontWeight.bold,
+                            color: PdfColors.black,
+                            font:
+                            arabicFont, // Ensure you're using the correct Arabic font
+                          ),
+                        ),
+                       pw.Text(
                           'التاريخ: ${formatDate(widget.order.deliveryDate)}',
                           style: pw.TextStyle(
-                            fontSize: 24,
+                            fontSize: 17,
                             fontWeight: pw.FontWeight.bold,
                             color: PdfColors.black,
                             font:
@@ -306,12 +334,14 @@ class _OrderItemState extends State<OrderItem> {
                       pw.Directionality(
                         textDirection: pw.TextDirection.rtl,
                         child: pw.Padding(
-                          padding: pw.EdgeInsets.all(8),
+                          padding: pw.EdgeInsets.all(5),
                           child: pw.Text(
                             'الصنف',
                             style: pw.TextStyle(
                               font: arabicFont,
                               fontWeight: pw.FontWeight.bold,
+                              fontSize: 10,
+
                               color: PdfColors.white,
                             ),
                           ),
@@ -326,6 +356,8 @@ class _OrderItemState extends State<OrderItem> {
                             style: pw.TextStyle(
                               font: arabicFont,
                               fontWeight: pw.FontWeight.bold,
+                              fontSize: 10,
+
                               color: PdfColors.white,
                             ),
                           ),
@@ -340,6 +372,8 @@ class _OrderItemState extends State<OrderItem> {
                             style: pw.TextStyle(
                               font: arabicFont,
                               fontWeight: pw.FontWeight.bold,
+                              fontSize: 10,
+
                               color: PdfColors.white,
                             ),
                           ),
@@ -354,6 +388,7 @@ class _OrderItemState extends State<OrderItem> {
                             style: pw.TextStyle(
                               font: arabicFont,
                               fontWeight: pw.FontWeight.bold,
+                              fontSize: 10,
                               color: PdfColors.white,
                             ),
                           ),
@@ -368,6 +403,8 @@ class _OrderItemState extends State<OrderItem> {
                             style: pw.TextStyle(
                               font: arabicFont,
                               fontWeight: pw.FontWeight.bold,
+                              fontSize: 10,
+
                               color: PdfColors.white,
                             ),
                           ),
@@ -417,7 +454,7 @@ class _OrderItemState extends State<OrderItem> {
                         ),
                       ),
                       pw.Padding(
-                        padding: const pw.EdgeInsets.all(8),
+                        padding: const pw.EdgeInsets.all(5),
                         child: pw.Text(
                           cartItem.quantity.toString(),
                           style: pw.TextStyle(font: arabicFont),
@@ -452,6 +489,7 @@ class _OrderItemState extends State<OrderItem> {
                   pw.TableRow(
                     children: [
                       pw.Container(
+
                         color: const PdfColor.fromInt(0xffc5e1a5),
                         // Light green
                         padding: const pw.EdgeInsets.all(8),

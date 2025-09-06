@@ -1,5 +1,4 @@
-package com.example.zezo_new
-
+package com.khstockatzezo
 import io.flutter.embedding.android.FlutterActivity
 
 class MainActivity: FlutterActivity()

@@ -1,6 +1,5 @@
 // @dart=2.16
 
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -33,19 +32,19 @@ main() async {
   String? token = await FirebaseMessaging.instance.getToken();
   print(token);
   // initialize awesome notifications
-  AwesomeNotifications().initialize(
-    null,
-    [
-      NotificationChannel(
-        channelKey: 'basic_channel',
-        channelName: 'Basic notifications',
-        channelDescription: 'Notifica '
-            'tion channel for basic tests',
-        defaultColor: Colors.teal,
-        ledColor: Colors.white,
-      ),
-    ],
-  );
+  // AwesomeNotifications().initialize(
+  //   null,
+  //   [
+  //     NotificationChannel(
+  //       channelKey: 'basic_channel',
+  //       channelName: 'Basic notifications',
+  //       channelDescription: 'Notifica '
+  //           'tion channel for basic tests',
+  //       defaultColor: Colors.teal,
+  //       ledColor: Colors.white,
+  //     ),
+  //   ],
+  // );
 
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => BottomNavbarProvider()),

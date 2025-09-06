@@ -94,7 +94,7 @@ class SignUp extends GetWidget<AuthViewModel> {
                               controller.name = value;
                             },
                             decoration:  InputDecoration(
-                              labelText: 'name'.tr,
+                              labelText: 'name (Shop name)'.tr,
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                                 borderSide: BorderSide(

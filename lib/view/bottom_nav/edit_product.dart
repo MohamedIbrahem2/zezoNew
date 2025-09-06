@@ -27,6 +27,7 @@ class _EditProductState extends State<EditProduct> {
   final name2Controller = TextEditingController();
   var priceController = TextEditingController();
   var deiscountController = TextEditingController();
+  var defaultcategory;
   @override
   void initState() {
     // priceController.text = '0';
@@ -36,6 +37,7 @@ class _EditProductState extends State<EditProduct> {
     priceController.text = widget.product.regularPrice.toString();
     deiscountController.text = widget.product.discountPrice.toString();
     _imageUrl = widget.product.images.first;
+    defaultcategory = widget.product.category;
 
     // CategoryService().getCategoryById(widget.product.categoryId).then((value) {
     //   setState(() {
@@ -145,9 +147,9 @@ class _EditProductState extends State<EditProduct> {
                         final categories = snapshot.data;
                         return DropdownButtonFormField<Category>(
                             value: category,
-                            decoration: const InputDecoration(
-                              labelText: 'Category',
-                              border: OutlineInputBorder(
+                            decoration: InputDecoration(
+                              labelText: widget.product.category,
+                              border: const OutlineInputBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(10)),
                               ),

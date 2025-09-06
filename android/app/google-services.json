@@ -48,7 +48,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:970646820738:android:a6dc50da3c995deb48a19b",
         "android_client_info": {
-          "package_name": "com.stockat"
+          "package_name": "com.khstockatzezo"
         }
       },
       "oauth_client": [
@@ -56,7 +56,7 @@
           "client_id": "970646820738-m01th78sev1dg2i86l7g3qbugu29597r.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.stockat",
+            "package_name": "com.khstockatzezo",
             "certificate_hash": "b978026db62105127d45c294e794203e9a5906ea"
           }
         },

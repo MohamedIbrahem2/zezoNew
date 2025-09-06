@@ -1,0 +1,2 @@
+/Users/khaledsallam/Downloads/zezoNew/android/app/.cxx/Debug/5k5f5152/x86_64/CMakeFiles/edit_cache.dir
+/Users/khaledsallam/Downloads/zezoNew/android/app/.cxx/Debug/5k5f5152/x86_64/CMakeFiles/rebuild_cache.dir
