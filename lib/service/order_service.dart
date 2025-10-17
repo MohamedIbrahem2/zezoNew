@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:zezo/fcm_provider.dart';
 import 'package:zezo/main.dart';
 import 'package:zezo/service/address_service.dart';
 import 'package:zezo/service/product_service.dart';
@@ -21,6 +22,8 @@ class Order {
   final String userId;
   final List<CartItem> items;
   final double totalAmount;
+  final double totalAmountAfterEdit;
+  final String clientName;
   final DateTime orderDate;
   final Address? address; // New field for address
   final DateTime deliveryDate; // New field for delivery date
@@ -35,6 +38,8 @@ class Order {
       required this.items,
       required this.totalAmount,
       required this.orderDate,
+        required this.totalAmountAfterEdit,
+        required this.clientName,
       this.address,
       this.invoiceNumber,
       required this.deliveryDate,
@@ -57,6 +62,8 @@ class Order {
             : UserProfile.fromMap(data['userProfile']),
         items: cartItems,
         totalAmount: data['totalAmount'],
+        totalAmountAfterEdit: data['totalAmountAfterEdit'] ?? 0.0,
+        clientName: data['clientName'] ?? "",
         orderDate: (data['orderDate'] as Timestamp).toDate(),
         status: data['status'],
         phones: data['phones'] == null
@@ -90,6 +97,8 @@ class Order {
           ? null
           : UserProfile.fromMap(data['userProfile']),
       totalAmount: data['totalAmount'],
+      totalAmountAfterEdit: data['totalAmountAfterEdit'] ?? 0.0,
+      clientName: data['clientName'] ?? "",
       orderDate: (data['orderDate'] as Timestamp).toDate(),
       phones: data['phones'] == null ? null : List<String>.from(data['phones']),
 
@@ -106,6 +115,7 @@ class OrderService {
       String userId,
       List<CartItem> items,
       double totalAmount,
+      String clientName,
       Address address,
       DateTime deliveryDate,
       List<String> phones) async {
@@ -116,6 +126,7 @@ class OrderService {
       'userId': userId,
       'items': items.map((item) => item.toMap()).toList(),
       'totalAmount': totalAmount,
+      'clientName' : clientName,
       'orderDate': orderDate,
       'status': OrderStatusKeys.pending,
       'address': address.toMap(), // Add address value to the order
@@ -124,7 +135,7 @@ class OrderService {
       'userProfile': userPrfile.toMap(),
       'phones': phones,
     });
-// clear cart
+    await FcmProvider().sendMessageAdmin(clientName);
     final cartCollection = FirebaseFirestore.instance.collection('cart');
     final cartItems = await cartCollection
         .where('userId', isEqualTo: userId)

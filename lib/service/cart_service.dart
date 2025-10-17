@@ -10,8 +10,8 @@ class CartItem {
   final String productName;
   final String productNameEng;
   final String image;
-  final double price;
-  final int quantity;
+   double price;
+   int quantity;
 // to map
   Map<String, dynamic> toMap() {
     return {

@@ -107,6 +107,60 @@ class FcmProvider {
 
     client.close(); // Close the OAuth client
   }
+  Future<void> sendMessageAdmin(String clientName) async {
+    // Step 1: Get tokens of users who are admins
+    List<String> adminTokens = [];
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .where('isAdmin', isEqualTo: true)
+        .get()
+        .then((querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        if (doc.data().containsKey('fcm')) {
+          String? token = doc['fcm'];
+          if (token != null && token.isNotEmpty) {
+            adminTokens.add(token);
+          }
+        } else {
+          print('Admin ${doc.id} does not contain "fcm"');
+        }
+      }
+    });
+
+    if (adminTokens.isEmpty) {
+      print('No admin tokens found.');
+      return;
+    }
+
+    // Step 2: Load service account credentials
+    final jsonCredentials = await rootBundle.loadString('data/zezo-6778a-674cf09cf39d.json');
+    final creds = auth.ServiceAccountCredentials.fromJson(jsonCredentials);
+
+    final client = await auth.clientViaServiceAccount(
+      creds,
+      ['https://www.googleapis.com/auth/cloud-platform'],
+    );
+
+    // Step 3: Send notification message to each admin
+    for (String token in adminTokens) {
+      bool success = await sendPushMessage(
+        recipientToken: token,
+        title: 'طلب جديد',
+        body: 'تم إضافة أوردر جديد بواسطة $clientName',
+        client: client,
+      );
+
+      if (success) {
+        print('Admin notified successfully: $token');
+      } else {
+        print('Failed to send message to admin: $token');
+      }
+    }
+
+    client.close();
+  }
+
   Future<void> sendMessage1(List<String> tokens, String message,String title,Function(bool) setLoading) async {
     final body = {
       "registration_ids": tokens,

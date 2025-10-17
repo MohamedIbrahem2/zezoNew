@@ -26,6 +26,7 @@ import 'package:zezo/view/categories/categories_view.dart';
 import 'package:zezo/view/categories/drinks/drinks_home.dart';
 import 'package:zezo/view/drawer_screens/add_subcategory_screen.dart';
 import 'package:zezo/view/drawer_screens/sendMessage.dart';
+import 'package:zezo/view/drawer_screens/stock_screen.dart';
 import 'package:zezo/view/drawer_screens/unavailable_product.dart';
 import 'package:zezo/view/my_page_screens/orders_management.dart';
 import 'package:zezo/view/my_page_screens/our_location_page.dart';
@@ -195,6 +196,19 @@ class _HomePageState extends State<HomePage> {
                   height: Get.height * .2,
                   alignment: Alignment.center,
                   color: Colors.blue.shade50,
+                ),
+                if (context.watch<AdminProvider>().isAdmin)
+                ListTile(
+                  title: Text(
+                    'stock'.tr,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onTap: () {
+                    Get.to(StockScreen());
+                  },
                 ),
                 ListTile(
                   title: Text(
@@ -474,43 +488,6 @@ class _HomePageState extends State<HomePage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(height: Get.height * .015),
-
-                // Directionality(
-                //   textDirection: TextDirection.rtl,
-                //   child: Padding(
-                //     padding: const EdgeInsets.symmetric(horizontal: 15),
-                //     child: TextFormField(
-                //       readOnly: true,
-                //       onTap: () {
-                //         Get.to( Search(uniqueId: widget.uniqueId,));
-                //       },
-                //       decoration: InputDecoration(
-                //         hintText: 'كل ما تريد !',
-                //         filled: true,
-                //         fillColor: Colors.white,
-                //         prefixIcon: const Icon(
-                //           Icons.search_rounded,
-                //           color: Colors.black,
-                //           size: 25,
-                //         ),
-                //         contentPadding: const EdgeInsets.symmetric(vertical: 1),
-                //         enabledBorder: OutlineInputBorder(
-                //           borderSide:  BorderSide(
-                //             width: 2,
-                //             color: mainColor
-                //           ),
-                //             borderRadius: BorderRadius.circular(25)),
-                //         focusedBorder: OutlineInputBorder(
-                //             borderSide:  BorderSide(
-                //               width: 3,
-                //                 color: mainColor
-                //             ),
-                //
-                //             borderRadius: BorderRadius.circular(25)),
-                //       ),
-                //     ),
-                //   ),
-                // ),
                 Stack(
                   alignment: Alignment.center,
                   children: [
@@ -544,14 +521,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
 
-                    // Row(
-                    //   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    //   children: [
-                    //     Image.asset('images/Rectangle 45.png',width: Get.width*.6),
-                    //
-                    //     //SizedBox(width: 5,)
-                    //   ],
-                    // ),
+
                     Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -653,27 +623,6 @@ class _HomePageState extends State<HomePage> {
                             isRepeatingAnimation: true,
                           ),
                         ),
-                        // AnimatedTextKit(
-                        //
-                        //   //  displayFullTextOnTap: true,
-                        //     //pause: Duration(seconds: 3),
-                        //     repeatForever: true,
-                        //     //isRepeatingAnimation: true,
-                        //     animatedTexts: [
-                        //       WavyAnimatedText(
-                        //
-                        //           'Welcome to',speed: Duration(seconds: 4),textStyle: TextStyle(
-                        //         letterSpacing: 5,
-                        //           fontSize: 32,fontWeight: FontWeight.bold,color: Colors.blue.shade900
-                        //       )
-                        //
-                        //       ),
-                        //       WavyAnimatedText('ZEZO',speed: Duration(seconds: 4),textStyle: TextStyle(
-                        //           letterSpacing: 20,
-                        //           fontSize: 35,fontWeight: FontWeight.bold,color:Colors.blue.shade900
-                        //       )),
-                        //     ],
-                        // ),
                       ],
                     ),
                   ],
@@ -725,18 +674,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                         ),
-                        // Container(
-                        //   margin: EdgeInsets.only(top: 15, right: 15),
-                        //   alignment: Alignment.topRight,
-                        //   child: Text(
-                        //     'category'.tr,
-                        //     style: TextStyle(
-                        //       fontSize: 19,
-                        //       fontWeight: FontWeight.bold,
-                        //       decoration: TextDecoration.underline,
-                        //     ),
-                        //   ),
-                        // ),
+
                       ],
                     )
                     : Container(),
@@ -1425,7 +1363,7 @@ class _HomePageState extends State<HomePage> {
                                     description:
                                         filteredNumbers[index]['description'] ??
                                         "",
-                                    stock: 0.0,
+                                    stock: 0,
                                     title:
                                         filteredNumbers[index]['title'] ?? "",
                                     weight:

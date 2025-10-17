@@ -13,7 +13,6 @@ import 'package:uuid/uuid.dart';
 
 import '../bottom_navbar_provider.dart';
 import 'bottom_nav/home.dart';
-
 class HomeView extends StatefulWidget {
   const HomeView({Key? key}) : super(key: key);
 

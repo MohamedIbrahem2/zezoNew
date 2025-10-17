@@ -29,22 +29,16 @@ main() async {
   await FirebaseAppCheck.instance.activate(
     androidProvider:  kDebugMode ? AndroidProvider.debug : AndroidProvider.playIntegrity
   );
-  String? token = await FirebaseMessaging.instance.getToken();
-  print(token);
-  // initialize awesome notifications
-  // AwesomeNotifications().initialize(
-  //   null,
-  //   [
-  //     NotificationChannel(
-  //       channelKey: 'basic_channel',
-  //       channelName: 'Basic notifications',
-  //       channelDescription: 'Notifica '
-  //           'tion channel for basic tests',
-  //       defaultColor: Colors.teal,
-  //       ledColor: Colors.white,
-  //     ),
-  //   ],
-  // );
+  var id = FirebaseAuth.instance.currentUser!.uid;
+  if (id != null) {
+    FirebaseMessaging.instance.getToken().then((token) {
+      if (token != null) {
+        FirebaseFirestore.instance.collection('users').doc(id).update({
+          'fcm': token,
+        });
+      }
+    });
+  }
 
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => BottomNavbarProvider()),

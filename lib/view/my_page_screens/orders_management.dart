@@ -277,7 +277,7 @@ class _OrderItemState extends State<OrderItem> {
                           padding: pw.EdgeInsets.all(5),
                           color: PdfColor.fromHex("#d5f0e8"),
                           child: pw.Text(
-                            widget.order.userProfile!.name,
+                           widget.order.clientName == "" ? widget.order.userProfile!.name : widget.order.clientName,
                             style: pw.TextStyle(
                               fontSize: 19,
                               fontWeight: pw.FontWeight.bold,
@@ -672,7 +672,7 @@ class _OrderItemState extends State<OrderItem> {
                         style: TextStyle(
                             fontSize: 14, fontWeight: FontWeight.w600),
                       ),
-                      Text(order.userProfile!.name,
+                      Text(order.clientName == "" ? order.userProfile!.name : order.clientName,
                           style: const TextStyle(
                               fontSize: 14, fontWeight: FontWeight.w400)),
                     ],

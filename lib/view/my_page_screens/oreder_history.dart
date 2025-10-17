@@ -404,7 +404,7 @@ class _OrderItemState extends State<OrderItem> {
                                                   MainAxisAlignment.center,
                                               children: [
                                                 Text(
-                                                  userProfile!.name,
+                                                order.clientName == "" ?  userProfile!.name : order.clientName,
                                                   style: const TextStyle(
                                                       fontSize: 20,
                                                       color: Colors.pink,
@@ -424,7 +424,7 @@ class _OrderItemState extends State<OrderItem> {
                                                 Row(
                                                   children: [
                                                     Text(
-                                                      userProfile.phone,
+                                                      userProfile!.phone,
                                                       style: const TextStyle(
                                                         fontSize: 15,
                                                         fontWeight:

@@ -317,6 +317,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                               description: '',
                               shippingFee: '',
                               weight: '',
+                              stock: 0.0,
                             );
                             setState(() {
                               isLoading = false;
