@@ -36,7 +36,15 @@ class _HomeViewState extends State<HomeView> {
     setState(() {
       _uniqueId = uniqueId!;
     });
-    CartService().changeCartItems(FirebaseAuth.instance.currentUser!.uid, _uniqueId);
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser == null) {
+      print('⚠️ No user signed in. Cannot change cart items.');
+      return;
+    }
+
+    CartService().changeCartItems(currentUser.uid, _uniqueId);
+
   }
 
   @override

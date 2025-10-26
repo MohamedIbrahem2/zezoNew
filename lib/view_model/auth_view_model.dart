@@ -16,11 +16,22 @@ class AuthViewModel extends GetxController {
   var vatNum='لا يوجد';
   UserProfile? userProfile;
   Future<void> getUserProfile() async {
-    userProfile = await _authService
-        .getUserProfile(FirebaseAuth.instance.currentUser!.uid);
-    if (userProfile!.isAdmin == true) {}
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser == null) {
+      print('⚠️ No user is signed in. Skipping profile fetch.');
+      return;
+    }
+
+    userProfile = await _authService.getUserProfile(currentUser.uid);
+
+    if (userProfile != null && userProfile!.isAdmin == true) {
+      // Handle admin logic here
+    }
+
     update();
   }
+
 
 // check if user is admin
   // Future<bool> checkIfAdmin() async {

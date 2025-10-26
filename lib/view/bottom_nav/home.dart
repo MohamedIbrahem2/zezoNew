@@ -18,6 +18,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:zezo/constants.dart';
 import 'package:zezo/main.dart';
 import 'package:zezo/service/category_service.dart';
+import 'package:zezo/service/order_service.dart';
 import 'package:zezo/service/product_service.dart';
 import 'package:zezo/view/bottom_nav/admins.dart';
 import 'package:zezo/view/bottom_nav/cart.dart';
@@ -197,6 +198,19 @@ class _HomePageState extends State<HomePage> {
                   alignment: Alignment.center,
                   color: Colors.blue.shade50,
                 ),
+                // if (context.watch<AdminProvider>().isAdmin)
+                //   ListTile(
+                //     title: Text(
+                //       'deleteUsers'.tr,
+                //       style: const TextStyle(
+                //         fontSize: 18,
+                //         fontWeight: FontWeight.bold,
+                //       ),
+                //     ),
+                //     onTap: () async{
+                //       await OrderService().deleteUsersWithEmail();
+                //     },
+                //   ),
                 if (context.watch<AdminProvider>().isAdmin)
                 ListTile(
                   title: Text(

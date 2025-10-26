@@ -14,7 +14,6 @@ class StockScreen extends StatefulWidget {
 }
 
 class _StockScreenState extends State<StockScreen> {
-  final ProductsService _service = ProductsService();
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
 
@@ -27,19 +26,11 @@ class _StockScreenState extends State<StockScreen> {
     super.initState();
     _loadProducts();
 
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels >=
-              _scrollController.position.maxScrollExtent - 200 &&
-          !_isLoading &&
-          _service.hasMore) {
-        _loadProducts(loadMore: true);
-      }
-    });
-
     _searchController.addListener(() {
       _filterProducts(_searchController.text);
     });
   }
+
   bool _containsOnlyEnglishCharacters(String input) {
     final RegExp regExp = RegExp(r'^[A-Za-z\s]+$');
     return regExp.hasMatch(input);
@@ -60,14 +51,26 @@ class _StockScreenState extends State<StockScreen> {
     }).toList();
   }
 
-  Future<void> _loadProducts({bool loadMore = false}) async {
+  Future<void> _loadProducts() async {
     setState(() => _isLoading = true);
-    final result = await _service.getProductsPagination(loadMore: loadMore);
-    setState(() {
-      _products = result;
-      _filteredProducts = result;
-      _isLoading = false;
-    });
+
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('products')
+          .orderBy('title', descending: false)
+          .get();
+
+      final products = snapshot.docs.map((doc) => Product.fromSnapshot(doc)).toList();
+
+      setState(() {
+        _products = products;
+        _filteredProducts = products;
+      });
+    } catch (e) {
+      debugPrint('Error loading products: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   void _filterProducts(String query) {
@@ -75,16 +78,12 @@ class _StockScreenState extends State<StockScreen> {
       setState(() => _filteredProducts = _products);
     } else {
       setState(() {
-        _filteredProducts =
-            _products
-                .where(
-                  (p) => p.title.toLowerCase().contains(query.toLowerCase()),
-                )
-                .toList();
+        _filteredProducts = _products
+            .where((p) => p.title.toLowerCase().contains(query.toLowerCase()))
+            .toList();
       });
     }
   }
-
 
   @override
   void dispose() {
@@ -98,6 +97,7 @@ class _StockScreenState extends State<StockScreen> {
     if (_products.isEmpty && _isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
+
     void _showStockDialog(BuildContext context, String productId, int currentStock,
         {required bool isAdd}) {
       final TextEditingController qtyController = TextEditingController();
@@ -126,10 +126,7 @@ class _StockScreenState extends State<StockScreen> {
                 ),
                 onPressed: () async {
                   final int? qty = int.tryParse(qtyController.text);
-                  if (qty == null || qty <= 0) {
-                    // invalid input - you may show an error toast if you want
-                    return;
-                  }
+                  if (qty == null || qty <= 0) return;
 
                   int newStock = currentStock;
                   if (isAdd) {
@@ -139,25 +136,20 @@ class _StockScreenState extends State<StockScreen> {
                   }
 
                   try {
-                    // 1) Update Firestore
                     await FirebaseFirestore.instance
                         .collection('products')
                         .doc(productId)
                         .update({'stock': newStock});
 
-                    // 2) Read the updated document back
                     final updatedDoc = await FirebaseFirestore.instance
                         .collection('products')
                         .doc(productId)
                         .get();
 
-                    // 3) Build a Product instance from snapshot
-                    // If you have a fromSnapshot factory, use it; otherwise create manually.
                     Product updatedProduct;
                     try {
                       updatedProduct = Product.fromSnapshot(updatedDoc);
                     } catch (_) {
-                      // If fromSnapshot isn't present or failed, build manually from data:
                       final data = updatedDoc.data() ?? <String, dynamic>{};
                       updatedProduct = Product(
                         available: data['available'] ?? false,
@@ -177,7 +169,6 @@ class _StockScreenState extends State<StockScreen> {
                       );
                     }
 
-                    // 4) Replace the product in both lists (if present)
                     setState(() {
                       _products = _products.map((p) {
                         if (p.id == productId) return updatedProduct;
@@ -191,8 +182,6 @@ class _StockScreenState extends State<StockScreen> {
                     });
 
                     Navigator.pop(ctx);
-
-                    // 5) Success snackbar
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
@@ -206,7 +195,6 @@ class _StockScreenState extends State<StockScreen> {
                       ),
                     );
                   } catch (e) {
-                    // error handling: show snackbar and keep dialog open (or close if you want)
                     Navigator.pop(ctx);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -228,7 +216,6 @@ class _StockScreenState extends State<StockScreen> {
       );
     }
 
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: mainColor,
@@ -243,7 +230,6 @@ class _StockScreenState extends State<StockScreen> {
         textDirection: TextDirection.rtl,
         child: Column(
           children: [
-            // 🔍 Search Bar
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
@@ -258,21 +244,17 @@ class _StockScreenState extends State<StockScreen> {
                   ),
                 ),
                 onChanged: (_) {
-                  setState(() {}); // Rebuild UI as user types
+                  setState(() {});
                 },
               ),
             ),
-
-            // 🧾 Product Grid
             Expanded(
               child: RefreshIndicator(
                 onRefresh: () async {
-                  _service.reset();
                   await _loadProducts();
                 },
                 child: Builder(
                   builder: (context) {
-                    // 🔎 Apply search filtering
                     List<Product> filteredProducts = _filterProductsBySearch(
                       _products,
                       _searchController.text,
@@ -317,7 +299,6 @@ class _StockScreenState extends State<StockScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                // 🖼 Product image
                                 Padding(
                                   padding: const EdgeInsets.all(4.0),
                                   child: Container(
@@ -342,8 +323,6 @@ class _StockScreenState extends State<StockScreen> {
                                     ),
                                   ),
                                 ),
-
-                                // 🏷 Product title
                                 Padding(
                                   padding: const EdgeInsets.all(2.0),
                                   child: Text(
@@ -359,8 +338,6 @@ class _StockScreenState extends State<StockScreen> {
                                     ),
                                   ),
                                 ),
-
-                                // 📦 Stock Control
                                 Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 6.0),
                                   child: Row(
@@ -375,7 +352,6 @@ class _StockScreenState extends State<StockScreen> {
                                       ),
                                       Column(
                                         children: [
-                                          // ➕ Add button
                                           IconButton(
                                             icon: const Icon(
                                               Icons.add,
@@ -390,8 +366,6 @@ class _StockScreenState extends State<StockScreen> {
                                               );
                                             },
                                           ),
-
-                                          // Stock number display
                                           Text(
                                             stock.toString(),
                                             style: const TextStyle(
@@ -399,8 +373,6 @@ class _StockScreenState extends State<StockScreen> {
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
-
-                                          // ➖ Remove button
                                           IconButton(
                                             icon: const Icon(
                                               Icons.remove,

@@ -29,16 +29,19 @@ main() async {
   await FirebaseAppCheck.instance.activate(
     androidProvider:  kDebugMode ? AndroidProvider.debug : AndroidProvider.playIntegrity
   );
-  var id = FirebaseAuth.instance.currentUser!.uid;
-  if (id != null) {
+  var user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
     FirebaseMessaging.instance.getToken().then((token) {
       if (token != null) {
-        FirebaseFirestore.instance.collection('users').doc(id).update({
+        FirebaseFirestore.instance.collection('users').doc(user.uid).update({
           'fcm': token,
         });
       }
     });
+  } else {
+    print('⚠️ No user is signed in yet.');
   }
+
 
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => BottomNavbarProvider()),
