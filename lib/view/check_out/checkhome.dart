@@ -1,7 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:zezo/constants.dart';
@@ -24,17 +23,22 @@ class CheckHome extends StatefulWidget {
 class _CheckHomeState extends State<CheckHome> {
   DateTime now = DateTime.now();
   DateTime finalDate = DateTime.now();
+
   final addressController = TextEditingController();
   final dateController = TextEditingController();
   final totalWithTax2Controller = TextEditingController();
   final clientNameController = TextEditingController();
-  List<TextEditingController> phoneNumbersController = [
-    TextEditingController()
-  ];
+  List<TextEditingController> phoneNumbersController = [TextEditingController()];
+
   UserProfile? userProfile;
 
   // Local list to store cart items (either from widget or from Firebase)
   List<CartItem> _cartItems = [];
+
+  final AddressService _addressService = AddressService(
+    FirebaseAuth.instance.currentUser!.uid,
+  );
+  Address? selectedAddress;
 
   @override
   void initState() {
@@ -42,59 +46,28 @@ class _CheckHomeState extends State<CheckHome> {
         .getUserProfile(FirebaseAuth.instance.currentUser!.uid)
         .then((value) {
       userProfile = value;
-      phoneNumbersController[0].text = userProfile!.phone ?? '';
+      phoneNumbersController[0].text = userProfile?.phone ?? '';
       setState(() {});
     });
-
     super.initState();
   }
 
-  getCurrentDate() {
-    var date = DateTime.now().add(const Duration(days: 1)).toString();
-
-    var dateParse = DateTime.parse(date);
-
-    var formattedDate = "${dateParse.day}/${dateParse.month}/${dateParse.year}";
-
-    // setState(() {
-    //   finalDate = formattedDate.toString();
-    // });
-  }
-
   String formatDate(DateTime date) => date.toString().substring(0, 10);
-  List days = [
-    'Saturday',
-    'Sunday',
-    'Monday',
-    'tuesday',
-    'wednesday',
-    'thursday',
-  ];
-  List date = [
-    DateTime.now(),
-    DateTime.now(),
-    DateTime.now(),
-    DateTime.now(),
-    DateTime.now(),
-  ];
-
-//
-
-  double count = 1.0;
 
   Future<void> _selectDate(BuildContext context) async {
-    // Function to disable Fridays
-    bool _isSelectableDate(DateTime date) {
-      // Return false if the day is Friday (weekday == 5)
-      return date.weekday != DateTime.friday;
-    }
+    bool _isSelectableDate(DateTime date) => date.weekday != DateTime.friday;
+
+    final nextDay = DateTime.now().add(const Duration(days: 1));
+    final initial = nextDay.weekday == DateTime.friday
+        ? nextDay.add(const Duration(days: 1))
+        : nextDay;
 
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now().add(const Duration(days: 1)),
-      firstDate: DateTime.now().add(const Duration(days: 1)),
+      initialDate: initial,
+      firstDate: initial,
       lastDate: DateTime(2026),
-      selectableDayPredicate: _isSelectableDate, // Disabling Fridays
+      selectableDayPredicate: _isSelectableDate,
     );
 
     if (picked != null) {
@@ -105,972 +78,550 @@ class _CheckHomeState extends State<CheckHome> {
     }
   }
 
-  final AddressService _addressService = AddressService(
-    FirebaseAuth.instance.currentUser!.uid,
-  );
-  Address? selectedAddress;
-
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<AdminProvider>(
-        context,
-        listen: false);
+    final provider = Provider.of<AdminProvider>(context, listen: false);
+    const Color mint = Color(0xFF2ECC71);
+    const Color darkMint = Color(0xFF27AE60);
+    const Color lightBg = Color(0xFFF7F7F7);
+
     return StreamBuilder<List<CartItem>>(
-        stream: CartService().getCartItems(FirebaseAuth
-            .instance.currentUser!.uid
-            .toString()), // Replace 'userId' with the actual user ID
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            // Use the provided cartItems if available, otherwise use Firebase cart items
-            _cartItems = widget.cartItems?.isNotEmpty == true
-                ? widget.cartItems!
-                : snapshot.data!;
+      stream: CartService().getCartItems(FirebaseAuth.instance.currentUser!.uid.toString()),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          // Use the provided cartItems if available, otherwise use Firebase cart items
+          _cartItems = widget.cartItems?.isNotEmpty == true ? widget.cartItems! : snapshot.data!;
 
-            int totalQuantity = 0;
-            double totalPrice = 0;
+          int totalQuantity = 0;
+          double totalPrice = 0;
 
-            // Calculate total quantity and price
-            for (var item in _cartItems) {
-              totalQuantity += item.quantity;
-              totalPrice += item.price * item.quantity;
-            }
+          for (var item in _cartItems) {
+            totalQuantity += item.quantity;
+            totalPrice += item.price * item.quantity;
+          }
 
-            return Scaffold(
-              appBar: AppBar(
-                centerTitle: true,
-                backgroundColor: mainColor,
-                iconTheme: const IconThemeData(color: Colors.white),
-                title: const Text(
-                  textDirection: TextDirection.rtl,
-                  'الدفع',
-                  style: TextStyle(fontSize: 20, color: Colors.white),
-                ),
+          return Scaffold(
+            backgroundColor: lightBg,
+            appBar: AppBar(
+              backgroundColor: Colors.white,
+              elevation: 0,
+              centerTitle: true,
+              iconTheme: const IconThemeData(color: Colors.black),
+              title: const Text(
+                'الدفع',
+                textDirection: TextDirection.rtl,
+                style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w700),
               ),
-              body: SingleChildScrollView(
-                child: Container(
-                  alignment: Alignment.center,
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: Get.height * .03,
-                      ),
-                      // cart items
-                      SizedBox(
-                        height: Get.height * .16,
-                        child: _cartItems.isEmpty
-                            ? const Center(
-                          child: Text(
-                            'لا يوجد منتجات في عربة التسوق',
-                            textDirection: TextDirection.rtl,
-                          ),
-                        )
-                            : ListView.builder(
-                            itemCount: _cartItems.length,
+            ),
+            body: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Cart Items (Horizontal)
+                    if (_cartItems.isNotEmpty)
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [BoxShadow(color: Colors.black12.withOpacity(0.06), blurRadius: 10, offset: const Offset(0, 4))],
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: SizedBox(
+                          height: Get.height * .16,
+                          child: ListView.builder(
                             scrollDirection: Axis.horizontal,
+                            itemCount: _cartItems.length,
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
                             itemBuilder: (context, index) {
                               final item = _cartItems[index];
                               return Container(
+                                width: Get.width * .92,
+                                margin: const EdgeInsets.only(right: 10),
                                 padding: const EdgeInsets.all(10),
-                                margin: const EdgeInsets.only(left: 10),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(14),
+                                  boxShadow: [BoxShadow(color: Colors.black12.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 3))],
+                                ),
                                 child: Row(
                                   children: [
+                                    // Image
                                     Container(
-                                      decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                          BorderRadius.circular(10),
-                                          boxShadow: const [
-                                            BoxShadow(
-                                              color: Colors.grey,
-                                              spreadRadius: 2,
-                                              blurRadius: 5,
-                                            )
-                                          ]),
-                                      child: Image.network(item.image),
-                                      margin:
-                                      const EdgeInsets.only(right: 7),
                                       width: Get.width * .27,
                                       height: Get.height * .12,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: mint.withOpacity(0.12),
+                                            blurRadius: 10,
+                                            offset: const Offset(0, 4),
+                                          )
+                                        ],
+                                      ),
+                                      clipBehavior: Clip.antiAlias,
+                                      child: Image.network(item.image, fit: BoxFit.cover),
                                     ),
-                                    Column(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(
-                                          width: Get.width * .3,
-                                          child: AutoSizeText(
-                                            item.productName,
-                                            maxLines: 1,
-                                            style: const TextStyle(
-                                                fontWeight:
-                                                FontWeight.bold,
-                                                color: Colors.black),
-                                          ),
-                                        ),
-                                        Text(
-                                          (item.quantity * item.price)
-                                              .toString() +
-                                              ' SR',
-                                          style: TextStyle(
-                                              fontSize: 20.0,
-                                              fontWeight: FontWeight.bold,
-                                              color: mainColor),
-                                        ),
-                                      ],
-                                    ),
-                                    Column(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 50),
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              CartService()
-                                                  .removeCartItem(
-                                                  item.id);
-                                            },
-                                            child: Icon(
-                                              Icons.delete,
-                                              color: mainColor,
+                                    const SizedBox(width: 10),
+                                    // Name + total price
+                                    Expanded(
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          SizedBox(
+                                            width: Get.width * .3,
+                                            child: AutoSizeText(
+                                              item.productName,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w700,
+                                                color: Colors.black,
+                                              ),
                                             ),
                                           ),
+                                          Text(
+                                            '${(item.quantity * item.price).toStringAsFixed(2)} SR',
+                                            style: TextStyle(
+                                              fontSize: 18.0,
+                                              fontWeight: FontWeight.bold,
+                                              color: mint,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    // Delete + qty
+                                    Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      children: [
+                                        IconButton(
+                                          padding: EdgeInsets.zero,
+                                          constraints: const BoxConstraints(),
+                                          onPressed: () {
+                                            CartService().removeCartItem(item.id);
+                                          },
+                                          icon: Icon(Icons.delete, color: Colors.redAccent.withOpacity(.85)),
                                         ),
                                         Container(
                                           width: Get.width * .25,
-                                          height: 30,
-                                          color: Colors.grey.shade300,
+                                          height: 32,
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey.shade200,
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
                                           child: Row(
-                                            mainAxisAlignment:
-                                            MainAxisAlignment
-                                                .spaceAround,
+                                            mainAxisAlignment: MainAxisAlignment.spaceAround,
                                             children: [
                                               GestureDetector(
-                                                child:
-                                                const Icon(Icons.add),
                                                 onTap: () {
-                                                  CartService()
-                                                      .updateCartItemQuantity(
-                                                      item.id,
-                                                      item.quantity +
-                                                          1,
-                                                      item.quantity);
+                                                  CartService().updateCartItemQuantity(
+                                                    item.id,
+                                                    item.quantity + 1,
+                                                    item.quantity,
+                                                  );
                                                 },
+                                                child: const Icon(Icons.add, size: 18),
                                               ),
-                                              Text(item.quantity
-                                                  .toString()),
+                                              Text('${item.quantity}', style: const TextStyle(fontWeight: FontWeight.w600)),
                                               GestureDetector(
-                                                  onTap: () {
-                                                    if (item.quantity ==
-                                                        0) {
-                                                      CartService()
-                                                          .removeCartItem(
-                                                          item.id);
-                                                      return;
-                                                    }
-                                                    CartService()
-                                                        .updateCartItemQuantity(
-                                                        item.id,
-                                                        item.quantity -
-                                                            1,
-                                                        item.quantity);
-                                                  },
-                                                  child: const Icon(Icons
-                                                      .remove_outlined))
+                                                onTap: () {
+                                                  if (item.quantity == 0) {
+                                                    CartService().removeCartItem(item.id);
+                                                    return;
+                                                  }
+                                                  CartService().updateCartItemQuantity(
+                                                    item.id,
+                                                    item.quantity - 1,
+                                                    item.quantity,
+                                                  );
+                                                },
+                                                child: const Icon(Icons.remove_outlined, size: 18),
+                                              ),
                                             ],
                                           ),
                                         ),
                                       ],
-                                    )
+                                    ),
                                   ],
                                 ),
-                                width: Get.width * .95,
-                                height: Get.height * .2,
-                                decoration: BoxDecoration(
-                                    borderRadius:
-                                    BorderRadius.circular(15),
-                                    color: Colors.white,
-                                    boxShadow: const [
-                                      BoxShadow(
-                                        color: Colors.grey,
-                                        spreadRadius: 2,
-                                        blurRadius: 5,
-                                      )
-                                    ]),
                               );
-                            }),
-                      ),
-
+                            },
+                          ),
+                        ),
+                      )
+                    else
                       Container(
-                        margin: const EdgeInsets.only(left: 15, top: 30),
-                        alignment: Alignment.centerLeft,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            if (userProfile != null)
-                              Text(
-                                userProfile!.name ?? '',
-                                style: const TextStyle(
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black),
-                              ),
-                            SizedBox(
-                              width: Get.width * .04,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                textDirection: TextDirection.rtl,
-                                "${'name'.tr}:",
-                                style: TextStyle(
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          margin: const EdgeInsets.only(left: 15, top: 30),
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            textDirection: TextDirection.rtl,
-                            'deliver to'.tr,
-                            style: TextStyle(
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black),
-                          ),
-                        ),
-                      ),
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.all(20),
-                            width: Get.width * .6,
-                            child: StreamBuilder<List<Address>>(
-                                stream: _addressService.stream,
-                                builder: (context, snapshot) {
-                                  if (snapshot.data != null &&
-                                      snapshot.data!.isEmpty) {
-                                    return Container(
-                                        padding: const EdgeInsets.all(10),
-                                        decoration: BoxDecoration(
-                                            color: mainColor,
-                                            borderRadius:
-                                            BorderRadius.circular(10),
-                                            border:
-                                            Border.all(color: Colors.grey)),
-                                        child: Row(
-                                          children: [
-                                            GestureDetector(
-                                              onTap: () {
-                                                Get.to(AddressesPage(
-                                                  uniqueId: widget.unique,
-                                                ));
-                                              },
-                                              child: const Icon(
-                                                Icons.add,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              width: Get.width * .04,
-                                            ),
-                                            const Text(
-                                              textDirection: TextDirection.rtl,
-                                              'لا يوجد عنوان, قم بأضافه عنوان',
-                                              style: TextStyle(
-                                                  fontSize: 11,
-                                                  color: Colors.white),
-                                            ),
-                                          ],
-                                        ));
-                                  }
-                                  return DropdownButtonFormField<Address?>(
-                                    validator: (value) {
-                                      if (selectedAddress == null ||
-                                          addressController.text.isEmpty) {
-                                        return 'اختار العنوان';
-                                      }
-                                      return null;
-                                    },
-                                    value: selectedAddress,
-                                    items: snapshot.data == null
-                                        ? []
-                                        : [
-                                      ...snapshot.data!
-                                          .map((e) =>
-                                          DropdownMenuItem<Address?>(
-                                            value: e,
-                                            child: Text(e.city),
-                                          ))
-                                          .toList()
-                                    ],
-                                    onChanged: (value) {
-                                      selectedAddress = value;
-                                      addressController.text =
-                                          selectedAddress!.id ?? '';
-                                    },
-                                    // controller: addressController,
-                                    decoration: InputDecoration(
-                                      labelText: 'select_address'.tr,
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(10)),
-                                      ),
-                                    ),
-                                  );
-                                }),
-                          ),
-                        ],
-                      ),
-                      // GestureDetector(
-                      //   onTap: () {
-
-                      //   },
-                      //   child: Container(
-                      //     margin: const EdgeInsets.only(top: 20),
-                      //     decoration: BoxDecoration(
-                      //         color: Colors.greenAccent,
-                      //         borderRadius: BorderRadius.circular(10),
-                      //         boxShadow: const [
-                      //           BoxShadow(
-                      //             color: Colors.grey,
-                      //             spreadRadius: 1,
-                      //             blurRadius: 3,
-                      //           )
-                      //         ]),
-                      //     width: Get.width * .87,
-                      //     height: 45,
-                      //     child: const Text(
-                      //       'Add Adress',
-                      //       style: TextStyle(
-                      //           fontSize: 20,
-                      //           fontWeight: FontWeight.bold,
-                      //           color: Colors.white),
-                      //     ),
-                      //     alignment: Alignment.center,
-                      //   ),
-                      // ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          margin: const EdgeInsets.only(left: 15, top: 30),
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            textDirection: TextDirection.rtl,
-                            'deliver time'.tr,
-                            style: TextStyle(
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black),
-                          ),
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.all(20),
-                            width: Get.width * .6,
-                            child: TextFormField(
-                                readOnly: true,
-                                controller: dateController,
-                                onTap: () {
-                                  _selectDate(context);
-                                },
-                                decoration: InputDecoration(
-                                  labelText: 'choose time'.tr,
-                                  border: OutlineInputBorder(
-                                    borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                )),
-                          ),
-                        ],
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          margin: const EdgeInsets.only(left: 15, top: 30),
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            textDirection: TextDirection.rtl,
-                            'phone'.tr,
-                            style: TextStyle(
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black),
-                          ),
-                        ),
-                      ),
-                      for (var i in phoneNumbersController)
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              margin: const EdgeInsets.only(top: 20),
-                              width: Get.width * .6,
-                              child: TextFormField(
-                                  controller: i,
-                                  decoration: InputDecoration(
-                                    labelText: 'phone'.tr,
-                                    border: OutlineInputBorder(
-                                      borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
-                                    ),
-                                  )),
-                            ),
-                          ],
-                        ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          IconButton(
-                              onPressed: () {
-                                phoneNumbersController
-                                    .add(TextEditingController());
-                                setState(() {});
-                              },
-                              icon: Icon(
-                                Icons.add,
-                                color: mainColor,
-                              )),
-                        ],
-                      ),
-                      // SizedBox(
-                      //   width: Get.width,
-                      //   height: Get.height * .15,
-                      //   child: ListView.builder(
-                      //       scrollDirection: Axis.horizontal,
-                      //       itemCount: 6,
-                      //       itemBuilder: (context, index) {
-                      //         return Container(
-                      //           child: Column(
-                      //             mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      //             children: [
-                      //               Text(
-                      //                 days[index],
-                      //                 style: const TextStyle(
-                      //                   fontSize: 19,
-                      //                   fontWeight: FontWeight.bold,
-                      //                 ),
-                      //               ),
-                      //               const Text(
-                      //                 '10-12-2023',
-                      //                 style: TextStyle(
-                      //                   fontSize: 19,
-                      //                   color: Colors.grey,
-                      //                   fontWeight: FontWeight.bold,
-                      //                 ),
-                      //               )
-                      //             ],
-                      //           ),
-                      //           margin: const EdgeInsets.all(15),
-                      //           width: Get.width * .4,
-                      //           height: Get.height * .11,
-                      //           decoration: BoxDecoration(
-                      //               color: Colors.grey.shade100,
-                      //               boxShadow: const [
-                      //                 BoxShadow(
-                      //                     spreadRadius: .4,
-                      //                     blurRadius: 2,
-                      //                     color: Colors.black),
-                      //               ],
-                      //               borderRadius: BorderRadius.circular(5)),
-                      //         );
-                      //       }),
-                      // ),
-                      // Container(
-                      //   margin: const EdgeInsets.only(left: 15, top: 20),
-                      //   alignment: Alignment.centerLeft,
-                      //   child: const Text(
-                      //     'View available coupon',
-                      //     style: TextStyle(
-                      //         fontSize: 18.0,
-                      //         fontWeight: FontWeight.bold,
-                      //         color: Colors.black),
-                      //   ),
-                      // ),
-                      // Row(
-                      //   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      //   children: [
-                      //     Container(
-                      //       margin: const EdgeInsets.all(20),
-                      //       width: Get.width * .6,
-                      //       child: TextFormField(
-                      //         decoration: InputDecoration(
-                      //             hintText: 'Enter Coupon code',
-                      //             enabledBorder: OutlineInputBorder(
-                      //                 borderRadius: BorderRadius.circular(10))),
-                      //       ),
-                      //     ),
-                      //     Padding(
-                      //       padding: const EdgeInsets.only(right: 20),
-                      //       child: ElevatedButton(
-                      //           onPressed: () {},
-                      //           style: ElevatedButton.styleFrom(
-                      //               backgroundColor: Colors.greenAccent),
-                      //           child: const Text('Apply')),
-                      //     )
-                      //   ],
-                      // ),
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        margin: const EdgeInsets.all(15),
-                        width: Get.width * .9,
-                        height: provider.isAdmin ? Get.height * .30 : Get.height * .22,
-                        // increased height
+                        height: Get.height * .12,
+                        alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color: Colors.grey.shade50,
-                          boxShadow: const [
-                            BoxShadow(
-                              spreadRadius: .4,
-                              blurRadius: 2,
-                              color: Colors.black,
-                            ),
-                          ],
-                          borderRadius: BorderRadius.circular(5),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [BoxShadow(color: Colors.black12.withOpacity(0.06), blurRadius: 10, offset: const Offset(0, 4))],
                         ),
-                        child: SingleChildScrollView(
-                          child: Column(
-                            mainAxisAlignment:
-                            MainAxisAlignment.spaceAround,
-                            children: [
-                              // total quantity row
-                              Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    textDirection: TextDirection.rtl,
-                                    '$totalQuantity${"pieces".tr}',
-                                    style: TextStyle(
-                                      fontSize: 17,
-                                      color: Colors.grey.shade800,
-                                    ),
-                                  ),
-                                  Text(
-                                    textDirection: TextDirection.rtl,
-                                    'products'.tr,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                        child: const Text('لا يوجد منتجات في عربة التسوق', textDirection: TextDirection.rtl),
+                      ),
 
-                              // total before tax row
-                              Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    textDirection: TextDirection.rtl,
-                                    '${(totalPrice - (totalPrice * .15)).toStringAsFixed(2)} SR',
-                                    style: TextStyle(
-                                      fontSize: 17,
-                                      color: Colors.grey.shade800,
-                                    ),
-                                  ),
-                                  Text(
-                                    textDirection: TextDirection.rtl,
-                                    'total before tax'.tr,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                    const SizedBox(height: 18),
 
-                              // tax row
-                              Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    textDirection: TextDirection.rtl,
-                                    '${(totalPrice * .15).toStringAsFixed(2)} SR',
-                                    style: TextStyle(
-                                      fontSize: 17,
-                                      color: Colors.grey.shade800,
-                                    ),
-                                  ),
-                                  Text(
-                                    textDirection: TextDirection.rtl,
-                                    '15%${"tax".tr}',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                    // Name Row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        if (userProfile != null)
+                          Text(
+                            userProfile!.name ?? '',
+                            style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.w600, color: Colors.black87),
+                          ),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'الاسم:',
+                          textDirection: TextDirection.rtl,
+                          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w800, color: Colors.black),
+                        ),
+                      ],
+                    ),
 
-                              // discount row
-                              Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    textDirection: TextDirection.rtl,
-                                    '0 SR',
-                                    style: TextStyle(
-                                      fontSize: 17,
-                                      color: Colors.grey.shade800,
-                                    ),
-                                  ),
-                                  Text(
-                                    textDirection: TextDirection.rtl,
-                                    'discount'.tr,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                    const SizedBox(height: 10),
 
-                              // delivery row
-                              Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    textDirection: TextDirection.rtl,
-                                    '0 SR',
-                                    style: TextStyle(
-                                      fontSize: 17,
-                                      color: Colors.grey.shade800,
-                                    ),
-                                  ),
-                                  Text(
-                                    textDirection: TextDirection.rtl,
-                                    'deliver'.tr,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                    // Deliver To
+                    _sectionTitle('deliver to'.tr),
 
-                              // total with tax row
-                              Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    textDirection: TextDirection.rtl,
-                                    '${totalPrice.toStringAsFixed(2)} SR',
-                                    style: TextStyle(
-                                      fontSize: 17,
-                                      color: Colors.grey.shade800,
-                                    ),
+                    // Address dropdown
+                    Container(
+                      margin: const EdgeInsets.symmetric(vertical: 10),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(14),
+                        boxShadow: [BoxShadow(color: Colors.black12.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 3))],
+                      ),
+                      child: StreamBuilder<List<Address>>(
+                        stream: _addressService.stream,
+                        builder: (context, snapshot) {
+                          if (snapshot.data != null && snapshot.data!.isEmpty) {
+                            return InkWell(
+                              onTap: () => Get.to(AddressesPage(uniqueId: widget.unique)),
+                              child: Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [mint.withOpacity(.95), darkMint],
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
                                   ),
-                                  Text(
-                                    textDirection: TextDirection.rtl,
-                                    'total with tax'.tr,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: const [
+                                    Icon(Icons.add, color: Colors.white),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'لا يوجد عنوان، قم بإضافة عنوان',
+                                      textDirection: TextDirection.rtl,
+                                      style: TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.w600),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
+                            );
+                          }
+                          return DropdownButtonFormField<Address?>(
+                            validator: (value) {
+                              if (selectedAddress == null || addressController.text.isEmpty) {
+                                return 'اختار العنوان';
+                              }
+                              return null;
+                            },
+                            value: selectedAddress,
+                            items: snapshot.data == null
+                                ? []
+                                : snapshot.data!
+                                .map((e) => DropdownMenuItem<Address?>(
+                              value: e,
+                              child: Text(e.city, textDirection: TextDirection.rtl),
+                            ))
+                                .toList(),
+                            onChanged: (value) {
+                              selectedAddress = value;
+                              addressController.text = selectedAddress?.id ?? '';
+                            },
+                            decoration: InputDecoration(
+                              labelText: 'select_address'.tr,
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
 
-                              const SizedBox(height: 12),
-                              // new field: client name
-                              Visibility(
-                                visible: provider.isAdmin,
-                                child: TextField(
+                    const SizedBox(height: 6),
+
+                    // Deliver Time
+                    _sectionTitle('deliver time'.tr),
+
+                    Container(
+                      margin: const EdgeInsets.symmetric(vertical: 10),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(14),
+                        boxShadow: [BoxShadow(color: Colors.black12.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 3))],
+                      ),
+                      child: TextFormField(
+                        readOnly: true,
+                        controller: dateController,
+                        onTap: () => _selectDate(context),
+                        decoration: InputDecoration(
+                          labelText: 'choose time'.tr,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 6),
+
+                    // Phone
+                    _sectionTitle('phone'.tr),
+                    const SizedBox(height: 8),
+
+                    ...phoneNumbersController.map(
+                          (i) => Container(
+                        margin: const EdgeInsets.only(bottom: 10),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                          boxShadow: [BoxShadow(color: Colors.black12.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 3))],
+                        ),
+                        child: TextFormField(
+                          controller: i,
+                          decoration: InputDecoration(
+                            labelText: 'phone'.tr,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: IconButton(
+                        onPressed: () {
+                          phoneNumbersController.add(TextEditingController());
+                          setState(() {});
+                        },
+                        icon: Icon(Icons.add_circle, color: mint, size: 28),
+                      ),
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    // Summary Card
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                      margin: const EdgeInsets.only(bottom: 18),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [BoxShadow(color: Colors.black12.withOpacity(0.06), blurRadius: 10, offset: const Offset(0, 4))],
+                      ),
+                      child: Column(
+                        children: [
+                          _summaryRow(label: 'products'.tr, value: '$totalQuantity${"pieces".tr}', bold: true),
+                          const Divider(height: 18, thickness: .7),
+
+                          _summaryRow(
+                            label: 'total before tax'.tr,
+                            value: '${(totalPrice - (totalPrice * .15)).toStringAsFixed(2)} SR',
+                          ),
+
+                          _summaryRow(
+                            label: '15%${"tax".tr}',
+                            value: '${(totalPrice * .15).toStringAsFixed(2)} SR',
+                          ),
+
+                          _summaryRow(label: 'discount'.tr, value: '0 SR'),
+                          _summaryRow(label: 'deliver'.tr, value: '0 SR'),
+
+                          const Divider(height: 20, thickness: .9),
+
+                          _summaryRow(
+                            label: 'total with tax'.tr,
+                            value: '${totalPrice.toStringAsFixed(2)} SR',
+                            bold: true,
+                            highlight: true,
+                          ),
+
+                          const SizedBox(height: 12),
+
+                          // Admin-only Client Name
+                          Visibility(
+                            visible: provider.isAdmin,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                const SizedBox(height: 6),
+                                TextField(
                                   controller: clientNameController,
-                                  decoration:  InputDecoration(
+                                  decoration: InputDecoration(
                                     labelText: 'clientName'.tr,
-                                    border: OutlineInputBorder(),
+                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                                   ),
                                   keyboardType: TextInputType.text,
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    SizedBox(height: Get.height * .12),
+                  ],
+                ),
+              ),
+            ),
+
+            // Bottom confirm button (logic unchanged)
+            bottomSheet: BottomSheet(
+              elevation: 12,
+              onClosing: () {},
+              builder: (context) => GestureDetector(
+                onTap: () {
+                  Get.defaultDialog(
+                    title: 'confirm order'.tr,
+                    content: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            elevation: 10,
+                            backgroundColor: mainColor,
+                          ),
+                          onPressed: () async {
+                            final String client = clientNameController.text.trim();
+                            final bool clientFilled = client.isNotEmpty;
+
+                            // if (!clientFilled) {
+                            //   Get.snackbar(
+                            //     'error'.tr,
+                            //     'typeClientName'.tr,
+                            //     backgroundColor: Colors.red,
+                            //     colorText: Colors.white,
+                            //     duration: const Duration(seconds: 3),
+                            //   );
+                            //   Navigator.pop(context);
+                            //   return;
+                            // }
+                            Navigator.pop(context);
+
+                            Get.snackbar(
+                              'please wait',
+                              'تاكد من تشغيل الانترنت وانتظر لحظات  !',
+                              leftBarIndicatorColor: Colors.white,
+                              showProgressIndicator: true,
+                              backgroundColor: Colors.green,
+                              colorText: Colors.white,
+                              duration: const Duration(seconds: 8),
+                            );
+
+                            await OrderService().placeOrder(
+                              FirebaseAuth.instance.currentUser!.uid,
+                              _cartItems,
+                              totalPrice,
+                              client,
+                              selectedAddress!,
+                              finalDate,
+                              phoneNumbersController
+                                  .map((e) => e.text)
+                                  .where((element) => element.isNotEmpty)
+                                  .toList(),
+                            );
+                          },
+                          child: const Text(
+                            'yes',
+                            textDirection: TextDirection.rtl,
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 18),
                           ),
                         ),
-                      )
-                      // Container(
-                      //   padding: const EdgeInsets.all(10),
-                      //   child: Column(
-                      //     mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      //     children: [
-                      //       Row(
-                      //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      //         children: [
-                      //           Text(
-                      //             'items',
-                      //             style: TextStyle(
-                      //                 fontSize: 18, color: Colors.grey.shade800),
-                      //           ),
-                      //           const Text(
-                      //             '10 pieces',
-                      //             style: TextStyle(
-                      //                 fontSize: 19,
-                      //                 fontWeight: FontWeight.bold,
-                      //                 color: Colors.black),
-                      //           )
-                      //         ],
-                      //       ),
-                      //       Row(
-                      //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      //         children: [
-                      //           Text(
-                      //             'Total',
-                      //             style: TextStyle(
-                      //                 fontSize: 18, color: Colors.grey.shade800),
-                      //           ),
-                      //           const Text(
-                      //             '200 SR',
-                      //             style: TextStyle(
-                      //                 fontSize: 19,
-                      //                 fontWeight: FontWeight.bold,
-                      //                 color: Colors.black),
-                      //           )
-                      //         ],
-                      //       ),
-                      //       Row(
-                      //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      //         children: [
-                      //           Text(
-                      //             'Vat 15%',
-                      //             style: TextStyle(
-                      //                 fontSize: 18, color: Colors.grey.shade800),
-                      //           ),
-                      //           const Text(
-                      //             '30 SR',
-                      //             style: TextStyle(
-                      //                 fontSize: 19,
-                      //                 fontWeight: FontWeight.bold,
-                      //                 color: Colors.black),
-                      //           )
-                      //         ],
-                      //       ),
-                      //       Row(
-                      //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      //         children: [
-                      //           Text(
-                      //             'discount',
-                      //             style: TextStyle(
-                      //                 fontSize: 18, color: Colors.grey.shade800),
-                      //           ),
-                      //           const Text(
-                      //             '0 SR',
-                      //             style: TextStyle(
-                      //                 fontSize: 19,
-                      //                 fontWeight: FontWeight.bold,
-                      //                 color: Colors.black),
-                      //           )
-                      //         ],
-                      //       ),
-                      //       Row(
-                      //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      //         children: [
-                      //           Text(
-                      //             'delivery',
-                      //             style: TextStyle(
-                      //                 fontSize: 18, color: Colors.grey.shade800),
-                      //           ),
-                      //           const Text(
-                      //             '0 SR',
-                      //             style: TextStyle(
-                      //                 fontSize: 19,
-                      //                 fontWeight: FontWeight.bold,
-                      //                 color: Colors.black),
-                      //           )
-                      //         ],
-                      //       ),
-                      //       Row(
-                      //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      //         children: [
-                      //           Text(
-                      //             'Total with vat',
-                      //             style: TextStyle(
-                      //                 fontSize: 18, color: Colors.grey.shade800),
-                      //           ),
-                      //           const Text(
-                      //             '230 SR',
-                      //             style: TextStyle(
-                      //                 fontSize: 19,
-                      //                 fontWeight: FontWeight.bold,
-                      //                 color: Colors.black),
-                      //           )
-                      //         ],
-                      //       ),
-                      //     ],
-                      //   ),
-                      //   margin: const EdgeInsets.all(15),
-                      //   width: Get.width * .9,
-                      //   height: Get.height * .25,
-                      //   decoration: BoxDecoration(
-                      //       color: Colors.grey.shade50,
-                      //       boxShadow: const [
-                      //         BoxShadow(
-                      //             spreadRadius: .4, blurRadius: 2, color: Colors.black),
-                      //       ],
-                      //       borderRadius: BorderRadius.circular(5)),
-                      // ),
-                      ,
-                      SizedBox(
-                        height: Get.height * .1,
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              bottomSheet: BottomSheet(
-                onClosing: () {},
-                builder: (context) => GestureDetector(
-                  onTap: () {
-                    // if (totalPrice < 250) {
-                    //   Get.snackbar(
-                    //     '',
-                    //     'أقل حد للطلب هو 250 SAR',
-                    //     duration: const Duration(seconds: 2),
-                    //     snackPosition: SnackPosition.TOP,
-                    //     titleText: const Text(
-                    //       textDirection: TextDirection.rtl,
-                    //       'لا يمكن اتمام الطلب',
-                    //       style: TextStyle(
-                    //           color: Colors.white,
-                    //           fontSize: 18,
-                    //           fontWeight: FontWeight.w500),
-                    //     ),
-                    //     messageText: const Text(
-                    //       textDirection: TextDirection.rtl,
-                    //       'أقل حد للطلب هو 250 SAR',
-                    //       style: TextStyle(
-                    //           color: Colors.white,
-                    //           fontSize: 18,
-                    //           fontWeight: FontWeight.bold),
-                    //     ),
-                    //     backgroundColor: mainColor,
-                    //   );
-                    //   return;
-                    // }
-
-                    Get.defaultDialog(
-                        title: 'confirm order'.tr,
-                        content: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                elevation: 10,
-                                backgroundColor: mainColor,
-                              ),
-                              onPressed: () async {
-                                final String client =
-                                clientNameController.text.trim();
-                                final bool clientFilled = client.isNotEmpty;
-
-                                // Validation
-                                if (!clientFilled) {
-                                  Get.snackbar(
-                                    'error'.tr,
-                                    'typeClientName'.tr,
-                                    backgroundColor: Colors.red,
-                                    colorText: Colors.white,
-                                    duration: const Duration(seconds: 3),
-                                  );
-                                  Navigator.pop(context);
-                                  return; // stop execution
-                                }
-                                Navigator.pop(context);
-
-                                Get.snackbar(
-                                  leftBarIndicatorColor: Colors.white,
-                                  showProgressIndicator: true,
-                                  backgroundColor: Colors.green,
-                                  colorText: Colors.white,
-                                  duration: const Duration(seconds: 8),
-                                  'please wait',
-                                  'تاكد من تشغيل الانترنت وانتظر لحظات  !',
-                                );
-
-                                await OrderService().placeOrder(
-                                  FirebaseAuth.instance.currentUser!.uid,
-                                  _cartItems,
-                                  totalPrice,
-                                  client,
-                                  selectedAddress!,
-                                  finalDate,
-                                  phoneNumbersController
-                                      .map((e) => e.text)
-                                      .where((element) => element.isNotEmpty)
-                                      .toList(),
-                                );
-                              },
-                              child: Text(
-                                textDirection: TextDirection.rtl,
-                                'yes'.tr,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                ),
-                              ),
-                            ),
-                            ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                    elevation: 10,
-                                    backgroundColor: Colors.white),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: Text(
-                                  textDirection: TextDirection.rtl,
-                                  'no'.tr,
-                                  style: TextStyle(color: Colors.black),
-                                ))
-                          ],
-                        ));
-                  },
-                  child: Container(
-                    alignment: Alignment.center,
-                    width: Get.width,
-                    height: 50,
-                    color: mainColor,
-                    child: Text(
-                      textDirection: TextDirection.rtl,
-                      'confirm'.tr,
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(elevation: 10, backgroundColor: Colors.white),
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('no', textDirection: TextDirection.rtl, style: TextStyle(color: Colors.black)),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                child: Container(
+                  width: Get.width,
+                  height: 56,
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+                    gradient: LinearGradient(
+                      colors: [mint, darkMint],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
                     ),
                   ),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'confirm',
+                    textDirection: TextDirection.rtl,
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
                 ),
               ),
-            );
-          }
-          return const Center(child: CircularProgressIndicator());
-        });
+            ),
+          );
+        }
+        return const Center(child: CircularProgressIndicator());
+      },
+    );
+  }
+
+  Widget _sectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 4, bottom: 6, right: 4),
+      child: Text(
+        title,
+        textDirection: TextDirection.rtl,
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.black87),
+      ),
+    );
+  }
+
+  Widget _summaryRow({required String label, required String value, bool bold = false, bool highlight = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            value,
+            textDirection: TextDirection.rtl,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
+              color: highlight ? const Color(0xFF2ECC71) : Colors.black87,
+            ),
+          ),
+          Text(
+            label,
+            textDirection: TextDirection.rtl,
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.black),
+          ),
+        ],
+      ),
+    );
   }
 }

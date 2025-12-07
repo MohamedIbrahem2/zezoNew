@@ -24,7 +24,11 @@ class _StockScreenState extends State<StockScreen> {
   @override
   void initState() {
     super.initState();
-    _loadProducts();
+
+    // ✅ Load products after first frame to avoid drawer animation black flash
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadProducts();
+    });
 
     _searchController.addListener(() {
       _filterProducts(_searchController.text);
@@ -94,129 +98,8 @@ class _StockScreenState extends State<StockScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_products.isEmpty && _isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    void _showStockDialog(BuildContext context, String productId, int currentStock,
-        {required bool isAdd}) {
-      final TextEditingController qtyController = TextEditingController();
-
-      showDialog(
-        context: context,
-        builder: (ctx) {
-          return AlertDialog(
-            title: Text(isAdd ? "إضافة كمية" : "حذف كمية"),
-            content: TextField(
-              controller: qtyController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                hintText: isAdd ? "أدخل الكمية لإضافتها" : "أدخل الكمية للحذف",
-                border: const OutlineInputBorder(),
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text("إغلاق"),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: isAdd ? Colors.green : Colors.red,
-                ),
-                onPressed: () async {
-                  final int? qty = int.tryParse(qtyController.text);
-                  if (qty == null || qty <= 0) return;
-
-                  int newStock = currentStock;
-                  if (isAdd) {
-                    newStock += qty;
-                  } else {
-                    newStock = (currentStock - qty).clamp(0, double.infinity).toInt();
-                  }
-
-                  try {
-                    await FirebaseFirestore.instance
-                        .collection('products')
-                        .doc(productId)
-                        .update({'stock': newStock});
-
-                    final updatedDoc = await FirebaseFirestore.instance
-                        .collection('products')
-                        .doc(productId)
-                        .get();
-
-                    Product updatedProduct;
-                    try {
-                      updatedProduct = Product.fromSnapshot(updatedDoc);
-                    } catch (_) {
-                      final data = updatedDoc.data() ?? <String, dynamic>{};
-                      updatedProduct = Product(
-                        available: data['available'] ?? false,
-                        favorite: data['favorite'] ?? false,
-                        isbestselling: data['isbestselling'] ?? false,
-                        category: data['category'] ?? '',
-                        brand: data['brand'] ?? '',
-                        description: data['description'] ?? '',
-                        stock: (data['stock'] ?? 0).toDouble().toInt(),
-                        title: data['title'] ?? '',
-                        weight: data['weight'] ?? '',
-                        id: updatedDoc.id,
-                        categoryId: data['categoryId'] ?? '',
-                        regularPrice: data['regularPrice'] ?? 0,
-                        images: List<String>.from(data['images'] ?? []),
-                        discountPrice: data['discountPrice'] ?? 0,
-                      );
-                    }
-
-                    setState(() {
-                      _products = _products.map((p) {
-                        if (p.id == productId) return updatedProduct;
-                        return p;
-                      }).toList();
-
-                      _filteredProducts = _filteredProducts.map((p) {
-                        if (p.id == productId) return updatedProduct;
-                        return p;
-                      }).toList();
-                    });
-
-                    Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          isAdd
-                              ? "تمت إضافة $qty إلى المخزون بنجاح ✅"
-                              : "تم حذف $qty من المخزون بنجاح ✅",
-                          textDirection: TextDirection.rtl,
-                        ),
-                        backgroundColor: isAdd ? Colors.green : Colors.red,
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
-                  } catch (e) {
-                    Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          "حدث خطأ أثناء التحديث: $e",
-                          textDirection: TextDirection.rtl,
-                        ),
-                        backgroundColor: Colors.red,
-                        duration: const Duration(seconds: 3),
-                      ),
-                    );
-                  }
-                },
-                child: Text(isAdd ? "إضافة" : "حذف"),
-              ),
-            ],
-          );
-        },
-      );
-    }
-
     return Scaffold(
+      backgroundColor: Colors.white, // ✅ Prevents black flash on open
       appBar: AppBar(
         backgroundColor: mainColor,
         iconTheme: const IconThemeData(color: Colors.black),
@@ -230,6 +113,7 @@ class _StockScreenState extends State<StockScreen> {
         textDirection: TextDirection.rtl,
         child: Column(
           children: [
+            // ---------- Search Bar ----------
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
@@ -243,17 +127,16 @@ class _StockScreenState extends State<StockScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                onChanged: (_) {
-                  setState(() {});
-                },
               ),
             ),
+
+            // ---------- Products Section ----------
             Expanded(
               child: RefreshIndicator(
-                onRefresh: () async {
-                  await _loadProducts();
-                },
-                child: Builder(
+                onRefresh: _loadProducts,
+                child: _isLoading
+                    ? buildShimmer(4) // ✅ Show shimmer while loading
+                    : Builder(
                   builder: (context) {
                     List<Product> filteredProducts = _filterProductsBySearch(
                       _products,
@@ -261,7 +144,12 @@ class _StockScreenState extends State<StockScreen> {
                     );
 
                     if (filteredProducts.isEmpty && !_isLoading) {
-                      return const Center(child: Text('لا توجد منتجات مطابقة'));
+                      return const Center(
+                        child: Text(
+                          'لا توجد منتجات مطابقة',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      );
                     }
 
                     return GridView.builder(
@@ -272,12 +160,8 @@ class _StockScreenState extends State<StockScreen> {
                         crossAxisSpacing: 5,
                         mainAxisSpacing: 5,
                       ),
-                      itemCount: filteredProducts.length + (_isLoading ? 1 : 0),
+                      itemCount: filteredProducts.length,
                       itemBuilder: (context, index) {
-                        if (index == filteredProducts.length) {
-                          return const Center(child: CircularProgressIndicator());
-                        }
-
                         final product = filteredProducts[index];
                         int stock = (product.stock ?? 0).toDouble().toInt();
 
@@ -310,7 +194,7 @@ class _StockScreenState extends State<StockScreen> {
                                           blurRadius: 3.0,
                                         ),
                                       ],
-                                      color: Colors.blue,
+                                      color: Colors.white,
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: SizedBox(
@@ -353,10 +237,7 @@ class _StockScreenState extends State<StockScreen> {
                                       Column(
                                         children: [
                                           IconButton(
-                                            icon: const Icon(
-                                              Icons.add,
-                                              color: Colors.green,
-                                            ),
+                                            icon: const Icon(Icons.add, color: Colors.green),
                                             onPressed: () {
                                               _showStockDialog(
                                                 context,
@@ -374,10 +255,7 @@ class _StockScreenState extends State<StockScreen> {
                                             ),
                                           ),
                                           IconButton(
-                                            icon: const Icon(
-                                              Icons.remove,
-                                              color: Colors.red,
-                                            ),
+                                            icon: const Icon(Icons.remove, color: Colors.red),
                                             onPressed: () {
                                               _showStockDialog(
                                                 context,
@@ -405,6 +283,125 @@ class _StockScreenState extends State<StockScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  // ---------- Stock Dialog ----------
+  void _showStockDialog(BuildContext context, String productId, int currentStock,
+      {required bool isAdd}) {
+    final TextEditingController qtyController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: Text(isAdd ? "إضافة كمية" : "حذف كمية"),
+          content: TextField(
+            controller: qtyController,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              hintText: isAdd ? "أدخل الكمية لإضافتها" : "أدخل الكمية للحذف",
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text("إغلاق"),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isAdd ? Colors.green : Colors.red,
+              ),
+              onPressed: () async {
+                final int? qty = int.tryParse(qtyController.text);
+                if (qty == null || qty <= 0) return;
+
+                int newStock = currentStock;
+                if (isAdd) {
+                  newStock += qty;
+                } else {
+                  newStock = (currentStock - qty).clamp(0, double.infinity).toInt();
+                }
+
+                try {
+                  await FirebaseFirestore.instance
+                      .collection('products')
+                      .doc(productId)
+                      .update({'stock': newStock});
+
+                  final updatedDoc = await FirebaseFirestore.instance
+                      .collection('products')
+                      .doc(productId)
+                      .get();
+
+                  Product updatedProduct;
+                  try {
+                    updatedProduct = Product.fromSnapshot(updatedDoc);
+                  } catch (_) {
+                    final data = updatedDoc.data() ?? <String, dynamic>{};
+                    updatedProduct = Product(
+                      available: data['available'] ?? false,
+                      favorite: data['favorite'] ?? false,
+                      isbestselling: data['isbestselling'] ?? false,
+                      category: data['category'] ?? '',
+                      brand: data['brand'] ?? '',
+                      description: data['description'] ?? '',
+                      stock: (data['stock'] ?? 0).toDouble().toInt(),
+                      title: data['title'] ?? '',
+                      weight: data['weight'] ?? '',
+                      id: updatedDoc.id,
+                      categoryId: data['categoryId'] ?? '',
+                      regularPrice: data['regularPrice'] ?? 0,
+                      images: List<String>.from(data['images'] ?? []),
+                      discountPrice: data['discountPrice'] ?? 0,
+                    );
+                  }
+
+                  setState(() {
+                    _products = _products.map((p) {
+                      if (p.id == productId) return updatedProduct;
+                      return p;
+                    }).toList();
+
+                    _filteredProducts = _filteredProducts.map((p) {
+                      if (p.id == productId) return updatedProduct;
+                      return p;
+                    }).toList();
+                  });
+
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        isAdd
+                            ? "تمت إضافة $qty إلى المخزون بنجاح ✅"
+                            : "تم حذف $qty من المخزون بنجاح ✅",
+                        textDirection: TextDirection.rtl,
+                      ),
+                      backgroundColor: isAdd ? Colors.green : Colors.red,
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                } catch (e) {
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        "حدث خطأ أثناء التحديث: $e",
+                        textDirection: TextDirection.rtl,
+                      ),
+                      backgroundColor: Colors.red,
+                      duration: const Duration(seconds: 3),
+                    ),
+                  );
+                }
+              },
+              child: Text(isAdd ? "إضافة" : "حذف"),
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -194,6 +194,7 @@ class Languages extends Translations {
           "typeClientName" : "Please Type Client Name",
           "typeTotalAfter" : "Please Type Total After Edit",
           "stock" : "Stock Management",
+          "All categories": "Categories",
         },
         'ar': {
           "stock" : "إدارة المخزون",

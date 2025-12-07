@@ -68,6 +68,7 @@ class _HomeViewState extends State<HomeView> {
     return Scaffold(
       body: _uniqueId == "" ? const Center(child: CircularProgressIndicator(),): screens[bottomNavProvider.currentIndex],
       bottomNavigationBar: Container(
+        height: Get.height * 0.102,
         decoration: const BoxDecoration(
             borderRadius: BorderRadius.only(
                 topRight: Radius.circular(40), topLeft: Radius.circular(40)
@@ -92,11 +93,11 @@ class _HomeViewState extends State<HomeView> {
             currentIndex: bottomNavProvider.currentIndex,
             items: [
               BottomNavigationBarItem(
-                  icon: const Icon(Icons.home), label: 'home'.tr),
+                  icon: const Icon(Icons.home_outlined), label: 'home'.tr),
               BottomNavigationBarItem(
-                  icon: const Icon(Icons.shopping_cart), label: 'cart'.tr),
+                  icon: const Icon(Icons.shopping_cart_outlined), label: 'cart'.tr),
               BottomNavigationBarItem(
-                  icon: const Icon(Icons.person), label: 'my_page'.tr),
+                  icon: const Icon(Icons.account_circle_outlined), label: 'my_page'.tr),
             ],
           ),
         ),

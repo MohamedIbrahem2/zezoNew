@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:zezo/constants.dart';
 import 'package:zezo/view/bottom_nav/edit_product.dart';
-
 import '../../main.dart';
 import '../../service/cart_service.dart';
 import '../../service/product_service.dart';
@@ -16,472 +15,424 @@ class ProductDetails extends StatefulWidget {
   final Product product;
   final String uniqueId;
 
-  const ProductDetails(
-      {super.key, required this.product, required this.uniqueId});
+  const ProductDetails({super.key, required this.product, required this.uniqueId});
 
   @override
   State<ProductDetails> createState() => _ProductDetailsState();
 }
 
 class _ProductDetailsState extends State<ProductDetails> {
-  late Product product;
+  late final String userId;
+  late final ValueNotifier<Product> productNotifier;
+  int quantity = 1;
 
   @override
   void initState() {
-    product = widget.product;
-
-    ProductsService().getProductById(product.id).then((event) {
-      setState(() {
-        product = event;
-      });
-    });
     super.initState();
+    userId = FirebaseAuth.instance.currentUser?.uid ?? widget.uniqueId;
+    productNotifier = ValueNotifier<Product>(widget.product);
+    _refreshProduct();
+  }
+
+  Future<void> _refreshProduct() async {
+    final updated = await ProductsService().getProductById(productNotifier.value.id);
+    if (mounted) productNotifier.value = updated;
+  }
+
+  @override
+  void dispose() {
+    productNotifier.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<AdminProvider>(context, listen: false);
+    final Color _mint = const Color(0xFF2ECC71);
+
     return Scaffold(
+      backgroundColor: Colors.white,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: mainColor,
-        iconTheme: const IconThemeData(color: Colors.white),
-        title:  Text(
-          'product details'.tr,
-          textDirection: TextDirection.rtl,
-          style: TextStyle(color: Colors.white),
-        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.white,
-                        offset: Offset(0.0, 1.0), //(x,y)
-                        blurRadius: 6.0,
+      body: ValueListenableBuilder<Product>(
+        valueListenable: productNotifier,
+        builder: (context, product, _) {
+          final totalPrice = product.regularPrice - product.discountPrice;
+
+          return Stack(
+            children: [
+              SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // ---------- Gradient Header with Image ----------
+                    Container(
+                      height: Get.height * 0.38,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            _mint.withOpacity(0.4),
+                            Colors.white,
+                          ],
+                        ),
                       ),
-                    ],
-                  ),
-                  child: CarouselSlider(
-                    options: CarouselOptions(height: Get.height * 0.36),
-                    items: product.images.map((url) {
-                      return Builder(
-                        builder: (BuildContext context) {
-                          return Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: SizedBox(
-                                width: Get.width,
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                  child: Image.network(
-                                    url,
-                                    fit: BoxFit.fill,
-                                  ),
-                                )),
-                          );
-                        },
-                      );
-                    }).toList(),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      // edit product button
-                      Row(
+                      child: Column(
                         children: [
-                          provider.isAdmin
-                              ? IconButton(
-                                  onPressed: () async {
-                                    await Get.to(EditProduct(product: product));
-                                    print('product id: ${product.id}');
-                                    ProductsService()
-                                        .getProductById(product.id)
-                                        .then((event) {
-                                      setState(() {
-                                        product = event;
-                                      });
-                                    });
-                                  },
-                                  icon: const Icon(Icons.edit),
-                                )
-                              : Container(),
-                          SizedBox(width: Get.width * 0.03),
-                          provider.isAdmin
-                              ? IconButton(
-                                  onPressed: () async{
-                                    if (product.favorite) {
-                                      await ProductsService()
-                                          .removeProductFromFavorite(product);
-                                      Get.defaultDialog(
-                                        middleText: "",
-                                        title: product.brand.tr +
-                                            " Removed successfully from Favorite",
-                                      );
-                                    } else {
-                                      await ProductsService()
-                                          .addProductToFavorite(product);
-                                      Get.defaultDialog(
-                                        middleText: "",
-                                        title: product.brand.tr +
-                                            " Added successfully to Favorite.",
-                                      );
-                                    }
-                                  },
-                                  icon:  Icon(
-                                      product.favorite ? Icons.favorite_outlined: Icons.favorite_outline_outlined))
-                              : Container()
-                          // qr code button
-
-                          // provider.isAdmin ? IconButton(
-                          //     onPressed: () {
-                          //       Get.to(ProductQrImageView(
-                          //           id: product.id,
-                          //           productName: product.brand));
-                          //     },
-                          //     icon: const Icon(Icons.qr_code_scanner_outlined)):
-                          //     Container()
-
-                          // IconButton(
-                          //   onPressed: () {
-                          //     // ProductService().deleteProduct(product.id);
-                          //     Navigator.pop(context);
-                          //   },
-                          //   icon: const Icon(Icons.delete),
-                          // ),
-                        ],
-                      ),
-
-                      Text(
-                        product.title,
-                        textDirection: TextDirection.rtl,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        product.brand,
-                        textDirection: TextDirection.rtl,
-                        style: const TextStyle(
-                            fontSize: 19, color: Colors.black45),
-                      ),
-                      SizedBox(height: Get.height * 0.03),
-                      Text(
-                        textDirection: TextDirection.rtl,
-                        product.description,
-                        style: const TextStyle(
-                          fontSize: 17,
-                        ),
-                      ),
-                      SizedBox(height: Get.height * 0.03),
-                      Text(
-                        textDirection: TextDirection.rtl,
-                        'السعر: SR ${product.regularPrice.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.normal,
-                        ),
-                      ),
-                      SizedBox(height: Get.height * 0.03),
-                      Text(
-                        textDirection: TextDirection.rtl,
-                        'التخفيض: ${product.discountPrice}',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.normal,
-                        ),
-                      ),
-                      SizedBox(height: Get.height * 0.03),
-                      // Text(
-                      //   'Category: ${product.categoryId}',
-                      //   style: const TextStyle(
-                      //     fontSize: 18,
-                      //     fontWeight: FontWeight.normal,
-                      //   ),
-                      // ),
-                      // const SizedBox(height: 8),
-                      // Text(
-                      //   'Subcategory: ${product.subcategoryId}',
-                      //   style: const TextStyle(
-                      //     fontSize: 18,
-                      //     fontWeight: FontWeight.normal,
-                      //   ),
-                      // ),
-                      // const SizedBox(height: 8),
-                      // Text(
-                      //   'Sales Count: ${product.salesCount}',
-                      //   style: const TextStyle(
-                      //     fontSize: 18,
-                      //     fontWeight: FontWeight.normal,
-                      //   ),
-                      // ),
-                      SizedBox(height: Get.height * 0.03),
-                      // total price
-                      Text(
-                        textDirection: TextDirection.rtl,
-                        'السعر الكلي: SR ${(product.regularPrice - product.discountPrice).toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.normal,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: Get.height * 0.03),
-            Row(
-              children: [
-                provider.isAdmin
-                    ? Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: mainColor),
-                              onPressed: () async {
-                                await ProductsService()
-                                    .addProductToBestSelling(product);
-                                if (product.isbestselling) {
-                                  Get.defaultDialog(
-                                    middleText: "",
-                                    title: product.brand.tr +
-                                        " Already in bestSelling",
-                                  );
-                                } else {
-                                  Get.defaultDialog(
-                                    middleText: "",
-                                    title: product.brand.tr +
-                                        " Added successfully to BestSelling.",
-                                  );
-                                }
-                              },
-                              child:  Text(
-                                  textDirection: TextDirection.rtl,
-                                  style: TextStyle(color: Colors.white),
-                                  "add to bestselling".tr)),
-                        ),
-                      )
-                    : Container(),
-                provider.isAdmin
-                    ? Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.black),
-                              onPressed: () async {
-                                await ProductsService()
-                                    .removeProductFromBestSelling(product);
-                                if (product.isbestselling) {
-                                  Get.defaultDialog(
-                                    middleText: "",
-                                    title: product.brand.tr +
-                                        " Removed successfully from BestSelling.",
-                                  );
-                                } else {
-                                  Get.defaultDialog(
-                                    middleText: "",
-                                    title: product.brand.tr +
-                                        " Already not in bestSelling",
-                                  );
-                                }
-                              },
-                              child:  Text(
-                                  textDirection: TextDirection.rtl,
-                                  style: TextStyle(color: Colors.white),
-                                  "remove from bestselling".tr)),
-                        ),
-                      )
-                    : Container(),
-              ],
-            ),
-            SizedBox(height: Get.height * 0.03),
-            Row(
-              children: [
-                provider.isAdmin
-                    ? Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: mainColor),
-                        onPressed: () async {
-                          await ProductsService()
-                              .productNotAvailable(product.id);
-                          if (!product.available) {
-                            Get.defaultDialog(
-                              middleText: "",
-                              title: product.brand.tr +
-                                  " Already in UnavialableProducts",
-                            );
-                          } else {
-                            Get.defaultDialog(
-                              middleText: "",
-                              title: product.brand.tr +
-                                  " Added successfully to UnavialableProducts.",
-                            );
-                          }
-                        },
-                        child:  Text(
-                            textDirection: TextDirection.rtl,
-                            style: TextStyle(color: Colors.white),
-                            "add to unavailable".tr)),
-                  ),
-                )
-                    : Container(),
-                provider.isAdmin
-                    ? Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black),
-                        onPressed: () async {
-                          await ProductsService()
-                              .productAvailable(product.id);
-                          if (!product.available) {
-                            Get.defaultDialog(
-                              middleText: "",
-                              title: product.brand.tr +
-                                  " Removed successfully from UnavialableProducts.",
-                            );
-                          } else {
-                            Get.defaultDialog(
-                              middleText: "",
-                              title: product.brand.tr +
-                                  " Already not in UnavialableProducts",
-                            );
-                          }
-                        },
-                        child:  Text(
-                            textDirection: TextDirection.rtl,
-                            style: TextStyle(color: Colors.white),
-                            "remove from unavailable".tr)),
-                  ),
-                )
-                    : Container(),
-              ],
-            ),
-            SizedBox(height: Get.height * 0.04),
-            StreamBuilder<List<CartItem>>(
-                stream: CartService().getCartItemsByProductId(
-                    FirebaseAuth.instance.currentUser != null
-                        ? FirebaseAuth.instance.currentUser!.uid
-                        : widget.uniqueId,
-                    product.id),
-                builder: (context, snapshot) {
-                  final quantity =
-                      (snapshot.data == null || snapshot.data!.isEmpty)
-                          ? 0
-                          : snapshot.data
-                              ?.map((e) => e.quantity)
-                              .reduce((value, element) => value + element);
-                  final items = snapshot.data;
-                  return Container(
-                    width: double.infinity,
-                    margin: const EdgeInsets.all(16.0),
-                    padding: const EdgeInsets.all(10.0),
-                    decoration: BoxDecoration(
-                      color: mainColor,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.shopping_cart,
-                          color: Colors.white,
-                        ),
-                        SizedBox(width: Get.width * 0.06),
-                        GestureDetector(
-                          onTap: () {
-                            Get.to(Screen2(
-                              uniqueId: widget.uniqueId,
-                            ));
-                          },
-                          child:  Text(
-                            textDirection: TextDirection.rtl,
-                            'go to cart'.tr,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        const Spacer(),
-                        //       await CartService().addToCart(
-                        //   FirebaseAuth.instance.currentUser!.uid,
-                        //   product,
-                        // );
-                        Row(
-                          children: [
-                            IconButton(
-                                onPressed: () {
-                                  if(!product.available){
-                                    Get.snackbar("", "unavailable product".tr);
-                                  }else{
-                                    CartService().addToCart(
-                                      productNameEng: product.brand,
-                                      productId: product.id,
-                                      userId: FirebaseAuth.instance.currentUser !=
-                                          null
-                                          ? FirebaseAuth.instance.currentUser!.uid
-                                          : widget.uniqueId,
-                                      quantity: 0,
-                                      productName: product.title,
-                                      image: product.images.first,
-                                      price: product.regularPrice-product.discountPrice,
-
-                                      // product: product,
-                                    );
-                                  }
-
-                                },
-                                icon: const Icon(
-                                  Icons.add,
-                                  color: Colors.white,
-                                )),
-                            Text(
-                              quantity.toString(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
+                          const SizedBox(height: 70),
+                          Expanded(
+                            child: Center(
+                              child: Image.network(
+                                product.images.first,
+                                fit: BoxFit.contain,
+                                height: 220,
                               ),
                             ),
-                            IconButton(
-                                onPressed: () {
-                                  if (items != null) {
-                                    CartService().updateCartItemQuantity(
-                                        items[0].id, quantity! - 1, quantity);
-                                  }
-                                },
-                                icon: const Icon(
-                                  Icons.remove,
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // ---------- Product Info ----------
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Product title
+                          Text(
+                            product.title,
+                            textAlign: TextAlign.start,
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+
+                          // Brand / weight
+                          Text(
+                            product.brand,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black54,
+                            ),
+                          ),
+
+                          const SizedBox(height: 18),
+
+                          // ---------- Arabic Price Summary Box ----------
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(14),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black12.withOpacity(0.05),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                              border: Border.all(color: Colors.grey.shade200),
+                            ),
+                            child: Directionality(
+                              textDirection: TextDirection.rtl,
+                              child: Column(
+                                children: [
+                                  _priceRow("السعر", product.regularPrice),
+                                  const Divider(height: 16, thickness: 0.7),
+                                  _priceRow("سعر التخفيض", product.discountPrice),
+                                  const Divider(height: 16, thickness: 0.7),
+                                  _priceRow("السعر الكلي", totalPrice, highlight: true),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 24),
+
+                          // ---------- Description ----------
+                          Text(
+                            product.description,
+                            textAlign: TextAlign.start,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              color: Colors.black87,
+                              height: 1.4,
+                            ),
+                          ),
+
+                          const SizedBox(height: 28),
+
+                          // ---------- Quantity Selector ----------
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF5F6F7),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.grey.shade200),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  "الكمية",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          if (quantity > 1) quantity--;
+                                        });
+                                      },
+                                      icon: const Icon(Icons.remove, color: Colors.black54),
+                                    ),
+                                    Text(
+                                      quantity.toString(),
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    IconButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          quantity++;
+                                        });
+                                      },
+                                      icon: Icon(Icons.add, color: _mint),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 24),
+
+                          // ---------- Add to Cart Button ----------
+                          SizedBox(
+                            width: double.infinity,
+                            height: 54,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                if (!product.available) {
+                                  Get.snackbar("غير متاح", "هذا المنتج غير متاح حالياً");
+                                  return;
+                                }
+                                await CartService().addToCart(
+                                  productNameEng: product.brand,
+                                  productId: product.id,
+                                  productName: product.title,
+                                  price: totalPrice,
+                                  quantity: quantity,
+                                  userId: FirebaseAuth.instance.currentUser?.uid ??
+                                      widget.uniqueId,
+                                  image: product.images.first,
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: _mint,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: const Text(
+                                "إضافة إلى السلة",
+                                style: TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w600,
                                   color: Colors.white,
-                                )),
-                          ],
-                        )
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 30),
+
+                          if (provider.isAdmin)
+                            _AdminActionSection(
+                              product: product,
+                              onRefresh: _refreshProduct,
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // ---------- Floating Edit Button for Admin ----------
+              if (provider.isAdmin)
+                Positioned(
+                  top: 90,
+                  right: 20,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.9),
+                      borderRadius: BorderRadius.circular(50),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26.withOpacity(0.1),
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),
+                        ),
                       ],
                     ),
-                  );
-                })
-            // add to cart button
-            ,
-          ],
+                    child: IconButton(
+                      onPressed: () {
+                        Get.to(EditProduct(product: widget.product));
+                      },
+                      icon: const Icon(Icons.edit, color: Colors.black87, size: 24),
+                      tooltip: "تعديل المنتج",
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _priceRow(String label, double value, {bool highlight = false}) {
+    final Color _mint = const Color(0xFF2ECC71);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 16,
+            color: Colors.black87,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        Text(
+          value.toStringAsFixed(2),
+          style: TextStyle(
+            fontSize: 16,
+            color: highlight ? _mint : Colors.black54,
+            fontWeight: highlight ? FontWeight.bold : FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/* ---------------- ADMIN ACTIONS ---------------- */
+
+class _AdminActionSection extends StatelessWidget {
+  final Product product;
+  final Future<void> Function() onRefresh;
+
+  const _AdminActionSection({required this.product, required this.onRefresh});
+
+  Future<void> _performAction({
+    required Future<void> Function(Product) action,
+    required String title,
+    required String message,
+  }) async {
+    await action(product);
+    Get.defaultDialog(middleText: "", title: "$title ${product.brand.tr} $message");
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(children: [
+          _AdminButton(
+            label: "إضافة للأكثر مبيعاً",
+            color: mainColor,
+            onTap: () async {
+              await _performAction(
+                action: ProductsService().addProductToBestSelling,
+                title: product.brand.tr,
+                message: " تمت الإضافة للأكثر مبيعاً",
+              );
+              await onRefresh();
+            },
+          ),
+          _AdminButton(
+            label: "إزالة من الأكثر مبيعاً",
+            color: Colors.black,
+            onTap: () async {
+              await _performAction(
+                action: ProductsService().removeProductFromBestSelling,
+                title: product.brand.tr,
+                message: " تمت الإزالة من الأكثر مبيعاً",
+              );
+              await onRefresh();
+            },
+          ),
+        ]),
+        Row(children: [
+          _AdminButton(
+            label: "إضافة لغير المتاح",
+            color: mainColor,
+            onTap: () async {
+              await _performAction(
+                action: (p) => ProductsService().productNotAvailable(p.id),
+                title: product.brand.tr,
+                message: " تمت الإضافة لقائمة غير المتاح",
+              );
+              await onRefresh();
+            },
+          ),
+          _AdminButton(
+            label: "إزالة من غير المتاح",
+            color: Colors.black,
+            onTap: () async {
+              await _performAction(
+                action: (p) => ProductsService().productAvailable(p.id),
+                title: product.brand.tr,
+                message: " تمت الإزالة من قائمة غير المتاح",
+              );
+              await onRefresh();
+            },
+          ),
+        ]),
+      ],
+    );
+  }
+}
+
+class _AdminButton extends StatelessWidget {
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _AdminButton({required this.label, required this.color, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: color),
+          onPressed: onTap,
+          child: Text(
+            label,
+            style: const TextStyle(color: Colors.white),
+          ),
         ),
       ),
     );

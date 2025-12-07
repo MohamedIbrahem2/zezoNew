@@ -85,6 +85,8 @@ dependencies:
   syncfusion_flutter_datagrid_export: ^28.1.33
   pdf: ^3.11.1
   printing: ^5.13.4
+  crystal_navigation_bar: ^1.0.4
+  spotlight_bottom_navbar: ^0.0.6
 
 dev_dependencies:
   flutter_test:
