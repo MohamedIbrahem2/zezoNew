@@ -77,6 +77,7 @@ class _CheckHomeState extends State<CheckHome> {
       });
     }
   }
+  bool _isSubmitting = false;
 
   @override
   Widget build(BuildContext context) {
@@ -496,7 +497,9 @@ class _CheckHomeState extends State<CheckHome> {
               elevation: 12,
               onClosing: () {},
               builder: (context) => GestureDetector(
-                onTap: () {
+                onTap: _isSubmitting
+                    ? null
+                    : () {
                   Get.defaultDialog(
                     title: 'confirm order'.tr,
                     content: Row(
@@ -507,21 +510,11 @@ class _CheckHomeState extends State<CheckHome> {
                             elevation: 10,
                             backgroundColor: mainColor,
                           ),
-                          onPressed: () async {
-                            final String client = clientNameController.text.trim();
-                            final bool clientFilled = client.isNotEmpty;
+                          onPressed: _isSubmitting
+                              ? null
+                              : () async {
+                            setState(() => _isSubmitting = true);
 
-                            // if (!clientFilled) {
-                            //   Get.snackbar(
-                            //     'error'.tr,
-                            //     'typeClientName'.tr,
-                            //     backgroundColor: Colors.red,
-                            //     colorText: Colors.white,
-                            //     duration: const Duration(seconds: 3),
-                            //   );
-                            //   Navigator.pop(context);
-                            //   return;
-                            // }
                             Navigator.pop(context);
 
                             Get.snackbar(
@@ -534,29 +527,58 @@ class _CheckHomeState extends State<CheckHome> {
                               duration: const Duration(seconds: 8),
                             );
 
-                            await OrderService().placeOrder(
-                              FirebaseAuth.instance.currentUser!.uid,
-                              _cartItems,
-                              totalPrice,
-                              client,
-                              selectedAddress!,
-                              finalDate,
-                              phoneNumbersController
-                                  .map((e) => e.text)
-                                  .where((element) => element.isNotEmpty)
-                                  .toList(),
-                            );
+                            try {
+                              final String client =
+                              clientNameController.text.trim();
+
+                              await OrderService().placeOrder(
+                                FirebaseAuth.instance.currentUser!.uid,
+                                _cartItems,
+                                totalPrice,
+                                client,
+                                selectedAddress!,
+                                finalDate,
+                                phoneNumbersController
+                                    .map((e) => e.text)
+                                    .where((e) => e.isNotEmpty)
+                                    .toList(),
+                              );
+                            } finally {
+                              setState(() => _isSubmitting = false);
+                            }
                           },
-                          child: const Text(
+                          child: _isSubmitting
+                              ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                              : const Text(
                             'yes',
                             textDirection: TextDirection.rtl,
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 18),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 18,
+                            ),
                           ),
                         ),
                         ElevatedButton(
-                          style: ElevatedButton.styleFrom(elevation: 10, backgroundColor: Colors.white),
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('no', textDirection: TextDirection.rtl, style: TextStyle(color: Colors.black)),
+                          style: ElevatedButton.styleFrom(
+                            elevation: 10,
+                            backgroundColor: Colors.white,
+                          ),
+                          onPressed: _isSubmitting
+                              ? null
+                              : () => Navigator.pop(context),
+                          child: const Text(
+                            'no',
+                            textDirection: TextDirection.rtl,
+                            style: TextStyle(color: Colors.black),
+                          ),
                         ),
                       ],
                     ),
@@ -574,10 +596,16 @@ class _CheckHomeState extends State<CheckHome> {
                     ),
                   ),
                   alignment: Alignment.center,
-                  child: const Text(
+                  child: _isSubmitting
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text(
                     'confirm',
                     textDirection: TextDirection.rtl,
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),

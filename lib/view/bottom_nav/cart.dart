@@ -368,28 +368,16 @@ class _Screen2State extends State<Screen2> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text("Subtotal",
+                    const Text("total",
                         style: TextStyle(color: Colors.grey, fontSize: 14)),
                     Text(
-                      subtotal.toStringAsFixed(1),
+                      total.toStringAsFixed(1),
                       style: const TextStyle(
                           color: Colors.black, fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
                 const SizedBox(height: 6),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
-                    Text("Shipping charges",
-                        style: TextStyle(color: Colors.grey, fontSize: 14)),
-                    Text(
-                      "1.6",
-                      style: TextStyle(
-                          color: Colors.black, fontWeight: FontWeight.w600),
-                    ),
-                  ],
-                ),
                 const Divider(height: 24, thickness: 0.8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -411,87 +399,114 @@ class _Screen2State extends State<Screen2> {
                 ),
                 const SizedBox(height: 18),
 
-                // Gradient Checkout Button
-                Container(
-                  width: double.infinity,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14),
-                    gradient: const LinearGradient(
-                      colors: [mint, darkMint],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
-                  ),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (FirebaseAuth.instance.currentUser == null) {
-                        Get.defaultDialog(
-                          title: "يجب تسجيل الدخول لإتمام العملية",
-                          content: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              ElevatedButton(
-                                onPressed: () => Navigator.pop(context),
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.white),
-                                child: const Text("رجوع",
-                                    style: TextStyle(color: Colors.black)),
-                              ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                  Get.to(const SignIn());
-                                },
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: mint),
-                                child: const Text("تسجيل الدخول",
-                                    style: TextStyle(color: Colors.white)),
-                              ),
-                            ],
+            Container(
+              width: double.infinity,
+              height: 50,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                gradient: const LinearGradient(
+                  colors: [mint, darkMint],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+              child: ElevatedButton(
+                onPressed: () {
+                  if (total < 800) {
+                    Get.defaultDialog(
+                      title: "تنبيه",
+                      middleText: "يجب ان لا تقل قيمه الطلب عن 800 ريال\n\n"
+                          "The order value must not be less than 800 SAR",
+                      textConfirm: "حسناً",
+                      confirmTextColor: Colors.white,
+                      buttonColor: mint,
+                      onConfirm: () => Navigator.pop(context),
+                    );
+                    return;
+                  }
+                  if (FirebaseAuth.instance.currentUser == null) {
+                    Get.defaultDialog(
+                      title: "يجب تسجيل الدخول لإتمام العملية",
+                      content: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                            ),
+                            child: const Text(
+                              "رجوع",
+                              style: TextStyle(color: Colors.black),
+                            ),
                           ),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              Get.to(const SignIn());
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: mint,
+                            ),
+                            child: const Text(
+                              "تسجيل الدخول",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    final provider =
+                    Provider.of<AdminProvider>(context, listen: false);
+
+                    if (provider.isAdmin) {
+                      final updatedCartItems = cartItems.map((item) {
+                        return CartItem(
+                          id: item.id,
+                          productName: item.productName,
+                          price: _editedPrices[item.id] ?? item.price,
+                          quantity: item.quantity,
+                          image: item.image,
+                          productId: item.productId,
+                          productNameEng: item.productNameEng,
                         );
-                      } else {
-                        final provider =
-                        Provider.of<AdminProvider>(context, listen: false);
-                        if (provider.isAdmin) {
-                          final updatedCartItems = cartItems.map((item) {
-                            return CartItem(
-                              id: item.id,
-                              productName: item.productName,
-                              price: _editedPrices[item.id] ?? item.price,
-                              quantity: item.quantity,
-                              image: item.image,
-                              productId: item.productId,
-                              productNameEng: item.productNameEng,
-                            );
-                          }).toList();
-                          Get.to(CheckHome(
-                              unique: widget.uniqueId,
-                              cartItems: updatedCartItems));
-                        } else {
-                          Get.to(CheckHome(unique: widget.uniqueId, cartItems: []));
-                        }
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      shadowColor: Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                    child: const Text(
-                      "Checkout",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                      }).toList();
+
+                      Get.to(
+                        CheckHome(
+                          unique: widget.uniqueId,
+                          cartItems: updatedCartItems,
+                        ),
+                      );
+                    } else {
+                      Get.to(
+                        CheckHome(
+                          unique: widget.uniqueId,
+                          cartItems: [],
+                        ),
+                      );
+                    }
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-              ],
+                child: const Text(
+                  "Checkout",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            )
+            ],
             ),
           );
         },

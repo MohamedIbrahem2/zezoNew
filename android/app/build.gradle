@@ -41,8 +41,8 @@ android {
         applicationId "com.khstockatzezo"
         minSdkVersion flutter.minSdkVersion
         targetSdkVersion 35
-        versionCode 31
-        versionName "6.2.8"
+        versionCode 35
+        versionName "6.2.9"
         multiDexEnabled true
 
         ndk {
