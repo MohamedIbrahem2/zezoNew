@@ -87,6 +87,7 @@ dependencies:
   printing: ^5.13.4
   crystal_navigation_bar: ^1.0.4
   spotlight_bottom_navbar: ^0.0.6
+  flutter_screenutil: ^5.9.3
 
 dev_dependencies:
   flutter_test:

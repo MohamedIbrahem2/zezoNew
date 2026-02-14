@@ -450,7 +450,7 @@ class _CheckHomeState extends State<CheckHome> {
                           ),
 
                           _summaryRow(label: 'discount'.tr, value: '0 SR'),
-                          _summaryRow(label: 'deliver'.tr, value: '0 SR'),
+                          _summaryRow(label: 'deliver'.tr, value: 'free'.tr),
 
                           const Divider(height: 20, thickness: .9),
 

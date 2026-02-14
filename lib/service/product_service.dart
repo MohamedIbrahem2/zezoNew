@@ -266,6 +266,15 @@ class ProductsService {
       return snapshot.docs.map((doc) => Product.fromSnapshot(doc)).toList();
     });
   }
+
+  Stream<List<Product>> getStories(String categoryId) {
+    final collection = FirebaseFirestore.instance.collection('stories');
+    return collection
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) => Product.fromSnapshot(doc)).toList();
+    });
+  }
   /*Future<void> removeProductFromBestSellingTest() async{
     final collection = FirebaseFirestore.instance.collection('products');
     await collection.get().then((snapshot) {

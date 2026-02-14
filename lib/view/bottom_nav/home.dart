@@ -5,6 +5,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:zezo/constants.dart';
@@ -14,6 +15,7 @@ import 'package:zezo/service/product_service.dart';
 import 'package:zezo/view/bottom_nav/cart.dart';
 import 'package:zezo/view/bottom_nav/peoduct_details.dart';
 import 'package:zezo/view/categories/categories_view.dart';
+import 'package:zezo/view/drawer_screens/add_stories_screen.dart';
 import 'package:zezo/view/drawer_screens/stock_screen.dart';
 import 'package:zezo/view/drawer_screens/unavailable_product.dart';
 import 'package:zezo/view/drawer_screens/sendMessage.dart';
@@ -30,8 +32,10 @@ import 'package:zezo/view/my_page_screens/orders_management.dart';
 import 'package:zezo/view/my_page_screens/our_location_page.dart';
 import 'package:zezo/view/bottom_nav/admins.dart';
 import 'package:zezo/view/sign_in.dart';
+import 'package:zezo/widgets/stories_view.dart';
 import '../../service/cart_service.dart';
 import '../../service/offer_service.dart';
+import '../../widgets/stories_shimmer.dart';
 
 class HomePage extends StatefulWidget {
   final String uniqueId;
@@ -125,6 +129,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
               const SizedBox(height: 12),
 
+              ListItemsStatusHome(),
+
+              const SizedBox(height: 12),
+
               // ---- Carousel (kept logic, adjusted look) ----
               _buildCarousel(),
 
@@ -157,10 +165,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   compact: false,
                   allowRemoveFromBestSelling: false,
                 ),
-
+              const SizedBox(height: 16),
               // ---- Search results ----
               if (_isSearching) _buildSearchResults(),
-
+              const SizedBox(height: 24),
               // ---- Best Selling ----
               if (!_isSearching) ...[
                 _buildSectionTitle('best_selling'.tr),
@@ -170,7 +178,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   allowRemoveFromBestSelling: true,
                 ),
               ],
-
+              const SizedBox(height: 24),
               // ---- Offers / Favorites ----
               if (!_isSearching) ...[
                 _buildSectionTitle('offers'.tr),
@@ -269,6 +277,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               _drawerTile('who_we_are'.tr, () => Get.to(const AboutUs())),
               _drawerTile('our_location'.tr, () => Get.to(const OurLocationPage())),
               if (isAdmin) _drawerTile('orders Management'.tr, () => Get.to(const OrdersManagement())),
+              if (isAdmin) _drawerTile('addStory'.tr, () => Get.to(AddStoryPage())),
               if (isAdmin) _drawerTile('admins'.tr, () => Get.to(const AdminsPage())),
               if (isAdmin) _drawerTile('unavailable_products'.tr, () => Get.to(const UnavailableProduct())),
               if (isAdmin) _drawerTile('send_message'.tr, () => Get.to(const SendMessage())),
@@ -422,84 +431,120 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       stream: CategoryService().getCategories(),
       builder: (context, snapshot) {
         if (snapshot.hasError) return const SizedBox();
+
         if (!snapshot.hasData) {
-          return _fadeIn(
-            SizedBox(
-              height: Get.height * 0.16,
-              child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+          return SizedBox(
+            height: 400,
+            child: const Center(
+              child: CircularProgressIndicator(strokeWidth: 2),
             ),
           );
         }
+
         final categories = snapshot.data!;
+        if (categories.isEmpty) return const SizedBox();
+
         return SizedBox(
           width: Get.width,
-          height: Get.height * 0.16,
-          child: ListView.builder(
-            reverse: true,
+          height: 400, // 🔥 SAME HEIGHT AS FIRST GRID
+          child: GridView.builder(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 10),
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3, // 🔥 SAME AS FIRST ONE
+              mainAxisSpacing: 18,
+              crossAxisSpacing: 30,
+              childAspectRatio: 1.05,
+            ),
             itemCount: categories.length,
             itemBuilder: (context, index) {
               final category = categories[index];
               final isSelected = categoryId == category.id;
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
-                child: InkWell(
-                  onLongPress: () {
-                    if (!context.read<AdminProvider>().isAdmin) return;
-                    _showEditDeleteCategoryDialog(category);
-                  },
-                  onTap: () => setState(() {
-                    categoryId = category.id;
-                    _selectedIndex = index;
-                  }),
-                  borderRadius: BorderRadius.circular(16),
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 74,
-                        height: 70,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            colors: isSelected
-                                ? [ _mint, _mintDark ]
-                                : [ const Color(0xFFF7FDF9), const Color(0xFFEAF8F0) ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          boxShadow: [
-                            BoxShadow(color: _cardShadow, blurRadius: 10, offset: const Offset(0, 6)),
-                          ],
-                          border: Border.all(color: isSelected ? _mintDark : const Color(0xFFEAEAEA), width: 1),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(50),
-                          child: CachedNetworkImage(imageUrl: category.image,
-                            fit: BoxFit.cover,
-                            placeholder: (_,__)=> Container(
-                              color: _mintLight,
+
+              return InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onLongPress: () {
+                  if (!context.read<AdminProvider>().isAdmin) return;
+                  _showEditDeleteCategoryDialog(category);
+                },
+                onTap: () => setState(() {
+                  categoryId = category.id;
+                  _selectedIndex = index;
+                }),
+                child: Column(
+                  children: [
+                    /// ===== IMAGE CARD (SAME DESIGN)
+                    Expanded(
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: isSelected
+                                    ? [mainColor, Colors.white]
+                                    : [mainColor.withOpacity(0.6), Colors.white],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                              ),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Container(
+                              margin: const EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(14),
+                                child: CachedNetworkImage(
+                                  imageUrl: category.image,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  placeholder: (_, __) =>
+                                  const ImageShimmer(
+                                    borderRadius:
+                                    BorderRadius.all(Radius.circular(14)),
+                                  ),
+                                  errorWidget: (_, __, ___) => Image.asset(
+                                    "",
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                        ],
                       ),
-                      const SizedBox(height: 6),
-                      SizedBox(
-                        width: 84,
-                        child: Text(
-                          category.name,
-                          textAlign: TextAlign.center,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                          style: TextStyle(
-                            color: isSelected ? _mintDark : Colors.black87,
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w600,
-                          ),
+                    ),
+
+                    const SizedBox(height: 6),
+
+                    /// ===== TITLE (UNCHANGED)
+                    Builder(builder: (ctx) {
+                      final title = category.name;
+                      final len = title.trim().length;
+                      final langCode = Get.locale?.languageCode ?? 'ar';
+                      final isArabic = langCode.startsWith('ar');
+                      final threshold = isArabic ? 14 : 18;
+                      final fontSize = len > threshold ? 10.0 : 13.5;
+
+                      return Text(
+                        title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black,
+                          fontFamily: 'lamasans',
                         ),
-                      ),
-                    ],
-                  ),
+                      );
+                    }),
+                  ],
                 ),
               );
             },
@@ -508,6 +553,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       },
     );
   }
+
+
 
   void _showEditDeleteCategoryDialog(Category category) {
     Get.defaultDialog(
@@ -663,7 +710,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return Container(
       margin: const EdgeInsets.all(10).copyWith(bottom: 0),
       width: Get.width,
-      height: Get.height * .83,
+      height: Get.height * .67,
       child: StreamBuilder<QuerySnapshot>(
         stream: _firestore.collection("products").snapshots(),
         builder: (context, snap) {

@@ -66,7 +66,7 @@ class Languages extends Translations {
           "search_for_categories": "Search for Categories",
           "language": "Language",
           "general management" : "General management",
-          "contact sales" : "Contact with our salesman",
+          "contact sales" : "Contact with Us",
           "who_we_are": "Who We Are?",
           "our_location": "Our Location",
           "shipping_address": "Shipping Address",
@@ -195,8 +195,11 @@ class Languages extends Translations {
           "typeTotalAfter" : "Please Type Total After Edit",
           "stock" : "Stock Management",
           "All categories": "Categories",
+          "addStory" : "Add Story",
+          "free" : "Free"
         },
         'ar': {
+          "free" : "مجاني",
           "stock" : "إدارة المخزون",
           "error" : "خطأ",
           "typeClientName" : "يرجي كتابة اسم العميل",
@@ -261,7 +264,7 @@ class Languages extends Translations {
           "terms_and_conditions": "الشروط والأحكام",
           "privacy_policy": "سياسة الخصوصية",
           "search": "بحث",
-          "contact sales" : "تواصل مع مندوب المبيعات",
+          "contact sales" : "تواصل معنا",
           "search_for_products": "بحث عن منتجات",
           "search_for_categories": "بحث عن أقسام",
           "language": "اللغة",
@@ -344,6 +347,7 @@ class Languages extends Translations {
           "email is required": "البريد الإلكتروني مطلوب",
           "email must be valid": "البريد الإلكتروني يجب أن يكون صحيح",
           "all" : "الكل",
+          "addStory" : "اضافة حالة",
           "please_login" : "لا يمكن اتمام العمليه\n"
               "يجب تسجيل الدخول",
           "go_back" : "الرجوع",
