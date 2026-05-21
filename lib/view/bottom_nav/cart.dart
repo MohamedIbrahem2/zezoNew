@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -22,13 +23,34 @@ class Screen2 extends StatefulWidget {
 class _Screen2State extends State<Screen2> {
   final Map<String, TextEditingController> _qtyControllers = {};
   final Map<String, double> _editedPrices = {};
+  double orderLimit = 800;
+  Future<void> getConfigs() async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('configs')
+          .doc('getConfigs')
+          .get();
 
+      if (doc.exists) {
+        setState(() {
+          orderLimit = (doc.data()?['orderLimit'] ?? 800).toDouble();
+        });
+      }
+    } catch (e) {
+      print("Config load error: $e");
+    }
+  }
   @override
   void dispose() {
     for (final c in _qtyControllers.values) {
       c.dispose();
     }
     super.dispose();
+  }
+  @override
+  void initState() {
+    super.initState();
+    getConfigs();
   }
 
   @override
@@ -412,11 +434,12 @@ class _Screen2State extends State<Screen2> {
               ),
               child: ElevatedButton(
                 onPressed: () {
-                  if (total < 800) {
+                  if (total < orderLimit) {
                     Get.defaultDialog(
                       title: "تنبيه",
-                      middleText: "يجب ان لا تقل قيمه الطلب عن 800 ريال\n\n"
-                          "The order value must not be less than 800 SAR",
+                      middleText:
+                      "يجب ان لا تقل قيمه الطلب عن $orderLimit ريال\n\n"
+                          "The order value must not be less than $orderLimit SAR",
                       textConfirm: "حسناً",
                       confirmTextColor: Colors.white,
                       buttonColor: mint,
@@ -470,6 +493,8 @@ class _Screen2State extends State<Screen2> {
                           image: item.image,
                           productId: item.productId,
                           productNameEng: item.productNameEng,
+                          discountPercentage: item.discountPercentage,
+                          quantityDiscount: item.quantityDiscount
                         );
                       }).toList();
 

@@ -677,7 +677,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         }
         final products = snapshot.data ?? const <Product>[];
         return SizedBox(
-          height: compact ? Get.height * .21 : Get.height * .295,
+          height: compact ? Get.height * .26 : Get.height * .31,
           width: Get.width,
           child: GridView.builder(
             reverse: true,
@@ -710,7 +710,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return Container(
       margin: const EdgeInsets.all(10).copyWith(bottom: 0),
       width: Get.width,
-      height: Get.height * .67,
+      height: Get.height * .88,
       child: StreamBuilder<QuerySnapshot>(
         stream: _firestore.collection("products").snapshots(),
         builder: (context, snap) {
@@ -744,21 +744,24 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               itemCount: filtered.length,
               itemBuilder: (_, i) {
                 final f = filtered[i];
+                final data = f.data() as Map<String, dynamic>;
                 final p = Product(
-                  available: (f['avalible'] ?? true) as bool,
-                  favorite: (f['favorite'] ?? false) as bool,
-                  isbestselling: (f['isbestselling'] ?? false) as bool,
-                  category: (f['category'] ?? '') as String,
-                  brand: (f['brand'] ?? '') as String,
-                  description: (f['description'] ?? '') as String,
+                  available: (data['avalible'] ?? true) as bool,
+                  favorite: (data['favorite'] ?? false) as bool,
+                  isbestselling: (data['isbestselling'] ?? false) as bool,
+                  category: (data['category'] ?? '') as String,
+                  brand: (data['brand'] ?? '') as String,
+                  description: (data['description'] ?? '') as String,
                   stock: 0,
-                  title: (f['title'] ?? '') as String,
-                  weight: (f['weight'] ?? '') as String,
+                  title: (data['title'] ?? '') as String,
+                  weight: (data['weight'] ?? '') as String,
                   id: f.id,
-                  categoryId: f['categoryId'] ?? 0,
-                  regularPrice: (f['regularPrice'] ?? 0.0) * 1.0,
-                  images: List<String>.from((f['images'] ?? const <String>[]) as List),
-                  discountPrice: (f['discountPrice'] ?? 0.0) * 1.0,
+                  categoryId: data['categoryId'] ?? 0,
+                  regularPrice: (data['regularPrice'] ?? 0.0) * 1.0,
+                  images: List<String>.from((data['images'] ?? const <String>[]) as List),
+                  discountPrice: (data['discountPrice'] ?? 0.0) * 1.0,
+                  discountPercentage: (data['discountPercentage'] ?? 0.0),
+                  quantityDiscount: (data['quantityDiscount'] ?? 0)
                 );
                 return _buildProductTile(product: p, compact: false, allowRemoveFromBestSelling: false);
               },
@@ -877,8 +880,40 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   style: TextStyle(fontSize: compact ? 10 : 12, color: Colors.black54, fontWeight: FontWeight.w500),
                 ),
               ),
-
-              const Spacer(),
+           product.discountPercentage != 0 ?   Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2),
+                child: RichText(
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  text: TextSpan(
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Colors.black54,
+                      fontWeight: FontWeight.w800,
+                    ),
+                    children: [
+                      TextSpan(text: "discountQuantity".tr),
+                      TextSpan(
+                        text: "${(product.discountPercentage * 100).toStringAsFixed(0)}%",
+                        style: const TextStyle(
+                          color: Color(0xFF1CD426), // dark green
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      TextSpan(text: "moreThan".tr),
+                      TextSpan(
+                        text: "${product.quantityDiscount}",
+                        style: const TextStyle(
+                          color: Color(0xFF1CD426),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      TextSpan(text: "product".tr),
+                    ],
+                  ),
+                ),
+              ) : const SizedBox(),
+              Flexible(child: Container()),
 
               // Price + Add Button
               Padding(
@@ -942,6 +977,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             quantity: _count <= 0 ? 1 : _count,
                             userId: _userId,
                             image: product.images.first,
+                            discountPercentage: product.discountPercentage,
+                            quantityDiscount: product.quantityDiscount
                           );
                         },
                         style: ElevatedButton.styleFrom(
@@ -955,7 +992,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     ),
                   ],
                 ),
-              ),
+              ) ,
             ],
           ),
         ),
@@ -981,7 +1018,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         if (products.isEmpty) return const Center(child: Text("لا يوجد منتجات مفضله"));
 
         return SizedBox(
-          height: Get.height * .22,
+          height: Get.height * .25,
           width: Get.width,
           child: GridView.builder(
             reverse: true,

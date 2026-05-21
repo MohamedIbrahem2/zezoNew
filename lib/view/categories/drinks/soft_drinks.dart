@@ -224,6 +224,40 @@ class _DrinksItemsState extends State<SubCategoriesProducts> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
+                                product.discountPercentage != 0 ?   Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2),
+                                  child: RichText(
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    text: TextSpan(
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: Colors.black54,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                      children: [
+                                        TextSpan(text: "discountQuantity".tr),
+                                        TextSpan(
+                                          text: "${(product.discountPercentage * 100).toStringAsFixed(0)}%",
+                                          style: const TextStyle(
+                                            color: Color(0xFF1CD426), // dark green
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        TextSpan(text: "moreThan".tr),
+                                        TextSpan(
+                                          text: "${product.quantityDiscount}",
+                                          style: const TextStyle(
+                                            color: Color(0xFF1CD426),
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        TextSpan(text: "product".tr),
+                                      ],
+                                    ),
+                                  ),
+                                ) : const SizedBox(),
+                                Flexible(child: Container()),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -291,6 +325,8 @@ class _DrinksItemsState extends State<SubCategoriesProducts> {
                                           image: '',
                                           userId: FirebaseAuth
                                               .instance.currentUser!.uid,
+                                          discountPercentage: product.discountPercentage,
+                                          quantityDiscount: product.quantityDiscount
                                         );
 
                                     },

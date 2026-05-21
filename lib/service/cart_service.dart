@@ -10,6 +10,8 @@ class CartItem {
   final String productName;
   final String productNameEng;
   final String image;
+  final double discountPercentage;
+  final int quantityDiscount;
    double price;
    int quantity;
 // to map
@@ -22,6 +24,8 @@ class CartItem {
       'price': price,
       'quantity': quantity,
       'image': image,
+      'discountPercentage' : discountPercentage,
+      'quantityDiscount' : quantityDiscount
     };
   }
 
@@ -32,7 +36,9 @@ class CartItem {
         productNameEng = map['productNameEng'] ?? "",
         price = map['price'],
         image = map['image'] ?? '',
-        quantity = map['quantity'];
+        quantity = map['quantity'],
+        discountPercentage = map['discountPercentage'],
+        quantityDiscount = map['quantityDiscount'];
   CartItem(
       {required this.id,
       required this.productId,
@@ -40,7 +46,9 @@ class CartItem {
       required this.price,
       required this.image,
       required this.quantity,
-        required this.productNameEng});
+        required this.productNameEng,
+        required this.discountPercentage,
+        required this.quantityDiscount});
 
   factory CartItem.fromSnapshot(DocumentSnapshot snapshot) {
     final data = snapshot.data() as Map<String, dynamic>;
@@ -52,6 +60,8 @@ class CartItem {
       price: data['price'],
       image: data['image'],
       quantity: data['quantity'],
+        discountPercentage: data['discountPercentage'] ?? 0.0,
+        quantityDiscount: data['quantityDiscount'] ?? 0
     );
   }
 }
@@ -64,7 +74,10 @@ class CartService {
         required String productNameEng,
       required String image,
       required double price,
+        required double discountPercentage,
+        required int quantityDiscount,
        double? discountPrice,
+
       required int quantity}) async {
     final collection = FirebaseFirestore.instance.collection('cart');
     // check if the product is already in the cart
@@ -80,6 +93,8 @@ class CartService {
         'quantity': 1,
         'userId': userId,
         'image': image,
+        'discountPercentage' : discountPercentage,
+        'quantityDiscount' : quantityDiscount
       });
       showSimpleNotification(Text("تم الأضافه الي العربه".tr,textDirection: TextDirection.rtl,),
           leading: Builder(builder: (

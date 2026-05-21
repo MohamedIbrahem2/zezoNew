@@ -66,7 +66,7 @@ class _CheckHomeState extends State<CheckHome> {
       context: context,
       initialDate: initial,
       firstDate: initial,
-      lastDate: DateTime(2026),
+      lastDate: DateTime(2027),
       selectableDayPredicate: _isSelectableDate,
     );
 
@@ -94,11 +94,26 @@ class _CheckHomeState extends State<CheckHome> {
           _cartItems = widget.cartItems?.isNotEmpty == true ? widget.cartItems! : snapshot.data!;
 
           int totalQuantity = 0;
-          double totalPrice = 0;
 
+          double totalPrice = 0;
+          double totalPriceBeforeDiscount = 0;
+          double quantityDiscountTotal = 0;
+          double discount = 0;
           for (var item in _cartItems) {
             totalQuantity += item.quantity;
-            totalPrice += item.price * item.quantity;
+
+            double itemTotal = item.price * item.quantity;
+
+
+
+            if (item.quantity >= item.quantityDiscount &&
+                item.discountPercentage > 0) {
+              discount = itemTotal * item.discountPercentage;
+            }
+            totalPriceBeforeDiscount += itemTotal;
+            quantityDiscountTotal += discount;
+
+            totalPrice += (itemTotal - discount);
           }
 
           return Scaffold(
@@ -441,7 +456,7 @@ class _CheckHomeState extends State<CheckHome> {
 
                           _summaryRow(
                             label: 'total before tax'.tr,
-                            value: '${(totalPrice - (totalPrice * .15)).toStringAsFixed(2)} SR',
+                            value: '${(totalPriceBeforeDiscount - (totalPriceBeforeDiscount * .15)).toStringAsFixed(2)} SR',
                           ),
 
                           _summaryRow(
@@ -449,18 +464,24 @@ class _CheckHomeState extends State<CheckHome> {
                             value: '${(totalPrice * .15).toStringAsFixed(2)} SR',
                           ),
 
-                          _summaryRow(label: 'discount'.tr, value: '0 SR'),
+                          _summaryRow(
+                            label: 'discount by quantity'.tr,
+                            value: '-${quantityDiscountTotal.toStringAsFixed(2)} SR',
+                          ),
+
+
+
+
                           _summaryRow(label: 'deliver'.tr, value: 'free'.tr),
 
                           const Divider(height: 20, thickness: .9),
 
                           _summaryRow(
                             label: 'total with tax'.tr,
-                            value: '${totalPrice.toStringAsFixed(2)} SR',
+                            value: '${(totalPrice ).toStringAsFixed(2)} SR',
                             bold: true,
                             highlight: true,
                           ),
-
                           const SizedBox(height: 12),
 
                           // Admin-only Client Name

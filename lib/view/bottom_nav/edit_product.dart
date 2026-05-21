@@ -27,6 +27,8 @@ class _EditProductState extends State<EditProduct> {
   final name2Controller = TextEditingController();
   var priceController = TextEditingController();
   var deiscountController = TextEditingController();
+  var discountPercentController = TextEditingController();
+  var quantityDiscountController = TextEditingController();
   var defaultcategory;
   @override
   void initState() {
@@ -36,11 +38,17 @@ class _EditProductState extends State<EditProduct> {
     name2Controller.text = widget.product.brand;
     priceController.text = widget.product.regularPrice.toString();
     deiscountController.text = widget.product.discountPrice.toString();
+    discountPercentController.text =
+        ((widget.product.discountPercentage ?? 0) * 100).toInt().toString();
+
+    quantityDiscountController.text =
+        widget.product.quantityDiscount?.toString() ?? '0';
     _imageUrl = widget.product.images.first;
     defaultcategory = widget.product.category;
 
     // CategoryService().getCategoryById(widget.product.categoryId).then((value) {
     //   setState(() {
+
     //     category = value;
     //   });
     // });
@@ -244,6 +252,52 @@ class _EditProductState extends State<EditProduct> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 20),
+
+                  TextFormField(
+                    controller: discountPercentController,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Enter discount percentage';
+                      }
+
+                      final v = int.tryParse(value);
+                      if (v == null || v < 0 || v > 100) {
+                        return 'Value must be between 0 and 100';
+                      }
+
+                      return null;
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'discount percentage (0 - 100)%'.tr,
+                      border: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  TextFormField(
+                    controller: quantityDiscountController,
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) return 'Enter quantity discount';
+
+                      final v = int.tryParse(value);
+                      if (v == null || v < 0) {
+                        return 'Invalid quantity';
+                      }
+
+                      return null;
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'quantity discount'.tr,
+                      border: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                    ),
+                  ),
                   const SizedBox(
                     height: 20,
                   ),
@@ -261,38 +315,49 @@ class _EditProductState extends State<EditProduct> {
                             Get.snackbar('Error', 'Please select category');
                             return;
                           }
-                          // if (_imageFile == null) {
-                          //   Get.snackbar('Error', 'Please select image');
-                          //   return;
-                          // }
 
                           try {
                             setState(() {
                               isLoading = true;
                             });
+
+                            // Initialize image upload
                             await _uploadImage();
+
                             if (_imageUrl.isNotEmpty) {
-                              await ProductsService()
-                                  .updateProduct(widget.product.copyWith(
+                              // Update the product
+                              await ProductsService().updateProduct(widget.product.copyWith(
                                 title: nameController.text,
                                 brand: name2Controller.text,
                                 regularPrice: double.parse(priceController.text),
                                 discountPrice: double.parse(deiscountController.text),
                                 images: [_imageUrl],
-                                categoryId: category!.id
+                                categoryId: category!.id,
+                                discountPercentage: double.parse(discountPercentController.text) / 100,
+                                quantityDiscount: int.parse(quantityDiscountController.text),
                               ));
+
                               setState(() {
                                 isLoading = false;
                               });
-                              Get.back();
-                              Get.snackbar(
-                                  'Success', 'Products added successfully');
+
+                              // Close the current Snackbar if open and navigate
+                              if (Get.isSnackbarOpen) {
+                                Get.closeCurrentSnackbar();
+                              }
+
+                              // Add navigation delay to ensure everything is set up
+                              Future.delayed(Duration(milliseconds: 200), () {
+                                Get.back();
+                                Get.snackbar('Success', 'Product updated successfully');
+                              });
                             }
                           } catch (e) {
                             setState(() {
                               isLoading = false;
                               error = e.toString();
                             });
+                            print("Error: $error");
                           }
                         }
                       },

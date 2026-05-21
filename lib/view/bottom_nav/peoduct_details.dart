@@ -62,7 +62,6 @@ class _ProductDetailsState extends State<ProductDetails> {
         valueListenable: productNotifier,
         builder: (context, product, _) {
           final totalPrice = product.regularPrice - product.discountPrice;
-
           return Stack(
             children: [
               SingleChildScrollView(
@@ -244,6 +243,8 @@ class _ProductDetailsState extends State<ProductDetails> {
                                   userId: FirebaseAuth.instance.currentUser?.uid ??
                                       widget.uniqueId,
                                   image: product.images.first,
+                                  discountPercentage: product.discountPercentage,
+                                  quantityDiscount: product.quantityDiscount
                                 );
                               },
                               style: ElevatedButton.styleFrom(
@@ -296,7 +297,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                     ),
                     child: IconButton(
                       onPressed: () {
-                        Get.to(EditProduct(product: widget.product));
+                        Get.to(() => EditProduct(product: widget.product));
                       },
                       icon: const Icon(Icons.edit, color: Colors.black87, size: 24),
                       tooltip: "تعديل المنتج",

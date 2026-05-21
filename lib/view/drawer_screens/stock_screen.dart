@@ -355,6 +355,8 @@ class _StockScreenState extends State<StockScreen> {
                       regularPrice: data['regularPrice'] ?? 0,
                       images: List<String>.from(data['images'] ?? []),
                       discountPrice: data['discountPrice'] ?? 0,
+                      discountPercentage: data['discountPercentage'] ?? 0.0,
+                      quantityDiscount: data['quantityDiscount'] ?? 0
                     );
                   }
 

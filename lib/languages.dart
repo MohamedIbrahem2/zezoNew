@@ -196,9 +196,17 @@ class Languages extends Translations {
           "stock" : "Stock Management",
           "All categories": "Categories",
           "addStory" : "Add Story",
-          "free" : "Free"
+          "free" : "Free",
+          'discount by quantity' : "Discount by Quantity",
+          "discountQuantity" : "Discount  " ,
+          "moreThan" : "  for More Than  ",
+          "product" : " Product"
         },
         'ar': {
+  "product" : "  عنصر",
+          "moreThan" : "  لأكثر من  ",
+          "discountQuantity" : "خصم  ",
+          'discount by quantity' : "خصم بالكميه",
           "free" : "مجاني",
           "stock" : "إدارة المخزون",
           "error" : "خطأ",

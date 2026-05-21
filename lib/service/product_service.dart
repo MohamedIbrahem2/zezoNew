@@ -15,6 +15,8 @@ class Product {
   final bool available;
   final List images;
   final String categoryId;
+  final double discountPercentage;
+  final int quantityDiscount;
   Product(
       {
         required this.available,
@@ -30,7 +32,9 @@ class Product {
         required this.categoryId,
         required this.regularPrice,
         required this.images,
-        required this.discountPrice});
+        required this.discountPrice,
+        required this.discountPercentage,
+        required this.quantityDiscount});
 
   factory Product.fromSnapshot(DocumentSnapshot snapshot) {
     final data = snapshot.data() as Map<String, dynamic>;
@@ -57,7 +61,9 @@ class Product {
       title: data['title'],
       weight: data['weight'],
       category: 'category',
-      categoryId: 'categoryId'
+      categoryId: 'categoryId',
+      discountPercentage: data['discountPercentage'] ?? 0.0,
+      quantityDiscount: data['quantityDiscount'] ?? 0
     );
   }
 
@@ -75,7 +81,9 @@ class Product {
       'title' : title,
       'weight' : weight,
       'category': category,
-      'categoryId' : categoryId
+      'categoryId' : categoryId,
+      'discountPercentage' : discountPercentage,
+      'quantityDiscount' : quantityDiscount
     };
   }
 
@@ -93,6 +101,8 @@ class Product {
     String? weight,
     String? categoryId,
     String? category,
+    double? discountPercentage,
+    int? quantityDiscount
 
   }) {
     return Product(
@@ -110,6 +120,8 @@ class Product {
       images: images ?? this.images,
       category: category ?? this.category,
       categoryId: categoryId ?? this.categoryId,
+      discountPercentage: discountPercentage ?? this.discountPercentage,
+      quantityDiscount: quantityDiscount ?? this.quantityDiscount
 
     );
   }
