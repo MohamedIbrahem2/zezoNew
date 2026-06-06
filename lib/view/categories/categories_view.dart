@@ -17,6 +17,13 @@ class _CategoriesState extends State<Categories> {
   final Color _bgColor = const Color(0xFFF9FAFB);
   final Color _mint = const Color(0xFF2ECC71);
   final Color _shadow = Colors.black12;
+  late Stream<List<Category>> _categoriesStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _categoriesStream = CategoryService().getCategories();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +44,7 @@ class _CategoriesState extends State<Categories> {
         iconTheme: const IconThemeData(color: Colors.black87),
       ),
       body: StreamBuilder<List<Category>>(
-        stream: CategoryService().getCategories(),
+        stream: _categoriesStream,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(child: Text(snapshot.error.toString()));

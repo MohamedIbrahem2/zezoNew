@@ -186,30 +186,31 @@ class OrderService {
   }
 
 
-  // Future<void> deleteUsersWithEmail() async {
-  //   try {
-  //     final usersRef = FirebaseFirestore.instance.collection('users');
-  //
-  //     // Query for all users with email == "البريد الألكتروني"
-  //     final snapshot = await usersRef
-  //         .where('email', isEqualTo: 'البريد الألكتروني')
-  //         .get();
-  //
-  //     if (snapshot.docs.isEmpty) {
-  //       print('No users found with email == البريد الألكتروني');
-  //       return;
-  //     }
-  //
-  //     // Loop through and delete each document
-  //     for (var doc in snapshot.docs) {
-  //       await doc.reference.delete();
-  //       print('Deleted user: ${doc.id}');
-  //     }
-  //
-  //     print('✅ Successfully deleted all users with email == البريد الألكتروني');
-  //   } catch (e) {
-  //     print('❌ Error deleting users: $e');
-  //   }
+  Future<void> deleteUsersWithEmail() async {
+    try {
+      final usersRef = FirebaseFirestore.instance.collection('users');
+
+      // Query for all users with email == "البريد الألكتروني"
+      final snapshot = await usersRef
+          .where('email', isEqualTo: 'البريد الألكتروني')
+          .get();
+
+      if (snapshot.docs.isEmpty) {
+        print('No users found with email == البريد الألكتروني');
+        return;
+      }
+
+      // Loop through and delete each document
+      for (var doc in snapshot.docs) {
+        await doc.reference.delete();
+        print('Deleted user: ${doc.id}');
+      }
+
+      print('✅ Successfully deleted all users with email == البريد الألكتروني');
+    } catch (e) {
+      print('❌ Error deleting users: $e');
+    }
+  }
   //   //fetchOrders
   //   Future<List<Order>> fetchOrders({String? userId, String? status}) async {
   //     final collection = FirebaseFirestore.instance.collection('orders');

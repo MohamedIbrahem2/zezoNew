@@ -37,8 +37,8 @@ class CartItem {
         price = map['price'],
         image = map['image'] ?? '',
         quantity = map['quantity'],
-        discountPercentage = map['discountPercentage'],
-        quantityDiscount = map['quantityDiscount'];
+        discountPercentage = map['discountPercentage'] ?? 0.0,
+        quantityDiscount = map['quantityDiscount'] ?? 0;
   CartItem(
       {required this.id,
       required this.productId,

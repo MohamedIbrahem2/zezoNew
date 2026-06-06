@@ -11,13 +11,14 @@ import '../main.dart';
 /// HOME STORIES LIST
 /// =========================
 class ListItemsStatusHome extends StatelessWidget {
-  const ListItemsStatusHome({super.key});
+  final Stream<QuerySnapshot>? stream;
+  const ListItemsStatusHome({super.key, this.stream});
 
   @override
   Widget build(BuildContext context) {
 
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
+      stream: stream ?? FirebaseFirestore.instance
           .collection('stories')
           .orderBy('createdAt', descending: true)
           .snapshots(),

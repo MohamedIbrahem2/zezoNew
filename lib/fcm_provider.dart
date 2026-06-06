@@ -369,10 +369,13 @@ class FcmProvider {
   }
 
   Future<void> saveTokenToFirestore(String userId) async {
-    // save token to firestore
-
     try {
-      await _firestore.collection('users').doc(userId).update({'fcm': token});
+      await _firestore.collection('users').doc(userId).set(
+        {'fcm': token},
+        SetOptions(merge: true),
+      );
+
+      print('FCM token saved successfully: $token');
     } catch (e) {
       print('Error adding token: $e');
     }

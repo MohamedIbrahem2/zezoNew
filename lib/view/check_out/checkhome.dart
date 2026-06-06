@@ -34,7 +34,47 @@ class _CheckHomeState extends State<CheckHome> {
 
   // Local list to store cart items (either from widget or from Firebase)
   List<CartItem> _cartItems = [];
+  final GlobalKey<FormState> _checkoutFormKey = GlobalKey<FormState>();
 
+  AutovalidateMode _autoValidateMode = AutovalidateMode.disabled;
+
+  bool _validateBeforeConfirm() {
+    setState(() {
+      _autoValidateMode = AutovalidateMode.onUserInteraction;
+    });
+
+    final bool formValid = _checkoutFormKey.currentState?.validate() ?? false;
+
+    final bool hasAddress =
+        selectedAddress != null && addressController.text.trim().isNotEmpty;
+
+    final bool hasDate = dateController.text.trim().isNotEmpty;
+
+    if (!formValid || !hasAddress || !hasDate) {
+      String message = 'من فضلك اكمل البيانات المطلوبة';
+
+      if (!hasAddress && !hasDate) {
+        message = 'من فضلك اختار عنوان التوصيل وموعد التوصيل';
+      } else if (!hasAddress) {
+        message = 'من فضلك اختار عنوان التوصيل';
+      } else if (!hasDate) {
+        message = 'من فضلك اختار موعد التوصيل';
+      }
+
+      Get.snackbar(
+        'بيانات ناقصة',
+        message,
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+        duration: const Duration(seconds: 3),
+      );
+
+      return false;
+    }
+
+    return true;
+  }
   final AddressService _addressService = AddressService(
     FirebaseAuth.instance.currentUser!.uid,
   );
@@ -132,285 +172,263 @@ class _CheckHomeState extends State<CheckHome> {
             body: SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Cart Items (Horizontal)
-                    if (_cartItems.isNotEmpty)
+                child: Form(
+                  key: _checkoutFormKey,
+                  autovalidateMode: _autoValidateMode,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Cart Items (Horizontal)
+                      if (_cartItems.isNotEmpty)
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [BoxShadow(color: Colors.black12.withOpacity(0.06), blurRadius: 10, offset: const Offset(0, 4))],
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: SizedBox(
+                            height: Get.height * .16,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: _cartItems.length,
+                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                              itemBuilder: (context, index) {
+                                final item = _cartItems[index];
+                                return Container(
+                                  width: Get.width * .92,
+                                  margin: const EdgeInsets.only(right: 10),
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(14),
+                                    boxShadow: [BoxShadow(color: Colors.black12.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 3))],
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      // Image
+                                      Container(
+                                        width: Get.width * .27,
+                                        height: Get.height * .12,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(12),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: mint.withOpacity(0.12),
+                                              blurRadius: 10,
+                                              offset: const Offset(0, 4),
+                                            )
+                                          ],
+                                        ),
+                                        clipBehavior: Clip.antiAlias,
+                                        child: Image.network(item.image, fit: BoxFit.cover),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      // Name + total price
+                                      Expanded(
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            SizedBox(
+                                              width: Get.width * .3,
+                                              child: AutoSizeText(
+                                                item.productName,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                            ),
+                                            Text(
+                                              '${(item.quantity * item.price).toStringAsFixed(2)} SR',
+                                              style: TextStyle(
+                                                fontSize: 18.0,
+                                                fontWeight: FontWeight.bold,
+                                                color: mint,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      // Delete + qty
+                                      Column(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          IconButton(
+                                            padding: EdgeInsets.zero,
+                                            constraints: const BoxConstraints(),
+                                            onPressed: () {
+                                              CartService().removeCartItem(item.id);
+                                            },
+                                            icon: Icon(Icons.delete, color: Colors.redAccent.withOpacity(.85)),
+                                          ),
+                                          Container(
+                                            width: Get.width * .25,
+                                            height: 32,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey.shade200,
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                              children: [
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    CartService().updateCartItemQuantity(
+                                                      item.id,
+                                                      item.quantity + 1,
+                                                      item.quantity,
+                                                    );
+                                                  },
+                                                  child: const Icon(Icons.add, size: 18),
+                                                ),
+                                                Text('${item.quantity}', style: const TextStyle(fontWeight: FontWeight.w600)),
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    if (item.quantity == 0) {
+                                                      CartService().removeCartItem(item.id);
+                                                      return;
+                                                    }
+                                                    CartService().updateCartItemQuantity(
+                                                      item.id,
+                                                      item.quantity - 1,
+                                                      item.quantity,
+                                                    );
+                                                  },
+                                                  child: const Icon(Icons.remove_outlined, size: 18),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        )
+                      else
+                        Container(
+                          height: Get.height * .12,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [BoxShadow(color: Colors.black12.withOpacity(0.06), blurRadius: 10, offset: const Offset(0, 4))],
+                          ),
+                          child: const Text('لا يوجد منتجات في عربة التسوق', textDirection: TextDirection.rtl),
+                        ),
+                  
+                      const SizedBox(height: 18),
+                  
+                      // Name Row
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          if (userProfile != null)
+                            Text(
+                              userProfile!.name ?? '',
+                              style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.w600, color: Colors.black87),
+                            ),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'الاسم:',
+                            textDirection: TextDirection.rtl,
+                            style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w800, color: Colors.black),
+                          ),
+                        ],
+                      ),
+                  
+                      const SizedBox(height: 10),
+                  
+                      // Deliver To
+                      _sectionTitle('deliver to'.tr),
+                  
+                      // Address dropdown
                       Container(
+                        margin: const EdgeInsets.symmetric(vertical: 10),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [BoxShadow(color: Colors.black12.withOpacity(0.06), blurRadius: 10, offset: const Offset(0, 4))],
+                          borderRadius: BorderRadius.circular(14),
+                          boxShadow: [BoxShadow(color: Colors.black12.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 3))],
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        child: SizedBox(
-                          height: Get.height * .16,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: _cartItems.length,
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            itemBuilder: (context, index) {
-                              final item = _cartItems[index];
-                              return Container(
-                                width: Get.width * .92,
-                                margin: const EdgeInsets.only(right: 10),
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(14),
-                                  boxShadow: [BoxShadow(color: Colors.black12.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 3))],
-                                ),
-                                child: Row(
-                                  children: [
-                                    // Image
-                                    Container(
-                                      width: Get.width * .27,
-                                      height: Get.height * .12,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(12),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: mint.withOpacity(0.12),
-                                            blurRadius: 10,
-                                            offset: const Offset(0, 4),
-                                          )
-                                        ],
+                        child: StreamBuilder<List<Address>>(
+                          stream: _addressService.stream,
+                          builder: (context, snapshot) {
+                            if (snapshot.data != null && snapshot.data!.isEmpty) {
+                              return InkWell(
+                                onTap: () => Get.to(AddressesPage(uniqueId: widget.unique)),
+                                child: Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [mint.withOpacity(.95), darkMint],
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: const [
+                                      Icon(Icons.add, color: Colors.white),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        'لا يوجد عنوان، قم بإضافة عنوان',
+                                        textDirection: TextDirection.rtl,
+                                        style: TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.w600),
                                       ),
-                                      clipBehavior: Clip.antiAlias,
-                                      child: Image.network(item.image, fit: BoxFit.cover),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    // Name + total price
-                                    Expanded(
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          SizedBox(
-                                            width: Get.width * .3,
-                                            child: AutoSizeText(
-                                              item.productName,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.w700,
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                          ),
-                                          Text(
-                                            '${(item.quantity * item.price).toStringAsFixed(2)} SR',
-                                            style: TextStyle(
-                                              fontSize: 18.0,
-                                              fontWeight: FontWeight.bold,
-                                              color: mint,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    // Delete + qty
-                                    Column(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment: CrossAxisAlignment.end,
-                                      children: [
-                                        IconButton(
-                                          padding: EdgeInsets.zero,
-                                          constraints: const BoxConstraints(),
-                                          onPressed: () {
-                                            CartService().removeCartItem(item.id);
-                                          },
-                                          icon: Icon(Icons.delete, color: Colors.redAccent.withOpacity(.85)),
-                                        ),
-                                        Container(
-                                          width: Get.width * .25,
-                                          height: 32,
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey.shade200,
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                            children: [
-                                              GestureDetector(
-                                                onTap: () {
-                                                  CartService().updateCartItemQuantity(
-                                                    item.id,
-                                                    item.quantity + 1,
-                                                    item.quantity,
-                                                  );
-                                                },
-                                                child: const Icon(Icons.add, size: 18),
-                                              ),
-                                              Text('${item.quantity}', style: const TextStyle(fontWeight: FontWeight.w600)),
-                                              GestureDetector(
-                                                onTap: () {
-                                                  if (item.quantity == 0) {
-                                                    CartService().removeCartItem(item.id);
-                                                    return;
-                                                  }
-                                                  CartService().updateCartItemQuantity(
-                                                    item.id,
-                                                    item.quantity - 1,
-                                                    item.quantity,
-                                                  );
-                                                },
-                                                child: const Icon(Icons.remove_outlined, size: 18),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               );
-                            },
-                          ),
-                        ),
-                      )
-                    else
-                      Container(
-                        height: Get.height * .12,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [BoxShadow(color: Colors.black12.withOpacity(0.06), blurRadius: 10, offset: const Offset(0, 4))],
-                        ),
-                        child: const Text('لا يوجد منتجات في عربة التسوق', textDirection: TextDirection.rtl),
-                      ),
-
-                    const SizedBox(height: 18),
-
-                    // Name Row
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        if (userProfile != null)
-                          Text(
-                            userProfile!.name ?? '',
-                            style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.w600, color: Colors.black87),
-                          ),
-                        const SizedBox(width: 8),
-                        const Text(
-                          'الاسم:',
-                          textDirection: TextDirection.rtl,
-                          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w800, color: Colors.black),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    // Deliver To
-                    _sectionTitle('deliver to'.tr),
-
-                    // Address dropdown
-                    Container(
-                      margin: const EdgeInsets.symmetric(vertical: 10),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(14),
-                        boxShadow: [BoxShadow(color: Colors.black12.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 3))],
-                      ),
-                      child: StreamBuilder<List<Address>>(
-                        stream: _addressService.stream,
-                        builder: (context, snapshot) {
-                          if (snapshot.data != null && snapshot.data!.isEmpty) {
-                            return InkWell(
-                              onTap: () => Get.to(AddressesPage(uniqueId: widget.unique)),
-                              child: Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [mint.withOpacity(.95), darkMint],
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: const [
-                                    Icon(Icons.add, color: Colors.white),
-                                    SizedBox(width: 8),
-                                    Text(
-                                      'لا يوجد عنوان، قم بإضافة عنوان',
-                                      textDirection: TextDirection.rtl,
-                                      style: TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.w600),
-                                    ),
-                                  ],
-                                ),
+                            }
+                            return DropdownButtonFormField<Address?>(
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'من فضلك اختار عنوان التوصيل';
+                                }
+                                return null;
+                              },
+                              value: selectedAddress,
+                              items: snapshot.data == null
+                                  ? []
+                                  : snapshot.data!
+                                  .map((e) => DropdownMenuItem<Address?>(
+                                value: e,
+                                child: Text(e.city, textDirection: TextDirection.rtl),
+                              ))
+                                  .toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedAddress = value;
+                                  addressController.text = selectedAddress?.id ?? '';
+                                });
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'select_address'.tr,
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                               ),
                             );
-                          }
-                          return DropdownButtonFormField<Address?>(
-                            validator: (value) {
-                              if (selectedAddress == null || addressController.text.isEmpty) {
-                                return 'اختار العنوان';
-                              }
-                              return null;
-                            },
-                            value: selectedAddress,
-                            items: snapshot.data == null
-                                ? []
-                                : snapshot.data!
-                                .map((e) => DropdownMenuItem<Address?>(
-                              value: e,
-                              child: Text(e.city, textDirection: TextDirection.rtl),
-                            ))
-                                .toList(),
-                            onChanged: (value) {
-                              selectedAddress = value;
-                              addressController.text = selectedAddress?.id ?? '';
-                            },
-                            decoration: InputDecoration(
-                              labelText: 'select_address'.tr,
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-
-                    const SizedBox(height: 6),
-
-                    // Deliver Time
-                    _sectionTitle('deliver time'.tr),
-
-                    Container(
-                      margin: const EdgeInsets.symmetric(vertical: 10),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(14),
-                        boxShadow: [BoxShadow(color: Colors.black12.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 3))],
-                      ),
-                      child: TextFormField(
-                        readOnly: true,
-                        controller: dateController,
-                        onTap: () => _selectDate(context),
-                        decoration: InputDecoration(
-                          labelText: 'choose time'.tr,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          },
                         ),
                       ),
-                    ),
-
-                    const SizedBox(height: 6),
-
-                    // Phone
-                    _sectionTitle('phone'.tr),
-                    const SizedBox(height: 8),
-
-                    ...phoneNumbersController.map(
-                          (i) => Container(
-                        margin: const EdgeInsets.only(bottom: 10),
+                  
+                      const SizedBox(height: 6),
+                  
+                      // Deliver Time
+                      _sectionTitle('deliver time'.tr),
+                  
+                      Container(
+                        margin: const EdgeInsets.symmetric(vertical: 10),
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -418,97 +436,131 @@ class _CheckHomeState extends State<CheckHome> {
                           boxShadow: [BoxShadow(color: Colors.black12.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 3))],
                         ),
                         child: TextFormField(
-                          controller: i,
+                          readOnly: true,
+                          controller: dateController,
+                          onTap: () => _selectDate(context),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'من فضلك اختار موعد التوصيل';
+                            }
+                            return null;
+                          },
                           decoration: InputDecoration(
-                            labelText: 'phone'.tr,
+                            labelText: 'choose time'.tr,
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                           ),
                         ),
                       ),
-                    ),
-                    Align(
-                      alignment: Alignment.center,
-                      child: IconButton(
-                        onPressed: () {
-                          phoneNumbersController.add(TextEditingController());
-                          setState(() {});
-                        },
-                        icon: Icon(Icons.add_circle, color: mint, size: 28),
-                      ),
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    // Summary Card
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-                      margin: const EdgeInsets.only(bottom: 18),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [BoxShadow(color: Colors.black12.withOpacity(0.06), blurRadius: 10, offset: const Offset(0, 4))],
-                      ),
-                      child: Column(
-                        children: [
-                          _summaryRow(label: 'products'.tr, value: '$totalQuantity${"pieces".tr}', bold: true),
-                          const Divider(height: 18, thickness: .7),
-
-                          _summaryRow(
-                            label: 'total before tax'.tr,
-                            value: '${(totalPriceBeforeDiscount - (totalPriceBeforeDiscount * .15)).toStringAsFixed(2)} SR',
+                  
+                      const SizedBox(height: 6),
+                  
+                      // Phone
+                      _sectionTitle('phone'.tr),
+                      const SizedBox(height: 8),
+                  
+                      ...phoneNumbersController.map(
+                            (i) => Container(
+                          margin: const EdgeInsets.only(bottom: 10),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(14),
+                            boxShadow: [BoxShadow(color: Colors.black12.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 3))],
                           ),
-
-                          _summaryRow(
-                            label: '15%${"tax".tr}',
-                            value: '${(totalPrice * .15).toStringAsFixed(2)} SR',
-                          ),
-
-                          _summaryRow(
-                            label: 'discount by quantity'.tr,
-                            value: '-${quantityDiscountTotal.toStringAsFixed(2)} SR',
-                          ),
-
-
-
-
-                          _summaryRow(label: 'deliver'.tr, value: 'free'.tr),
-
-                          const Divider(height: 20, thickness: .9),
-
-                          _summaryRow(
-                            label: 'total with tax'.tr,
-                            value: '${(totalPrice ).toStringAsFixed(2)} SR',
-                            bold: true,
-                            highlight: true,
-                          ),
-                          const SizedBox(height: 12),
-
-                          // Admin-only Client Name
-                          Visibility(
-                            visible: provider.isAdmin,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                const SizedBox(height: 6),
-                                TextField(
-                                  controller: clientNameController,
-                                  decoration: InputDecoration(
-                                    labelText: 'clientName'.tr,
-                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                                  ),
-                                  keyboardType: TextInputType.text,
-                                ),
-                              ],
+                          child: TextFormField(
+                            controller: i,
+                            decoration: InputDecoration(
+                              labelText: 'phone'.tr,
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                             ),
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-
-                    SizedBox(height: Get.height * .12),
-                  ],
+                      Align(
+                        alignment: Alignment.center,
+                        child: IconButton(
+                          onPressed: () {
+                            phoneNumbersController.add(TextEditingController());
+                            setState(() {});
+                          },
+                          icon: Icon(Icons.add_circle, color: mint, size: 28),
+                        ),
+                      ),
+                  
+                      const SizedBox(height: 8),
+                  
+                      // Summary Card
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                        margin: const EdgeInsets.only(bottom: 18),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [BoxShadow(color: Colors.black12.withOpacity(0.06), blurRadius: 10, offset: const Offset(0, 4))],
+                        ),
+                        child: Column(
+                          children: [
+                            _summaryRow(label: 'products'.tr, value: '$totalQuantity${"pieces".tr}', bold: true),
+                            const Divider(height: 18, thickness: .7),
+                  
+                            _summaryRow(
+                              label: 'total before tax'.tr,
+                              value: '${(totalPriceBeforeDiscount - (totalPriceBeforeDiscount * .15)).toStringAsFixed(2)} SR',
+                            ),
+                  
+                            _summaryRow(
+                              label: '15%${"tax".tr}',
+                              value: '${(totalPrice * .15).toStringAsFixed(2)} SR',
+                            ),
+                  
+                            _summaryRow(
+                              label: 'discount by quantity'.tr,
+                              value: '-${quantityDiscountTotal.toStringAsFixed(2)} SR',
+                            ),
+                  
+                  
+                  
+                  
+                            _summaryRow(label: 'deliver'.tr, value: 'free'.tr),
+                  
+                            const Divider(height: 20, thickness: .9),
+                  
+                            _summaryRow(
+                              label: 'total with tax'.tr,
+                              value: '${(totalPrice ).toStringAsFixed(2)} SR',
+                              bold: true,
+                              highlight: true,
+                            ),
+                            const SizedBox(height: 12),
+                  
+                            // Admin-only Client Name
+                            Visibility(
+                              visible: provider.isAdmin,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  const SizedBox(height: 6),
+                                  TextField(
+                                    controller: clientNameController,
+                                    decoration: InputDecoration(
+                                      labelText: 'clientName'.tr,
+                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                    ),
+                                    keyboardType: TextInputType.text,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  
+                      SizedBox(height: Get.height * .12),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -521,6 +573,7 @@ class _CheckHomeState extends State<CheckHome> {
                 onTap: _isSubmitting
                     ? null
                     : () {
+                  if (!_validateBeforeConfirm()) return;
                   Get.defaultDialog(
                     title: 'confirm order'.tr,
                     content: Row(

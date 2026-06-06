@@ -35,6 +35,7 @@ import 'package:zezo/view/sign_in.dart';
 import 'package:zezo/widgets/stories_view.dart';
 import '../../service/cart_service.dart';
 import '../../service/offer_service.dart';
+import '../../service/order_service.dart';
 import '../../widgets/stories_shimmer.dart';
 
 class HomePage extends StatefulWidget {
@@ -45,7 +46,7 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   final TextEditingController _search = TextEditingController();
   final TextEditingController _categoryController = TextEditingController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -61,13 +62,39 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   String _error = '';
   final _formKey = GlobalKey<FormState>();
 
+  late Stream<List<Category>> _categoriesStream;
+  late Stream<List<Offer>> _offersStream;
+  late Stream<List<Product>> _bestSellingStream;
+  late Stream<List<Product>> _favoriteStream;
+  late Stream<List<CartItem>> _cartStream;
+  late Stream<QuerySnapshot> _storiesStream;
+  late Stream<List<Product>> _categoryProductsStream;
+
   bool get _isSearching => _search.text.trim().isNotEmpty;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
     super.initState();
     _ensureProfile();
     _search.addListener(() => setState(() {}));
+
+    _categoriesStream = CategoryService().getCategories();
+    _offersStream = OfferService().getAllOffers();
+    _bestSellingStream = ProductsService().getBestSellingProducts();
+    _favoriteStream = ProductsService().getFavoriteProducts();
+    _cartStream = CartService().getCartItems(_userId);
+    _storiesStream = FirebaseFirestore.instance
+        .collection('stories')
+        .orderBy('createdAt', descending: true)
+        .snapshots();
+    _updateCategoryProductsStream();
+  }
+
+  void _updateCategoryProductsStream() {
+    _categoryProductsStream = ProductsService().getProductsByCategory(categoryId);
   }
 
   Future<void> _ensureProfile() async {
@@ -114,6 +141,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       backgroundColor: _mintLight,
       appBar: _buildAppBar(), // keep app bar logic & look
@@ -129,12 +157,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
               const SizedBox(height: 12),
 
-              ListItemsStatusHome(),
+              RepaintBoundary(child: ListItemsStatusHome(stream: _storiesStream)),
 
               const SizedBox(height: 12),
 
               // ---- Carousel (kept logic, adjusted look) ----
-              _buildCarousel(),
+              RepaintBoundary(child: _buildCarousel()),
 
               const SizedBox(height: 10),
 
@@ -154,16 +182,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ),
 
               // ---- Mint rounded categories ----
-              if (!_isSearching) _buildMintCategories(),
+              if (!_isSearching) RepaintBoundary(child: _buildMintCategories()),
 
               const SizedBox(height: 16),
 
               // ---- Products by selected category ----
               if (!_isSearching)
-                _buildHorizontalProducts(
-                  stream: ProductsService().getProductsByCategory(categoryId),
-                  compact: false,
-                  allowRemoveFromBestSelling: false,
+                RepaintBoundary(
+                  child: _buildHorizontalProducts(
+                    stream: _categoryProductsStream,
+                    compact: false,
+                    allowRemoveFromBestSelling: false,
+                  ),
                 ),
               const SizedBox(height: 16),
               // ---- Search results ----
@@ -172,17 +202,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               // ---- Best Selling ----
               if (!_isSearching) ...[
                 _buildSectionTitle('best_selling'.tr),
-                _buildHorizontalProducts(
-                  stream: ProductsService().getBestSellingProducts(),
-                  compact: true,
-                  allowRemoveFromBestSelling: true,
+                RepaintBoundary(
+                  child: _buildHorizontalProducts(
+                    stream: _bestSellingStream,
+                    compact: true,
+                    allowRemoveFromBestSelling: true,
+                  ),
                 ),
               ],
               const SizedBox(height: 24),
               // ---- Offers / Favorites ----
               if (!_isSearching) ...[
                 _buildSectionTitle('offers'.tr),
-                _buildFavoritesStrip(),
+                RepaintBoundary(child: _buildFavoritesStrip()),
               ],
 
               const SizedBox(height: 24),
@@ -211,12 +243,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ),
               // Cart badge
               StreamBuilder<List<CartItem>>(
-                stream: CartService().getCartItems(_userId),
+                stream: _cartStream,
                 builder: (context, snapshot) {
                   final quantity = (snapshot.data == null || snapshot.data!.isEmpty)
                       ? 0
                       : snapshot.data!.map((e) => e.quantity).fold<int>(0, (a, b) => a + b);
-                  final label = quantity >= 100 ? '99+' : quantity.toString();
+                  final label = quantity.toString();
                   return Positioned(
                     left: 18,
                     child: Container(
@@ -265,6 +297,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 child: Image.asset('images/logo_zezo.png'),
               ),
               if (isAdmin) _drawerTile('stock'.tr, () => Get.to(StockScreen())),
+              // if (isAdmin) _drawerTile("DeleteDummyUsers", () => OrderService().deleteUsersWithEmail()),
               _drawerTile('account_points'.tr, () => Get.to(const Wallet())),
               _drawerTile('technical_support'.tr, () => Get.to(const TechnicalSupport())),
               if (isAdmin) _drawerTile("financial management".tr, () => Get.to(const FinancialManegment())),
@@ -383,7 +416,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             boxShadow: [BoxShadow(color: _cardShadow, blurRadius: 10, offset: const Offset(0, 6))],
           ),
           child: StreamBuilder<List<Offer>>(
-            stream: OfferService().getAllOffers(),
+            stream: _offersStream,
             builder: (context, snapshot) {
               if (snapshot.hasError) return _fadeIn(const SizedBox(height: 130));
               if (!snapshot.hasData) {
@@ -428,7 +461,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   // ---------------- Mint Rounded Categories ----------------
   Widget _buildMintCategories() {
     return StreamBuilder<List<Category>>(
-      stream: CategoryService().getCategories(),
+      stream: _categoriesStream,
       builder: (context, snapshot) {
         if (snapshot.hasError) return const SizedBox();
 
@@ -446,108 +479,149 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
         return SizedBox(
           width: Get.width,
-          height: 400, // 🔥 SAME HEIGHT AS FIRST GRID
-          child: GridView.builder(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3, // 🔥 SAME AS FIRST ONE
-              mainAxisSpacing: 18,
-              crossAxisSpacing: 30,
-              childAspectRatio: 1.05,
-            ),
-            itemCount: categories.length,
-            itemBuilder: (context, index) {
-              final category = categories[index];
-              final isSelected = categoryId == category.id;
+          height: 400,
+          child: Stack(
+            children: [
+              GridView.builder(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  mainAxisSpacing: 18,
+                  crossAxisSpacing: 30,
+                  childAspectRatio: 1.05,
+                ),
+                itemCount: categories.length,
+                itemBuilder: (context, index) {
+                  final category = categories[index];
+                  final isSelected = categoryId == category.id;
 
-              return InkWell(
-                borderRadius: BorderRadius.circular(16),
-                onLongPress: () {
-                  if (!context.read<AdminProvider>().isAdmin) return;
-                  _showEditDeleteCategoryDialog(category);
-                },
-                onTap: () => setState(() {
-                  categoryId = category.id;
-                  _selectedIndex = index;
-                }),
-                child: Column(
-                  children: [
-                    /// ===== IMAGE CARD (SAME DESIGN)
-                    Expanded(
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: isSelected
-                                    ? [mainColor, Colors.white]
-                                    : [mainColor.withOpacity(0.6), Colors.white],
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                              ),
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Container(
-                              margin: const EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(14),
-                                child: CachedNetworkImage(
-                                  imageUrl: category.image,
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                  placeholder: (_, __) =>
-                                  const ImageShimmer(
-                                    borderRadius:
-                                    BorderRadius.all(Radius.circular(14)),
+                  return InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onLongPress: () {
+                      if (!context.read<AdminProvider>().isAdmin) return;
+                      _showEditDeleteCategoryDialog(category);
+                    },
+                    onTap: () => setState(() {
+                      categoryId = category.id;
+                      _selectedIndex = index;
+                      _updateCategoryProductsStream();
+                    }),
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: isSelected
+                                        ? [mainColor, Colors.white]
+                                        : [mainColor.withOpacity(0.6), Colors.white],
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
                                   ),
-                                  errorWidget: (_, __, ___) => Image.asset(
-                                    "",
-                                    fit: BoxFit.cover,
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: Container(
+                                  margin: const EdgeInsets.all(2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(14),
+                                    child: CachedNetworkImage(
+                                      imageUrl: category.image,
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      placeholder: (_, __) => const ImageShimmer(
+                                        borderRadius: BorderRadius.all(Radius.circular(14)),
+                                      ),
+                                      errorWidget: (_, __, ___) => Image.asset(
+                                        "",
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
+                            ],
                           ),
-                        ],
+                        ),
+
+                        const SizedBox(height: 6),
+
+                        Text(
+                          category.name,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.black,
+                            fontFamily: 'lamasans',
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+
+              if (categories.length > 6)
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: IgnorePointer(
+                    child: Container(
+                      width: 58,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.centerRight,
+                          end: Alignment.centerLeft,
+                          colors: [
+                            _mintLight,
+                            _mintLight.withOpacity(0.75),
+                            _mintLight.withOpacity(0.0),
+                          ],
+                        ),
+                      ),
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.only(right: 8),
+                      child: Container(
+                        width: 34,
+                        height: 34,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.95),
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.10),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                          border: Border.all(
+                            color: _mint.withOpacity(0.25),
+                            width: 1,
+                          ),
+                        ),
+                        child: Icon(
+                          Icons.keyboard_arrow_right_rounded,
+                          color: _mintDark,
+                          size: 28,
+                        ),
                       ),
                     ),
-
-                    const SizedBox(height: 6),
-
-                    /// ===== TITLE (UNCHANGED)
-                    Builder(builder: (ctx) {
-                      final title = category.name;
-                      final len = title.trim().length;
-                      final langCode = Get.locale?.languageCode ?? 'ar';
-                      final isArabic = langCode.startsWith('ar');
-                      final threshold = isArabic ? 14 : 18;
-                      final fontSize = len > threshold ? 10.0 : 13.5;
-
-                      return Text(
-                        title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black,
-                          fontFamily: 'lamasans',
-                        ),
-                      );
-                    }),
-                  ],
+                  ),
                 ),
-              );
-            },
+            ],
           ),
         );
       },
@@ -710,7 +784,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return Container(
       margin: const EdgeInsets.all(10).copyWith(bottom: 0),
       width: Get.width,
-      height: Get.height * .88,
+      height: Get.height * .67,
       child: StreamBuilder<QuerySnapshot>(
         stream: _firestore.collection("products").snapshots(),
         builder: (context, snap) {
@@ -1003,7 +1077,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   // ---------------- Favorites (with only heart icon here) ----------------
   Widget _buildFavoritesStrip() {
     return StreamBuilder<List<Product>>(
-      stream: ProductsService().getFavoriteProducts(),
+      stream: _favoriteStream,
       builder: (context, snapshot) {
         if (snapshot.hasError) return Center(child: Text(snapshot.error.toString()));
         if (snapshot.connectionState == ConnectionState.waiting) {
