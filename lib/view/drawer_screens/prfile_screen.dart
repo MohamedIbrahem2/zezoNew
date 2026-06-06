@@ -52,7 +52,7 @@ class _PrfileScreenState extends State<PrfileScreen> {
   TextEditingController name = TextEditingController();
   TextEditingController phone = TextEditingController();
   TextEditingController cr = TextEditingController();
-  TextEditingController vat = TextEditingController();
+  TextEditingController vatNum = TextEditingController();
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
 
@@ -72,7 +72,7 @@ class _PrfileScreenState extends State<PrfileScreen> {
       name.text = conroller.userProfile!.name;
       phone.text = conroller.userProfile!.phone;
       cr.text = conroller.userProfile!.cr;
-      vat.text = conroller.userProfile!.vat;
+      vatNum.text = conroller.userProfile!.vatNum;
       _imageUrl = conroller.userProfile!.photo ?? '';
 
       return Form(
@@ -194,7 +194,7 @@ class _PrfileScreenState extends State<PrfileScreen> {
                   ),
                   const Row(
                     children: [
-                      Text('vat'),
+                      Text('vatNum'),
                     ],
                   ),
                   const SizedBox(
@@ -204,7 +204,7 @@ class _PrfileScreenState extends State<PrfileScreen> {
                     controller: name,
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return 'Please enter vat';
+                        return 'Please enter vatNum';
                       }
                       return null;
                     },

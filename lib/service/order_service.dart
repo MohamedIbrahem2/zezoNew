@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:zezo/fcm_provider.dart';
 import 'package:zezo/main.dart';
 import 'package:zezo/service/address_service.dart';
 import 'package:zezo/service/product_service.dart';
@@ -21,6 +22,8 @@ class Order {
   final String userId;
   final List<CartItem> items;
   final double totalAmount;
+  final double totalAmountAfterEdit;
+  final String clientName;
   final DateTime orderDate;
   final Address? address; // New field for address
   final DateTime deliveryDate; // New field for delivery date
@@ -35,6 +38,8 @@ class Order {
       required this.items,
       required this.totalAmount,
       required this.orderDate,
+        required this.totalAmountAfterEdit,
+        required this.clientName,
       this.address,
       this.invoiceNumber,
       required this.deliveryDate,
@@ -57,6 +62,8 @@ class Order {
             : UserProfile.fromMap(data['userProfile']),
         items: cartItems,
         totalAmount: data['totalAmount'],
+        totalAmountAfterEdit: data['totalAmountAfterEdit'] ?? 0.0,
+        clientName: data['clientName'] ?? "",
         orderDate: (data['orderDate'] as Timestamp).toDate(),
         status: data['status'],
         phones: data['phones'] == null
@@ -90,6 +97,8 @@ class Order {
           ? null
           : UserProfile.fromMap(data['userProfile']),
       totalAmount: data['totalAmount'],
+      totalAmountAfterEdit: data['totalAmountAfterEdit'] ?? 0.0,
+      clientName: data['clientName'] ?? "",
       orderDate: (data['orderDate'] as Timestamp).toDate(),
       phones: data['phones'] == null ? null : List<String>.from(data['phones']),
 
@@ -106,42 +115,212 @@ class OrderService {
       String userId,
       List<CartItem> items,
       double totalAmount,
+      String clientName,
       Address address,
       DateTime deliveryDate,
-      List<String> phones) async {
-    final collection = FirebaseFirestore.instance.collection('orders');
-    final orderDate = DateTime.now();
-    final userPrfile = await AuthService().getUserProfile(userId);
-    await collection.add({
-      'userId': userId,
-      'items': items.map((item) => item.toMap()).toList(),
-      'totalAmount': totalAmount,
-      'orderDate': orderDate,
-      'status': OrderStatusKeys.pending,
-      'address': address.toMap(), // Add address value to the order
-      'deliveryDate': deliveryDate, // Add delivery date value to the order
-      'invoiceNumber': generateInvoiceNumber(),
-      'userProfile': userPrfile.toMap(),
-      'phones': phones,
-    });
-// clear cart
-    final cartCollection = FirebaseFirestore.instance.collection('cart');
-    final cartItems = await cartCollection
-        .where('userId', isEqualTo: userId)
-        .get()
-        .then((snapshot) {
-      return snapshot.docs.map((doc) => CartItem.fromSnapshot(doc)).toList();
-    });
-    for (var item in cartItems) {
-      await cartCollection.doc(item.id).delete();
-    }
+      List<String> phones,
+      ) async {
+    try {
+      final collection = FirebaseFirestore.instance.collection('orders');
+      final orderDate = DateTime.now();
+      final userProfile = await AuthService().getUserProfile(userId);
 
-    // go to order page
-    await Get.to(const OrderHistory());
-    Get.back();
+
+      await collection.add({
+        'userId': userId,
+        'items': items.map((item) => item.toMap()).toList(),
+        'totalAmount': totalAmount,
+        'clientName': clientName,
+        'orderDate': orderDate,
+        'status': OrderStatusKeys.pending,
+        'address': address.toMap(),
+        'deliveryDate': deliveryDate,
+        'invoiceNumber': generateInvoiceNumber(),
+        'userProfile': userProfile.toMap(),
+        'phones': phones,
+      });
+
+
+      await FcmProvider().sendMessageAdmin(clientName);
+
+
+      final productsCollection = FirebaseFirestore.instance.collection('products');
+
+      for (var item in items) {
+        try {
+
+          final productDoc = productsCollection.doc(item.productId);
+          final snapshot = await productDoc.get();
+
+          if (snapshot.exists) {
+            final data = snapshot.data() as Map<String, dynamic>;
+            final currentStock = (data['stock'] ?? 0).toDouble();
+
+
+            final newStock = currentStock - item.quantity;
+
+            await productDoc.update({'stock': newStock});
+            print('✅ Updated stock for ${item.productId}: $currentStock → $newStock');
+          } else {
+            print('⚠️ Product not found: ${item.productId}');
+          }
+        } catch (e) {
+          print('❌ Error updating stock for ${item.productId}: $e');
+        }
+      }
+
+
+      final cartCollection = FirebaseFirestore.instance.collection('cart');
+      final cartSnapshot = await cartCollection.where('userId', isEqualTo: userId).get();
+
+      for (var doc in cartSnapshot.docs) {
+        await doc.reference.delete();
+      }
+
+
+      await Get.to(const OrderHistory());
+      Get.back();
+    } catch (e) {
+      print('❌ Error placing order: $e');
+    }
   }
 
-  //fetchOrders
+
+  Future<void> deleteUsersWithEmail() async {
+    try {
+      final usersRef = FirebaseFirestore.instance.collection('users');
+
+      // Query for all users with email == "البريد الألكتروني"
+      final snapshot = await usersRef
+          .where('email', isEqualTo: 'البريد الألكتروني')
+          .get();
+
+      if (snapshot.docs.isEmpty) {
+        print('No users found with email == البريد الألكتروني');
+        return;
+      }
+
+      // Loop through and delete each document
+      for (var doc in snapshot.docs) {
+        await doc.reference.delete();
+        print('Deleted user: ${doc.id}');
+      }
+
+      print('✅ Successfully deleted all users with email == البريد الألكتروني');
+    } catch (e) {
+      print('❌ Error deleting users: $e');
+    }
+  }
+  //   //fetchOrders
+  //   Future<List<Order>> fetchOrders({String? userId, String? status}) async {
+  //     final collection = FirebaseFirestore.instance.collection('orders');
+  //     if (userId != null && status != null) {
+  //       final querySnapshot = await collection
+  //           .where('userId', isEqualTo: userId)
+  //           .where('status', isEqualTo: status)
+  //           .get();
+  //       return querySnapshot.docs.map((doc) => Order.fromSnapshot(doc)).toList();
+  //     }
+  //     if (userId != null) {
+  //       final querySnapshot =
+  //       await collection.where('userId', isEqualTo: userId).get();
+  //       return querySnapshot.docs.map((doc) => Order.fromSnapshot(doc)).toList();
+  //     }
+  //     if (status != null) {
+  //       final querySnapshot =
+  //       await collection.where('status', isEqualTo: status).get();
+  //       return querySnapshot.docs.map((doc) => Order.fromSnapshot(doc)).toList();
+  //     }
+  //
+  //     final querySnapshot = await collection.get();
+  //
+  //     return querySnapshot.docs.map((doc) => Order.fromSnapshot(doc)).toList();
+  //   }
+  //
+  //   Stream<List<Order>> getOrders() {
+  //     final collection = FirebaseFirestore.instance.collection('orders');
+  //
+  //     return collection.snapshots().map((snapshot) {
+  //       return snapshot.docs.map((doc) => Order.fromSnapshot(doc)).toList();
+  //     });
+  //   }
+  //
+  //   Stream<List<Order>> getOrdersByUser(String userId, {String? status}) {
+  //     final collection = FirebaseFirestore.instance.collection('orders');
+  //     if (status != null) {
+  //       return collection
+  //           .where('userId', isEqualTo: userId)
+  //           .where('status', isEqualTo: status)
+  //           .snapshots()
+  //           .map((snapshot) {
+  //         return snapshot.docs.map((doc) => Order.fromSnapshot(doc)).toList();
+  //       });
+  //     }
+  //     return collection
+  //         .where('userId', isEqualTo: userId)
+  //         .snapshots()
+  //         .map((snapshot) {
+  //       return snapshot.docs.map((doc) => Order.fromSnapshot(doc)).toList();
+  //     });
+  //   }
+  //
+  //   Future<void> deleteOrder(String orderId) async {
+  //     final collection = FirebaseFirestore.instance.collection('orders');
+  //     await collection.doc(orderId).delete();
+  //   }
+  //
+  //   Future<void> updateOrder(
+  //       String orderId, String address, DateTime deliveryDate) async {
+  //     final collection = FirebaseFirestore.instance.collection('orders');
+  //     await collection.doc(orderId).update({
+  //       'address': address,
+  //       'deliveryDate': deliveryDate,
+  //     });
+  //   }
+  //
+  //   Stream<List<Product>> getProductsFromOrder(String orderId) {
+  //     final collection = FirebaseFirestore.instance.collection('orders');
+  //     return collection.doc(orderId).snapshots().asyncMap((snapshot) async {
+  //       final data = snapshot.data() as Map<String, dynamic>;
+  //       final itemList = data['items'] as List<dynamic>;
+  //       final cartItems = itemList.map((item) => CartItem.fromMap(item)).toList();
+  //       final productIds = cartItems.map((item) => item.productId).toList();
+  //
+  //       final collection = FirebaseFirestore.instance.collection('products');
+  //       final querySnapshot = await collection
+  //           .where(FieldPath.documentId, whereIn: productIds)
+  //           .get();
+  //
+  //       return querySnapshot.docs
+  //           .map((doc) => Product.fromSnapshot(doc))
+  //           .toList();
+  //     });
+  //   }
+  //
+  //   // proccessing order
+  //   Future<void> updateOrderStatus(String orderId, String status) async {
+  //     final collection = FirebaseFirestore.instance.collection('orders');
+  //     await collection.doc(orderId).update({
+  //       'status': status,
+  //     });
+  //   }
+  //
+  //   // shipped order
+  //   Future<void> updateOrderStatusShipped(String orderId) async {
+  //     final collection = FirebaseFirestore.instance.collection('orders');
+  //     await collection.doc(orderId).update({
+  //       'status': OrderStatusKeys.shipped,
+  //     });
+  //   }
+  //
+  //   // delivered order
+  //   Future<void> updateOrderStatusDelivered(String orderId) async {
+  //     final collection = FirebaseFirestore.instance.collection('orders');
+  //     await collection.doc(orderId).update({
+  //       'status': OrderStatusKeys.delivered,
+  //     });
+  //   }
+  // }
   Future<List<Order>> fetchOrders({String? userId, String? status}) async {
     final collection = FirebaseFirestore.instance.collection('orders');
     if (userId != null && status != null) {

@@ -14,6 +14,9 @@ class Product {
   final bool favorite;
   final bool available;
   final List images;
+  final String categoryId;
+  final double discountPercentage;
+  final int quantityDiscount;
   Product(
       {
         required this.available,
@@ -26,9 +29,12 @@ class Product {
         required this.title,
         required this.weight,
         required this.id,
+        required this.categoryId,
         required this.regularPrice,
         required this.images,
-        required this.discountPrice});
+        required this.discountPrice,
+        required this.discountPercentage,
+        required this.quantityDiscount});
 
   factory Product.fromSnapshot(DocumentSnapshot snapshot) {
     final data = snapshot.data() as Map<String, dynamic>;
@@ -51,10 +57,13 @@ class Product {
       images: data['images'],
       brand: data['brand'],
       description: data['description'],
-      stock: parseDouble(data['stock']),
+      stock: parseDouble(data['stock'] ?? 0.0),
       title: data['title'],
       weight: data['weight'],
       category: 'category',
+      categoryId: 'categoryId',
+      discountPercentage: data['discountPercentage'] ?? 0.0,
+      quantityDiscount: data['quantityDiscount'] ?? 0
     );
   }
 
@@ -64,14 +73,17 @@ class Product {
       'favorite' : favorite,
       'isbestselling' : isbestselling,
       'regularPrice': regularPrice,
-      'discount': discountPrice,
+      'discountPrice': discountPrice,
       'images': images,
       'brand': brand,
       'description': description,
       'stock' : stock,
       'title' : title,
       'weight' : weight,
-      'category': category
+      'category': category,
+      'categoryId' : categoryId,
+      'discountPercentage' : discountPercentage,
+      'quantityDiscount' : quantityDiscount
     };
   }
 
@@ -86,7 +98,12 @@ class Product {
     String? description,
     double? stock,
     String? title,
-    String? weight
+    String? weight,
+    String? categoryId,
+    String? category,
+    double? discountPercentage,
+    int? quantityDiscount
+
   }) {
     return Product(
       available: available ?? this.available,
@@ -101,7 +118,10 @@ class Product {
       title: title ?? this.title,
       weight: weight ?? this.weight,
       images: images ?? this.images,
-      category: category,
+      category: category ?? this.category,
+      categoryId: categoryId ?? this.categoryId,
+      discountPercentage: discountPercentage ?? this.discountPercentage,
+      quantityDiscount: quantityDiscount ?? this.quantityDiscount
 
     );
   }
@@ -120,6 +140,7 @@ class ProductsService {
         required bool available,
         required double regularPrice,
         required double discountPrice,
+        required double stock,
         required List<String> images,
         required String categoryId,}) async {
     final collection = FirebaseFirestore.instance.collection('products');
@@ -134,6 +155,7 @@ class ProductsService {
       'brand': brand,
       'title': productName,
       'regularPrice': regularPrice,
+      'stock' : stock,
       'categoryId': categoryId,
       'discountPrice': discountPrice,
       'images': images,
@@ -142,12 +164,49 @@ class ProductsService {
       'favorite' : false
     });
   }
+  static const int _limit = 10;
 
+  DocumentSnapshot? _lastDocument;
+  bool _hasMore = true;
+  final List<Product> _allProducts = [];
   Stream<List<Product>> getProducts() {
     final collection = FirebaseFirestore.instance.collection('products');
     return collection.snapshots().map((snapshot) {
       return snapshot.docs.map((doc) => Product.fromSnapshot(doc)).toList();
     });
+  }
+  Future<List<Product>> getProductsPagination({bool loadMore = false}) async {
+    if (!_hasMore && loadMore) return _allProducts;
+
+    Query query = _db.collection('products').orderBy('title').limit(_limit);
+
+    if (loadMore && _lastDocument != null) {
+      query = query.startAfterDocument(_lastDocument!);
+    }
+
+    final snapshot = await query.get();
+
+    if (snapshot.docs.isNotEmpty) {
+      _lastDocument = snapshot.docs.last;
+      final newProducts = snapshot.docs
+          .map((doc) => Product.fromSnapshot(doc))
+          .toList();
+
+      _allProducts.addAll(newProducts);
+
+      if (snapshot.docs.length < _limit) _hasMore = false;
+    } else {
+      _hasMore = false;
+    }
+
+    return _allProducts;
+  }
+  bool get hasMore => _hasMore;
+
+  void reset() {
+    _lastDocument = null;
+    _hasMore = true;
+    _allProducts.clear();
   }
   Stream<List<Product>> getUnavailableProducts() {
     final collection = FirebaseFirestore.instance.collection('products');
@@ -214,6 +273,15 @@ class ProductsService {
     final collection = FirebaseFirestore.instance.collection('products');
     return collection
         .where('categoryId', isEqualTo: categoryId)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) => Product.fromSnapshot(doc)).toList();
+    });
+  }
+
+  Stream<List<Product>> getStories(String categoryId) {
+    final collection = FirebaseFirestore.instance.collection('stories');
+    return collection
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((doc) => Product.fromSnapshot(doc)).toList();
@@ -289,18 +357,33 @@ class ProductsService {
       return snapshot.docs.map((doc) => Product.fromSnapshot(doc)).toList();
     });
   }
-
+  bool isArabic(String text) {
+    final arabicRegex = RegExp(r'[\u0600-\u06FF]');
+    return arabicRegex.hasMatch(text);
+  }
   // search for a product
-  Stream<List<Product>> searchForProduct(String? productName) {
+  Stream<List<Product>> searchForProduct(String? productName, String? brandName) {
     final collection = FirebaseFirestore.instance.collection('products');
-    return collection
-        .where('title' , isGreaterThanOrEqualTo: productName)
-        .where('title' , isLessThanOrEqualTo: productName!+ '\uf7ff')
-        .snapshots()
-        .map((snapshot) {
+    Query query = collection;
+
+    // Apply the query for substrings
+    if (productName != null && productName.isNotEmpty) {
+      // If product name is provided, search in substrings
+      query = query.where('title', arrayContains: productName.toLowerCase());
+    }
+
+    if (brandName != null && brandName.isNotEmpty) {
+      // If brand name is provided, search in substrings
+      query = query.where('brand', arrayContains: brandName.toLowerCase());
+    }
+
+    // Return the stream of products based on the dynamic query
+    return query.snapshots().map((snapshot) {
       return snapshot.docs.map((doc) => Product.fromSnapshot(doc)).toList();
     });
   }
+
+
 
 // update product
   Future<void> updateProduct(

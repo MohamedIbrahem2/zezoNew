@@ -13,13 +13,25 @@ class AuthViewModel extends GetxController {
   final AuthService _authService = AuthService();
   late String email, password;
   String? name, phone;
+  var vatNum='لا يوجد';
   UserProfile? userProfile;
   Future<void> getUserProfile() async {
-    userProfile = await _authService
-        .getUserProfile(FirebaseAuth.instance.currentUser!.uid);
-    if (userProfile!.isAdmin == true) {}
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser == null) {
+      print('⚠️ No user is signed in. Skipping profile fetch.');
+      return;
+    }
+
+    userProfile = await _authService.getUserProfile(currentUser.uid);
+
+    if (userProfile != null && userProfile!.isAdmin == true) {
+      // Handle admin logic here
+    }
+
     update();
   }
+
 
 // check if user is admin
   // Future<bool> checkIfAdmin() async {
@@ -67,6 +79,7 @@ class AuthViewModel extends GetxController {
         userId: data.user!.uid,
         name: name!,
         phone: phone!,
+        vatNum:vatNum
       );
 
       userProfile = await _authService.getUserProfile(data.user!.uid);
@@ -88,7 +101,7 @@ class AuthViewModel extends GetxController {
     String? name,
     String? phone,
     String? cr,
-    String? vat,
+    var vatNum,
   }) async {
     try {
       Get.snackbar(
@@ -102,6 +115,7 @@ class AuthViewModel extends GetxController {
         userId: FirebaseAuth.instance.currentUser!.uid,
         name: name!,
         phone: phone!,
+        vatNum: vatNum,
       );
 
       userProfile = await _authService

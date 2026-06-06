@@ -8,18 +8,24 @@ class CartItem {
   final String id;
   final String productId;
   final String productName;
+  final String productNameEng;
   final String image;
-  final double price;
-  final int quantity;
+  final double discountPercentage;
+  final int quantityDiscount;
+   double price;
+   int quantity;
 // to map
   Map<String, dynamic> toMap() {
     return {
       'id': id,
       'productId': productId,
       'productName': productName,
+      'productNameEng': productNameEng,
       'price': price,
       'quantity': quantity,
       'image': image,
+      'discountPercentage' : discountPercentage,
+      'quantityDiscount' : quantityDiscount
     };
   }
 
@@ -27,26 +33,35 @@ class CartItem {
       : id = map['id'],
         productId = map['productId'],
         productName = map['productName'],
+        productNameEng = map['productNameEng'] ?? "",
         price = map['price'],
         image = map['image'] ?? '',
-        quantity = map['quantity'];
+        quantity = map['quantity'],
+        discountPercentage = map['discountPercentage'] ?? 0.0,
+        quantityDiscount = map['quantityDiscount'] ?? 0;
   CartItem(
       {required this.id,
       required this.productId,
       required this.productName,
       required this.price,
       required this.image,
-      required this.quantity});
+      required this.quantity,
+        required this.productNameEng,
+        required this.discountPercentage,
+        required this.quantityDiscount});
 
   factory CartItem.fromSnapshot(DocumentSnapshot snapshot) {
     final data = snapshot.data() as Map<String, dynamic>;
     return CartItem(
+      productNameEng: data['productNameEng'],
       id: snapshot.id,
       productId: data['productId'],
       productName: data['productName'],
       price: data['price'],
       image: data['image'],
       quantity: data['quantity'],
+        discountPercentage: data['discountPercentage'] ?? 0.0,
+        quantityDiscount: data['quantityDiscount'] ?? 0
     );
   }
 }
@@ -56,8 +71,13 @@ class CartService {
       {required String productId,
       required String userId,
       required String productName,
+        required String productNameEng,
       required String image,
       required double price,
+        required double discountPercentage,
+        required int quantityDiscount,
+       double? discountPrice,
+
       required int quantity}) async {
     final collection = FirebaseFirestore.instance.collection('cart');
     // check if the product is already in the cart
@@ -67,10 +87,14 @@ class CartService {
       await collection.doc(productId).set({
         'productId': productId,
         'productName': productName,
+        'productNameEng': productNameEng,
         'price': price,
+        'discountPrice': discountPrice,
         'quantity': 1,
         'userId': userId,
         'image': image,
+        'discountPercentage' : discountPercentage,
+        'quantityDiscount' : quantityDiscount
       });
       showSimpleNotification(Text("تم الأضافه الي العربه".tr,textDirection: TextDirection.rtl,),
           leading: Builder(builder: (

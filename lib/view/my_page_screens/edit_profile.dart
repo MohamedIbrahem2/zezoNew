@@ -52,7 +52,7 @@ class _EditprofileState extends State<Editprofile> {
         nameController.text = userProfile!.name;
         phoneController.text = userProfile!.phone;
         crController.text = userProfile!.cr;
-        vatController.text = userProfile!.vat;
+        vatNumController.text = userProfile!.vatNum;
         emailController.text = FirebaseAuth.instance.currentUser!.email!;
       }
       isLoading = false;
@@ -100,7 +100,7 @@ class _EditprofileState extends State<Editprofile> {
   TextEditingController nameController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController crController = TextEditingController();
-  TextEditingController vatController = TextEditingController();
+  TextEditingController vatNumController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   bool isPhotoLoading = false;
@@ -140,6 +140,10 @@ class _EditprofileState extends State<Editprofile> {
     return Form(
       key: _fromKey,
       child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: true,
+          elevation: 0,
+        ),
         body: isLoading
             ? const Center(
                 child: CircularProgressIndicator(),
@@ -154,12 +158,12 @@ class _EditprofileState extends State<Editprofile> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           SizedBox(
-                            height: Get.height * .07,
+                            height: Get.height * .01,
                           ),
                           Container(
                             alignment: Alignment.center,
                             child: Text(
-                              'تعديل الملف الشخصي'.tr,
+                              'Edit Profile'.tr,
                               style:  TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
@@ -223,7 +227,7 @@ class _EditprofileState extends State<Editprofile> {
                                     controller: nameController,
                                     obsecure: false,
                                     decoration: InputDecoration(
-                                      labelText: 'الاسم'.tr,
+                                      labelText: 'name'.tr,
                                       border: const OutlineInputBorder(
                                         borderRadius:
                                             BorderRadius.all(Radius.circular(10)),
@@ -234,6 +238,21 @@ class _EditprofileState extends State<Editprofile> {
                                 const SizedBox(
                                   height: 15,
                                 ),
+                                // CustomTextForm(
+                                //     controller: vatNumController,
+                                //     obsecure: false,
+                                //     decoration: InputDecoration(
+                                //       labelText: 'tax number'.tr,
+                                //       border: const OutlineInputBorder(
+                                //         borderRadius:
+                                //             BorderRadius.all(Radius.circular(10)),
+                                //       ),
+                                //     )
+                                //     // hint: 'zezo',
+                                //     ),
+                                // const SizedBox(
+                                //   height: 15,
+                                // ),
                                 // Container(
                                 //   alignment: Alignment.topLeft,
                                 //   child: const Text(
@@ -248,7 +267,7 @@ class _EditprofileState extends State<Editprofile> {
                                   controller: phoneController,
                                   obsecure: false,
                                   decoration: InputDecoration(
-                                    labelText: 'رقم الهاتف'.tr,
+                                    labelText: 'phone'.tr,
                                     border: const OutlineInputBorder(
                                       borderRadius:
                                           BorderRadius.all(Radius.circular(10)),
@@ -264,9 +283,7 @@ class _EditprofileState extends State<Editprofile> {
                                     return null;
                                   },
                                 ),
-                                const SizedBox(
-                                  height: 15,
-                                ),
+
 
                                 const SizedBox(
                                   height: 15,
@@ -286,7 +303,7 @@ class _EditprofileState extends State<Editprofile> {
                                   controller: emailController,
                                   obsecure: false,
                                   decoration: InputDecoration(
-                                    labelText: 'البريد الالكتروني'.tr,
+                                    labelText: 'email'.tr,
                                     border: const OutlineInputBorder(
                                       borderRadius:
                                           BorderRadius.all(Radius.circular(10)),
@@ -339,8 +356,7 @@ class _EditprofileState extends State<Editprofile> {
                                     onPressed: () async {
                                       if(FirebaseAuth.instance.currentUser == null){
                                         Get.defaultDialog(
-                                            title: "لا يمكن اتمام العمليه\n"
-                                                "يجب تسجيل الدخول",
+                                            title: "please_login".tr,
                                             content: Row(
                                               mainAxisAlignment:
                                               MainAxisAlignment.spaceAround,
@@ -350,7 +366,7 @@ class _EditprofileState extends State<Editprofile> {
                                                     Navigator.pop(context);
                                                   },
                                                   child: Text(
-                                                    'الرجوع'.tr,
+                                                    'go_back'.tr,
                                                     style: const TextStyle(
                                                         color: Colors.black),
                                                   ),
@@ -365,7 +381,7 @@ class _EditprofileState extends State<Editprofile> {
                                                     Get.to(const SignIn());
 
                                                   },
-                                                  child: Text('تسجيل الدخول'.tr,
+                                                  child: Text('login'.tr,
                                                       style: const TextStyle(
                                                           color: Colors.white)),
                                                   style: ElevatedButton.styleFrom(
@@ -377,12 +393,13 @@ class _EditprofileState extends State<Editprofile> {
                                       }else{
                                         if (_fromKey.currentState!.validate()) {
                                           authService.updateUserProfile(
+                                            vatNum: vatNumController.text,
                                             userId: FirebaseAuth
                                                 .instance.currentUser!.uid,
                                             name: nameController.text,
                                             phone: phoneController.text,
                                             // cr: crController.text,
-                                            // vat: vatController.text,
+
                                           );
                                           // if (emailController.text.isNotEmpty) {
                                           //   authService
@@ -397,8 +414,8 @@ class _EditprofileState extends State<Editprofile> {
                                         backgroundColor: mainColor,
                                         fixedSize:
                                             Size.fromWidth(Get.width * .8)),
-                                    child: const Text(
-                                      'تعديل',
+                                    child:  Text(
+                                      'edit'.tr,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 20,color: Colors.white),

@@ -58,7 +58,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
       key: _fromKey,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Add Category'),
+          title:  Text('add category'.tr),
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -110,8 +110,8 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                     }
                     return null;
                   },
-                  decoration: const InputDecoration(
-                    labelText: 'Category Name',
+                  decoration:  InputDecoration(
+                    labelText: 'category name'.tr,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                     ),
@@ -152,7 +152,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                       }
                     }
                   },
-                  child: const Text('Add Category'),
+                  child:  Text('add category'.tr),
                 ),
               ],
             ),

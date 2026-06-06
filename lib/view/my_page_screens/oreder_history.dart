@@ -37,8 +37,8 @@ class _OrderHistoryState extends State<OrderHistory> {
       appBar: AppBar(
         backgroundColor: mainColor,
         iconTheme: const IconThemeData(color: Colors.black),
-        title: const Text(
-          'Order history',
+        title:  Text(
+          'orders_history'.tr,
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
@@ -67,7 +67,7 @@ class AddressItem extends StatelessWidget {
                         address: address,
                       )));
         },
-        icon: const Icon(Icons.location_on_outlined),
+        icon: const Icon(Icons.location_on_outlined,size: 30,),
       ),
       // You can customize the rest of the UI for the address item as needed
       // For example, you might want to show the description or location on a map.
@@ -404,7 +404,7 @@ class _OrderItemState extends State<OrderItem> {
                                                   MainAxisAlignment.center,
                                               children: [
                                                 Text(
-                                                  userProfile!.name,
+                                                order.clientName == "" ?  userProfile!.name : order.clientName,
                                                   style: const TextStyle(
                                                       fontSize: 20,
                                                       color: Colors.pink,
@@ -424,7 +424,7 @@ class _OrderItemState extends State<OrderItem> {
                                                 Row(
                                                   children: [
                                                     Text(
-                                                      userProfile.phone,
+                                                      userProfile!.phone,
                                                       style: const TextStyle(
                                                         fontSize: 15,
                                                         fontWeight:

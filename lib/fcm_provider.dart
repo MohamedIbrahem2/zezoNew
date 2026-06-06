@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:flutter/services.dart';
 import 'dart:developer' as devtools show log;
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -40,7 +39,7 @@ class FcmProvider {
       },
     };
 
-    const String senderId = '970646820738'; // Replace with your project ID
+    const String senderId = 'zezo-6778a'; //970646820738 Replace with your project ID
     final response = await client.post(
       Uri.parse('https://fcm.googleapis.com/v1/projects/$senderId/messages:send'),
       headers: {
@@ -108,6 +107,60 @@ class FcmProvider {
 
     client.close(); // Close the OAuth client
   }
+  Future<void> sendMessageAdmin(String clientName) async {
+    // Step 1: Get tokens of users who are admins
+    List<String> adminTokens = [];
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .where('isAdmin', isEqualTo: true)
+        .get()
+        .then((querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        if (doc.data().containsKey('fcm')) {
+          String? token = doc['fcm'];
+          if (token != null && token.isNotEmpty) {
+            adminTokens.add(token);
+          }
+        } else {
+          print('Admin ${doc.id} does not contain "fcm"');
+        }
+      }
+    });
+
+    if (adminTokens.isEmpty) {
+      print('No admin tokens found.');
+      return;
+    }
+
+    // Step 2: Load service account credentials
+    final jsonCredentials = await rootBundle.loadString('data/zezo-6778a-674cf09cf39d.json');
+    final creds = auth.ServiceAccountCredentials.fromJson(jsonCredentials);
+
+    final client = await auth.clientViaServiceAccount(
+      creds,
+      ['https://www.googleapis.com/auth/cloud-platform'],
+    );
+
+    // Step 3: Send notification message to each admin
+    for (String token in adminTokens) {
+      bool success = await sendPushMessage(
+        recipientToken: token,
+        title: 'طلب جديد',
+        body: 'تم إضافة أوردر جديد بواسطة $clientName',
+        client: client,
+      );
+
+      if (success) {
+        print('Admin notified successfully: $token');
+      } else {
+        print('Failed to send message to admin: $token');
+      }
+    }
+
+    client.close();
+  }
+
   Future<void> sendMessage1(List<String> tokens, String message,String title,Function(bool) setLoading) async {
     final body = {
       "registration_ids": tokens,
@@ -312,14 +365,17 @@ class FcmProvider {
       token = event;
       await saveTokenToFirestore(FirebaseAuth.instance.currentUser!.uid);
     });
-    listenToNotification();
+    //listenToNotification();
   }
 
   Future<void> saveTokenToFirestore(String userId) async {
-    // save token to firestore
-
     try {
-      await _firestore.collection('users').doc(userId).update({'fcm': token});
+      await _firestore.collection('users').doc(userId).set(
+        {'fcm': token},
+        SetOptions(merge: true),
+      );
+
+      print('FCM token saved successfully: $token');
     } catch (e) {
       print('Error adding token: $e');
     }
@@ -372,50 +428,50 @@ class FcmProvider {
   }
 
 // listen to notification
-  Future<void> listenToNotification() async {
-    try {
-      await FirebaseMessaging.instance
-          .getInitialMessage()
-          .then((RemoteMessage? message) {
-        if (message != null) {
-          AwesomeNotifications().createNotification(
-            content: NotificationContent(
-              id: 10,
-              channelKey: 'basic_channel',
-              title: message.notification!.title,
-              body: message.notification!.body,
-            ),
-          );
-        }
-      });
-      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-        AwesomeNotifications().createNotification(
-          content: NotificationContent(
-            id: 10,
-            channelKey: 'basic_channel',
-            title: message.notification!.title,
-            body: message.notification!.body,
-          ),
-        );
-        print('''
-********** onMessage **********
-${message.notification!.title}
-${message.notification!.body}
-${message.data}
-********** onMessage **********
-
-
-
-
-''');
-        if (message.data['orderId'] != null) {
-          NotificationsDB.instance.addNotification(
-            notification: OrderNotification.fromRemoteMessage(message),
-          );
-        }
-      });
-    } catch (e) {
-      print('Error listening to notification: $e');
-    }
-  }
+//   Future<void> listenToNotification() async {
+//     try {
+//       await FirebaseMessaging.instance
+//           .getInitialMessage()
+//           .then((RemoteMessage? message) {
+//         if (message != null) {
+//           AwesomeNotifications().createNotification(
+//             content: NotificationContent(
+//               id: 10,
+//               channelKey: 'basic_channel',
+//               title: message.notification!.title,
+//               body: message.notification!.body,
+//             ),
+//           );
+//         }
+//       });
+// //       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+// //         AwesomeNotifications().createNotification(
+// //           content: NotificationContent(
+// //             id: 10,
+// //             channelKey: 'basic_channel',
+// //             title: message.notification!.title,
+// //             body: message.notification!.body,
+// //           ),
+// //         );
+// //         print('''
+// // ********** onMessage **********
+// // ${message.notification!.title}
+// // ${message.notification!.body}
+// // ${message.data}
+// // ********** onMessage **********
+// //
+// //
+// //
+// //
+// // ''');
+// //         if (message.data['orderId'] != null) {
+// //           NotificationsDB.instance.addNotification(
+// //             notification: OrderNotification.fromRemoteMessage(message),
+// //           );
+// //         }
+// //       });
+//     } catch (e) {
+//       print('Error listening to notification: $e');
+//     }
+//   }
 }

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:zezo/view/sign_up.dart';
-import 'package:video_player/video_player.dart';
 
 import '../constants.dart';
 import '../widgets/custom_text_form.dart';

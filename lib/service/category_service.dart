@@ -81,4 +81,16 @@ class CategoryService {
   }
 
   // update a category
+  Future<void> updateCategory(
+      Category category,
+      ) async {
+    final collection = FirebaseFirestore.instance
+        .collection('categories')
+        .doc(category.id)
+        .update(category.toDocument());
+
+    await collection;
+
+
+  }
 }

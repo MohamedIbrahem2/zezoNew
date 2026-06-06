@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -15,8 +16,8 @@ class TechnicalSupport extends StatelessWidget {
         centerTitle: true,
         backgroundColor: mainColor,
         iconTheme: const IconThemeData(color: Colors.black),
-        title: const Text(
-          'Technical Support ',
+        title:  Text(
+          'technical_support'.tr,
           style: TextStyle(color: Colors.white),
         ),
       ),
@@ -29,8 +30,8 @@ class TechnicalSupport extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
-                'Contact us with',
+               Text(
+                'contact_us'.tr,
                 style: TextStyle(
                     fontSize: 19,
                     fontWeight: FontWeight.bold,
@@ -85,11 +86,13 @@ class TechnicalSupport extends StatelessWidget {
                             launch("tel://+0555808297");
                           },
                           child: const Icon(Icons.call)),
-                      const Text(
-                        'الدعم الفني',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
+                       Expanded(
+                         child: Text(
+                          'technical_support'.tr,
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                                               ),
+                       ),
                     ],
                   ),
                 ),
@@ -107,7 +110,7 @@ class TechnicalSupport extends StatelessWidget {
               ),
               GestureDetector(
                 onTap: () {
-                  launch('https://wa.me/+0541297377');
+                  launch('https://wa.me/+0542788505');
                 },
                 child: Container(
                   margin: const EdgeInsets.symmetric(vertical: 10),
@@ -129,13 +132,15 @@ class TechnicalSupport extends StatelessWidget {
                           child: Image.asset('images/whatsapp.png')),
                       GestureDetector(
                           onTap: () {
-                            launch("tel://+0541297377");
+                            launch("tel://+0542788505");
                           },
                           child: const Icon(Icons.call)),
-                      const Text(
-                        'ادارة الحسابات',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
+                      Expanded(
+                        child: Text(
+                          'technical_support'.tr,
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ],
                   ),
@@ -143,53 +148,7 @@ class TechnicalSupport extends StatelessWidget {
               ),
             ],
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // const CircleAvatar(
-              //     backgroundImage: NetworkImage(
-              //         'https://pps.whatsapp.net/v/t61.24694-24/307317711_1262426030998902_748495295193957793_n.jpg?ccb=11-4&oh=01_AdRsJ3K3jcq5Fbt0bh5Phc_5aKAozMhq491lTdw4dgTY2A&oe=644D7F0C')),
-              const SizedBox(
-                width: 20,
-              ),
-              GestureDetector(
-                onTap: () {
-                  launch('https://wa.me/+0541297377');
-                },
-                child: Container(
-                  margin: const EdgeInsets.symmetric(vertical: 10),
-                  width: Get.width * .6,
-                  height: Get.height * .08,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: Colors.white,
-                      boxShadow: const [
-                        BoxShadow(
-                            spreadRadius: 1, blurRadius: 3, color: Colors.grey)
-                      ]),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      SizedBox(
-                          width: 35,
-                          height: 35,
-                          child: Image.asset('images/whatsapp.png')),
-                      GestureDetector(
-                          onTap: () {
-                            launch("tel://+0541297377");
-                          },
-                          child: const Icon(Icons.call)),
-                      const Text(
-                        'الادارة العامة',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
+
           Container(
             margin: const EdgeInsets.only(top: 20),
             padding: const EdgeInsets.all(7),
@@ -212,11 +171,11 @@ class TechnicalSupport extends StatelessWidget {
                               blurRadius: 3,
                               color: Colors.grey)
                         ]),
-                    child: const Row(
+                    child:  Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Text(
-                          'contact with our salesman',
+                          'contact sales'.tr,
                           style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -226,99 +185,55 @@ class TechnicalSupport extends StatelessWidget {
                     ),
                   ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // const CircleAvatar(
-                    //     backgroundImage: NetworkImage(
-                    //         'https://pps.whatsapp.net/v/t61.24694-24/307317711_1262426030998902_748495295193957793_n.jpg?ccb=11-4&oh=01_AdRsJ3K3jcq5Fbt0bh5Phc_5aKAozMhq491lTdw4dgTY2A&oe=644D7F0C')),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        launch('https://wa.me/+0566682732');
-                      },
-                      child: Container(
-                        width: Get.width * .28,
-                        height: Get.height * .05,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.white,
-                            boxShadow: const [
-                              BoxShadow(
-                                  spreadRadius: 1,
-                                  blurRadius: 3,
-                                  color: Colors.grey)
-                            ]),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            SizedBox(
-                                width: 25,
-                                height: 25,
-                                child: Image.asset('images/whatsapp.png')),
-                            GestureDetector(
-                                onTap: () {
-                                  launch("tel://+0566682732");
-                                },
-                                child: const Icon(Icons.call)),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(width: 10),
+          GestureDetector(
+            onTap: () async {
+              final Uri emailUri = Uri(
+                scheme: 'mailto',
+                path: 'tarekalmoder@miftaahalwadi.com',
+              );
+
+              await launchUrl(
+                emailUri,
+                mode: LaunchMode.externalApplication,
+              );
+            },
+
+            child: Container(
+              width: Get.width * .6,
+              height: Get.height * .05,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.white,
+                boxShadow: const [
+                  BoxShadow(
+                    spreadRadius: 1,
+                    blurRadius: 3,
+                    color: Colors.grey,
+                  )
+                ],
+              ),
+              child: const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                  'tarekalmoder@miftaahalwadi.com',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue, // Make it look clickable
+                    decoration: TextDecoration.underline,
+                  ),
                 ),
-                SizedBox(
-                  height: Get.height * .02,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // const CircleAvatar(
-                    //     backgroundImage: NetworkImage(
-                    //         'https://pps.whatsapp.net/v/t61.24694-24/307317711_1262426030998902_748495295193957793_n.jpg?ccb=11-4&oh=01_AdRsJ3K3jcq5Fbt0bh5Phc_5aKAozMhq491lTdw4dgTY2A&oe=644D7F0C')),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        launch('https://wa.me/+0568456527');
-                      },
-                      child: Container(
-                        width: Get.width * .28,
-                        height: Get.height * .05,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.white,
-                            boxShadow: const [
-                              BoxShadow(
-                                  spreadRadius: 1,
-                                  blurRadius: 3,
-                                  color: Colors.grey)
-                            ]),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            SizedBox(
-                                width: 25,
-                                height: 25,
-                                child: Image.asset('images/whatsapp.png')),
-                            GestureDetector(
-                                onTap: () {
-                                  launch("tel://+0568456527");
-                                },
-                                child: const Icon(Icons.call)),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: Get.height * .02,
-                ),
-              ],
+              ),
+            ),
+          ),
+        ],
+      ),
+
+      ],
             ),
           )
         ],

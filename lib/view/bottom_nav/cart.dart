@@ -1,14 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 import 'package:zezo/bottom_navbar_provider.dart';
 import 'package:zezo/service/cart_service.dart';
 import 'package:zezo/view/home_view.dart';
-import 'package:uuid/uuid.dart';
-
 import '../../constants.dart';
+import '../../main.dart';
 import '../check_out/checkhome.dart';
 import '../sign_in.dart';
 
@@ -20,281 +20,522 @@ class Screen2 extends StatefulWidget {
   State<Screen2> createState() => _Screen2State();
 }
 
-
 class _Screen2State extends State<Screen2> {
-  int count = 0;
-  List<String> images = [
-    'https://cdnprod.mafretailproxy.com/sys-master-root/hc1/hc4/14539671175198/3813_main.jpg_480Wx480H',
-    'https://www.citypng.com/public/uploads/preview/cheese-cheetos-crunchy-png-11665747344hyu31dqe6p.png',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDBhtT8kz4L3ld1y1ZH9fOLv0u8P5rQTAuCA&usqp=CAU',
-    'https://s7d1.scene7.com/is/image/mcdonalds/mcdonalds-dasani-water:1-3-product-tile-desktop?wid=829&hei=515&dpr=off',
-    'https://ik.imagekit.io/baeimages/catalog/product/cache/b190492e876561b9a9369467f00721c5/6/2/6281031114162-persil-gel-deep-clean-white-flower-3-ltr_vglvitcgz0q8w57m.jpg?tr=w-300',
-    'https://cdnprod.mafretailproxy.com/sys-master-root/h81/h0b/11281795612702/17115_1.jpg_480Wx480H',
-  ];
-  @override
-  void initState(){
-    super.initState();
+  final Map<String, TextEditingController> _qtyControllers = {};
+  final Map<String, double> _editedPrices = {};
+  double orderLimit = 800;
+  Future<void> getConfigs() async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('configs')
+          .doc('getConfigs')
+          .get();
+
+      if (doc.exists) {
+        setState(() {
+          orderLimit = (doc.data()?['orderLimit'] ?? 800).toDouble();
+        });
+      }
+    } catch (e) {
+      print("Config load error: $e");
+    }
   }
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Center(child:  Text("العربه",style: TextStyle(color: Colors.white),)),
-        backgroundColor: mainColor,
-        leading: const BackButton(
-          color: Colors.white,
+  void dispose() {
+    for (final c in _qtyControllers.values) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+  @override
+  void initState() {
+    super.initState();
+    getConfigs();
+  }
 
+  @override
+  Widget build(BuildContext context) {
+    final provider = Provider.of<AdminProvider>(context, listen: false);
+    String userId = FirebaseAuth.instance.currentUser?.uid ?? widget.uniqueId;
+
+    const Color mint = Color(0xFF2ECC71);
+    const Color darkMint = Color(0xFF27AE60);
+    const Color lightGray = Color(0xFFF7F7F7);
+
+    return Scaffold(
+      backgroundColor: lightGray,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.black),
+        title: const Text(
+          "Shopping Cart",
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
         ),
       ),
       body: Container(
-        margin:
-        const EdgeInsets.only(top: 15, left: 15, right: 15, bottom: 100),
-        child:  StreamBuilder<List<CartItem>>(
-            stream: CartService().getCartItems(
-              FirebaseAuth
-                  .instance.currentUser != null ?
-              FirebaseAuth.instance.currentUser!.uid : widget.uniqueId,
-            ),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                return const Center(child: Text('Something went wrong'));
-              }
-
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              final cartItems = snapshot.data!;
-
-              if (cartItems.isEmpty) {
-                // no item yet go to home page to shop
-                return const Center(
-                  child: Text('لا يوجد منتجات مختاره, اذهب للصفحه الرئيسيه للتسوق',textDirection: TextDirection.rtl,),
-                );
-              }
-
-              return ListView.separated(
-                separatorBuilder: (context, index) {
-                  return SizedBox(
-                    height: Get.height * .03,
-                  );
-                },
-                itemCount: cartItems.length,
-                itemBuilder: (context, index) {
-                  final cartItem = cartItems[index];
-                  final btn = Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      GestureDetector(
-                        child: const Icon(Icons.add),
-                        onTap: () {
-                          CartService().updateCartItemQuantity(
-                              cartItem.id, cartItem.quantity + 1,cartItem.quantity);
-                        },
-                      ),
-                      Text(
-                        '${cartItem.quantity}',
-                        style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      GestureDetector(
-                          onTap: () {
-                            if (cartItem.quantity == 0) {
-                              CartService().removeCartItem(cartItem.id);
-                              return;
-                            }
-                            CartService().updateCartItemQuantity(
-                                cartItem.id, cartItem.quantity - 1,cartItem.quantity);
-                          },
-                          child: const Icon(Icons.remove_outlined))
-                    ],
-                  );
-                  return SizedBox(
-                    height: 200,
-                    child: ListTile(
-                      visualDensity:
-                      const VisualDensity(vertical: 4, horizontal: 4),
-                      leading: CachedNetworkImage(
-                        imageUrl: cartItem.image,
-                        placeholder: (context, url) =>
-                        const CircularProgressIndicator(),
-                        errorWidget: (context, url, error) =>
-                        const Icon(Icons.error),
-                      ),
-                      title: Text(cartItem.productName),
-                      subtitle: Text('${cartItem.price} SAR'),
-                      trailing: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          InkWell(
-                            child: const Icon(Icons.add),
-                            onTap: () {
-                              CartService().updateCartItemQuantity(
-                                  cartItem.id, cartItem.quantity + 1,cartItem.quantity);
-                            },
-                          ),
-                          Text('${cartItem.quantity}'),
-                          InkWell(
-                              onTap: () {
-                                if (cartItem.quantity == 0) {
-                                  CartService().removeCartItem(cartItem.id);
-                                  return;
-                                }
-                                CartService().updateCartItemQuantity(
-                                    cartItem.id, cartItem.quantity - 1,cartItem.quantity);
-                              },
-                              child: const Icon(Icons.remove_outlined))
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              );
-            }),
-      ),
-      bottomSheet:  StreamBuilder<List<CartItem>>(
-          stream: CartService().getCartItems(
-            FirebaseAuth
-                .instance.currentUser != null ?
-            FirebaseAuth.instance.currentUser!.uid : widget.uniqueId,
-          ),
+        padding: const EdgeInsets.only(top: 15, left: 15, right: 15, bottom: 100),
+        child: StreamBuilder<List<CartItem>>(
+          stream: CartService().getCartItems(userId),
           builder: (context, snapshot) {
-            final total = snapshot.data == null || snapshot.data!.isEmpty
-                ? 0.0
-                : snapshot.data!.fold(0.0, (previousValue, element) {
-              return previousValue + (element.price * element.quantity);
-            });
+            if (snapshot.hasError) {
+              return const Center(child: Text('Something went wrong'));
+            }
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-            if (total == 0) {
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: BottomSheet(
-                  elevation: 20,
-                  onClosing: () {},
-                  builder: (context) => InkWell(
-                    onTap: () {
-                      BottomNavbarProvider.instance(context, listen: false)
-                          .changeIndex(0);
+            final cartItems = snapshot.data ?? [];
 
-                      Get.offAll(const HomeView());
-                    },
-                    child: Container(
-
-                      decoration: BoxDecoration(
-                          color: mainColor,
-                          borderRadius: BorderRadius.circular(25)),
-                      width: Get.width,
-                      height: Get.height * .07,
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.add_shopping_cart,color: Colors.white,),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text('اذهب للصفحه الرئيسيه للتسوق الأن',
-                            textDirection: TextDirection.rtl
-                            ,style: TextStyle(color: Colors.white),)
-                        ],
-                      ),
-                    ),
-                  ),
+            if (cartItems.isEmpty) {
+              return const Center(
+                child: Text(
+                  'No products in cart',
+                  style: TextStyle(fontSize: 16, color: Colors.black54),
                 ),
               );
             }
 
-            return BottomSheet(
-              elevation: 20,
-              onClosing: () {},
-              builder: (context) => Container(
-                padding: const EdgeInsets.only(top: 10),
-                width: Get.width,
-                height: Get.height * .09,
-                color: Colors.white,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Column(
-                      children: [
-                        const Text(
-                          'الكل',
-                          textDirection: TextDirection.rtl,
-                          style: TextStyle(fontSize: 19, color: Colors.grey),
-                        ),
-                        Text.rich(TextSpan(children: [
-                          TextSpan(
-                              text: total.toStringAsFixed(2),
-                              style:  TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: mainColor)),
-                          const TextSpan(
-                              text: '  SAR',
-                              style:
-                              TextStyle(fontSize: 18, color: Colors.black)),
-                        ])),
-                      ],
+            return ListView.separated(
+              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              itemCount: cartItems.length,
+              itemBuilder: (context, index) {
+                final cartItem = cartItems[index];
+                final qtyController = _qtyControllers.putIfAbsent(
+                  cartItem.id,
+                      () => TextEditingController(text: cartItem.quantity.toString()),
+                );
+                final currentPrice = _editedPrices[cartItem.id] ?? cartItem.price;
+                final priceController = TextEditingController(text: currentPrice.toString());
+                bool isEditingPrice = false;
+
+                return StatefulBuilder(
+                  builder: (context, setTileState) => Dismissible(
+                    key: Key(cartItem.id),
+                    direction: DismissDirection.endToStart,
+                    background: Container(
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      decoration: BoxDecoration(
+                        color: Colors.redAccent,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: const Icon(Icons.delete, color: Colors.white),
                     ),
-                    ElevatedButton(
-                        onPressed: () {
-                          if(FirebaseAuth.instance.currentUser == null){
-                            Get.defaultDialog(
-                                title: "لا يمكن اتمام العمليه\n"
-                                    "يجب تسجيل الدخول",
-                                content: Row(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.spaceAround,
-                                  children: [
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: Text(
-                                        'الرجوع'.tr,
-                                        style: const TextStyle(
-                                            color: Colors.black),
-                                      ),
-                                      style: ElevatedButton.styleFrom(
-                                          backgroundColor:
-                                          Colors.white,
-                                          elevation: 10),
+                    onDismissed: (_) => CartService().removeCartItem(cartItem.id),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12.withOpacity(0.05),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        child: Row(
+                          children: [
+                            // Product Image with Mint Shadow
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: mint.withOpacity(0.15),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: CachedNetworkImage(
+                                  imageUrl: cartItem.image,
+                                  width: 80,
+                                  height: 80,
+                                  fit: BoxFit.cover,
+                                  placeholder: (_, __) => const Center(
+                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                  ),
+                                  errorWidget: (_, __, ___) => const Icon(Icons.error),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+
+                            // Product Info
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    cartItem.productName,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
                                     ),
-                                    ElevatedButton(
-                                      onPressed: (){
-                                        Navigator.pop(context);
-                                        Get.to(const SignIn());
-                                      },
-                                      child: Text('تسجيل الدخول'.tr,
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Row(
+                                    children: [
+                                      if (provider.isAdmin && isEditingPrice)
+                                        SizedBox(
+                                          width: 70,
+                                          child: TextField(
+                                            controller: priceController,
+                                            keyboardType:
+                                            const TextInputType.numberWithOptions(decimal: true),
+                                            decoration: const InputDecoration(
+                                              border: OutlineInputBorder(),
+                                              isDense: true,
+                                              contentPadding: EdgeInsets.all(6),
+                                            ),
+                                          ),
+                                        )
+                                      else
+                                        Text(
+                                          '${currentPrice.toStringAsFixed(2)} × ${cartItem.quantity}',
                                           style: const TextStyle(
-                                              color: Colors.white)),
-                                      style: ElevatedButton.styleFrom(
-                                          backgroundColor: mainColor,
-                                          elevation: 10),
+                                            color: mint,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      if (provider.isAdmin)
+                                        IconButton(
+                                          icon: Icon(isEditingPrice ? Icons.check : Icons.edit,
+                                              size: 18),
+                                          onPressed: () {
+                                            if (isEditingPrice) {
+                                              final newPrice =
+                                                  double.tryParse(priceController.text) ?? currentPrice;
+                                              setState(() {
+                                                _editedPrices[cartItem.id] = newPrice;
+                                              });
+                                            }
+                                            setTileState(() => isEditingPrice = !isEditingPrice);
+                                          },
+                                        ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // Quantity Controls (User/Admin)
+                            provider.isAdmin
+                                ? Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey.shade300),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                children: [
+                                  SizedBox(
+                                    width: 36,
+                                    height: 30,
+                                    child: TextField(
+                                      controller: qtyController,
+                                      textAlign: TextAlign.center,
+                                      keyboardType: TextInputType.number,
+                                      decoration: const InputDecoration(
+                                        border: InputBorder.none,
+                                        isDense: true,
+                                        contentPadding: EdgeInsets.symmetric(vertical: 4),
+                                      ),
+                                      onSubmitted: (value) {
+                                        final newQuantity = int.tryParse(value);
+                                        if (newQuantity == null) return;
+                                        if (newQuantity <= 0) {
+                                          CartService().removeCartItem(cartItem.id);
+                                        } else {
+                                          CartService().updateCartItemQuantity(
+                                            cartItem.id,
+                                            newQuantity,
+                                            cartItem.quantity,
+                                          );
+                                        }
+                                      },
                                     ),
-                                  ],
-                                ));
-
-                          }else{
-                            Get.to(CheckHome(unique: widget.uniqueId,));
-                          }
-
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: mainColor,
-                          fixedSize: const Size(150, 45),
+                                  ),
+                                  IconButton(
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                    icon: const Icon(Icons.check,
+                                        size: 18, color: Colors.green),
+                                    onPressed: () {
+                                      final newQuantity =
+                                      int.tryParse(qtyController.text);
+                                      if (newQuantity == null) return;
+                                      if (newQuantity <= 0) {
+                                        CartService().removeCartItem(cartItem.id);
+                                      } else {
+                                        CartService().updateCartItemQuantity(
+                                          cartItem.id,
+                                          newQuantity,
+                                          cartItem.quantity,
+                                        );
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
+                            )
+                                : Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.add,
+                                      size: 20, color: mint),
+                                  onPressed: () {
+                                    final current =
+                                        int.tryParse(qtyController.text) ??
+                                            cartItem.quantity;
+                                    final updated = current + 1;
+                                    CartService().updateCartItemQuantity(
+                                      cartItem.id,
+                                      updated,
+                                      cartItem.quantity,
+                                    );
+                                    qtyController.text = updated.toString();
+                                  },
+                                ),
+                                Text(
+                                  '${cartItem.quantity}',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.remove_outlined,
+                                      size: 20, color: Colors.black54),
+                                  onPressed: () {
+                                    final current =
+                                        int.tryParse(qtyController.text) ??
+                                            cartItem.quantity;
+                                    if (current <= 1) {
+                                      CartService().removeCartItem(cartItem.id);
+                                      return;
+                                    }
+                                    final updated = current - 1;
+                                    CartService().updateCartItemQuantity(
+                                      cartItem.id,
+                                      updated,
+                                      cartItem.quantity,
+                                    );
+                                    qtyController.text = updated.toString();
+                                  },
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-                        child: const Text(
-                          textDirection: TextDirection.rtl,
-                          'الدفع',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 17, fontWeight: FontWeight.bold),
-                        ))
+                      ),
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      ),
+
+      // ---------- Bottom Checkout Section ----------
+      bottomSheet: StreamBuilder<List<CartItem>>(
+        stream: CartService().getCartItems(userId),
+        builder: (context, snapshot) {
+          final cartItems = snapshot.data ?? [];
+          final total = cartItems.fold<double>(
+              0.0,
+                  (prev, e) =>
+              prev + ((_editedPrices[e.id] ?? e.price) * e.quantity));
+
+          if (cartItems.isEmpty) return const SizedBox.shrink();
+
+          const shipping = 1.6;
+          final subtotal = total - shipping;
+
+          return Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 8,
+                  offset: Offset(0, -2),
+                )
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Price Summary
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text("total",
+                        style: TextStyle(color: Colors.grey, fontSize: 14)),
+                    Text(
+                      total.toStringAsFixed(1),
+                      style: const TextStyle(
+                          color: Colors.black, fontWeight: FontWeight.w600),
+                    ),
                   ],
                 ),
+                const SizedBox(height: 6),
+                const Divider(height: 24, thickness: 0.8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Total",
+                      style:
+                      TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      total.toStringAsFixed(1),
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+
+            Container(
+              width: double.infinity,
+              height: 50,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                gradient: const LinearGradient(
+                  colors: [mint, darkMint],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
               ),
-            );
-          }),
+              child: ElevatedButton(
+                onPressed: () {
+                  if (total < orderLimit) {
+                    Get.defaultDialog(
+                      title: "تنبيه",
+                      middleText:
+                      "يجب ان لا تقل قيمه الطلب عن $orderLimit ريال\n\n"
+                          "The order value must not be less than $orderLimit SAR",
+                      textConfirm: "حسناً",
+                      confirmTextColor: Colors.white,
+                      buttonColor: mint,
+                      onConfirm: () => Navigator.pop(context),
+                    );
+                    return;
+                  }
+                  if (FirebaseAuth.instance.currentUser == null) {
+                    Get.defaultDialog(
+                      title: "يجب تسجيل الدخول لإتمام العملية",
+                      content: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                            ),
+                            child: const Text(
+                              "رجوع",
+                              style: TextStyle(color: Colors.black),
+                            ),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              Get.to(const SignIn());
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: mint,
+                            ),
+                            child: const Text(
+                              "تسجيل الدخول",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    final provider =
+                    Provider.of<AdminProvider>(context, listen: false);
+
+                    if (provider.isAdmin) {
+                      final updatedCartItems = cartItems.map((item) {
+                        return CartItem(
+                          id: item.id,
+                          productName: item.productName,
+                          price: _editedPrices[item.id] ?? item.price,
+                          quantity: item.quantity,
+                          image: item.image,
+                          productId: item.productId,
+                          productNameEng: item.productNameEng,
+                          discountPercentage: item.discountPercentage,
+                          quantityDiscount: item.quantityDiscount
+                        );
+                      }).toList();
+
+                      Get.to(
+                        CheckHome(
+                          unique: widget.uniqueId,
+                          cartItems: updatedCartItems,
+                        ),
+                      );
+                    } else {
+                      Get.to(
+                        CheckHome(
+                          unique: widget.uniqueId,
+                          cartItems: [],
+                        ),
+                      );
+                    }
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: const Text(
+                  "Checkout",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            )
+            ],
+            ),
+          );
+        },
+      ),
     );
   }
 }

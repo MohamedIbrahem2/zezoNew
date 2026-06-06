@@ -1,0 +1,20 @@
+                        -H/Users/khaledsallam/development/flutter/packages/flutter_tools/gradle/src/main/groovy
+-DCMAKE_SYSTEM_NAME=Android
+-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+-DCMAKE_SYSTEM_VERSION=23
+-DANDROID_PLATFORM=android-23
+-DANDROID_ABI=arm64-v8a
+-DCMAKE_ANDROID_ARCH_ABI=arm64-v8a
+-DANDROID_NDK=/Users/khaledsallam/Library/Android/sdk/ndk/27.0.12077973
+-DCMAKE_ANDROID_NDK=/Users/khaledsallam/Library/Android/sdk/ndk/27.0.12077973
+-DCMAKE_TOOLCHAIN_FILE=/Users/khaledsallam/Library/Android/sdk/ndk/27.0.12077973/build/cmake/android.toolchain.cmake
+-DCMAKE_MAKE_PROGRAM=/Users/khaledsallam/Library/Android/sdk/cmake/3.22.1/bin/ninja
+-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=/Users/khaledsallam/Downloads/zezoNew/build/app/intermediates/cxx/Debug/5k5f5152/obj/arm64-v8a
+-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=/Users/khaledsallam/Downloads/zezoNew/build/app/intermediates/cxx/Debug/5k5f5152/obj/arm64-v8a
+-DCMAKE_BUILD_TYPE=Debug
+-B/Users/khaledsallam/Downloads/zezoNew/android/app/.cxx/Debug/5k5f5152/arm64-v8a
+-GNinja
+-Wno-dev
+--no-warn-unused-cli
+                        Build command args: []
+                        Version: 2

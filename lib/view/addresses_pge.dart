@@ -25,7 +25,7 @@ class _AddressesPageState extends State<AddressesPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-          title: const Text('عنوان التوصيل',style: TextStyle(color: Colors.white),),
+          title:  Text('shipping_address'.tr,style: TextStyle(color: Colors.white),),
           backgroundColor: mainColor),
       body: Column(
         children: [
@@ -68,8 +68,7 @@ class _AddressesPageState extends State<AddressesPage> {
               onPressed: () {
                 if(FirebaseAuth.instance.currentUser == null){
                   Get.defaultDialog(
-                      title: "لا يمكن اتمام العمليه\n"
-                          "يجب تسجيل الدخول",
+                      title: "please_login".tr,
                       content: Row(
                         mainAxisAlignment:
                         MainAxisAlignment.spaceAround,
@@ -79,7 +78,7 @@ class _AddressesPageState extends State<AddressesPage> {
                               Navigator.pop(context);
                             },
                             child: Text(
-                              'الرجوع'.tr,
+                              'go_back'.tr,
                               style: const TextStyle(
                                   color: Colors.black),
                             ),
@@ -93,7 +92,7 @@ class _AddressesPageState extends State<AddressesPage> {
                               Navigator.pop(context);
                               Get.to(const SignIn());
                             },
-                            child: Text('تسجيل الدخول'.tr,
+                            child: Text('login'.tr,
                                 style: const TextStyle(
                                     color: Colors.white)),
                             style: ElevatedButton.styleFrom(
@@ -118,7 +117,7 @@ class _AddressesPageState extends State<AddressesPage> {
                 //     street: 'street',
                 //     description: 'country'));
               },
-              child: const Text('اضافه عنوان',style: TextStyle(
+              child:  Text('add_new_address'.tr,style: TextStyle(
                 color: Colors.white
               ),))
         ],

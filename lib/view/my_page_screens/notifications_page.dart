@@ -43,8 +43,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
             color: Colors.black,
           ),
         ),
-        title: const Text(
-          'Notifications',
+        title:  Text(
+          'notifications'.tr,
           style: TextStyle(color: Colors.black),
         ),
       ),

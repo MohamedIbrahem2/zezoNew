@@ -84,7 +84,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
       key: _fromKey,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Add Products'),
+          title:  Text('add product'.tr),
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -215,8 +215,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     }
                     return null;
                   },
-                  decoration: const InputDecoration(
-                    labelText: 'Porduct Name',
+                  decoration:  InputDecoration(
+                    labelText: 'porduct name'.tr,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                     ),
@@ -234,8 +234,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     }
                     return null;
                   },
-                  decoration: const InputDecoration(
-                    labelText: 'Brand Name',
+                  decoration:  InputDecoration(
+                    labelText: 'brand name'.tr,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                     ),
@@ -254,8 +254,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     }
                     return null;
                   },
-                  decoration: const InputDecoration(
-                    labelText: 'Price',
+                  decoration:  InputDecoration(
+                    labelText: 'price'.tr,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                     ),
@@ -267,8 +267,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 TextFormField(
                   keyboardType: TextInputType.number,
                   controller: deiscountController,
-                  decoration: const InputDecoration(
-                    labelText: 'discount',
+                  decoration:  InputDecoration(
+                    labelText: 'discount'.tr,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                     ),
@@ -317,6 +317,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                               description: '',
                               shippingFee: '',
                               weight: '',
+                              stock: 0.0,
                             );
                             setState(() {
                               isLoading = false;
@@ -332,7 +333,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                         }
                       }
                     },
-                    child: const Text('Add Product'),
+                    child:  Text('add product'.tr),
                   ),
               ],
             ),

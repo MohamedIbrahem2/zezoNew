@@ -1,6 +1,5 @@
 // @dart=2.16
 
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -11,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:overlay_support/overlay_support.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zezo/fcm_provider.dart';
@@ -31,22 +29,19 @@ main() async {
   await FirebaseAppCheck.instance.activate(
     androidProvider:  kDebugMode ? AndroidProvider.debug : AndroidProvider.playIntegrity
   );
-  String? token = await FirebaseMessaging.instance.getToken();
-  print(token);
-  // initialize awesome notifications
-  AwesomeNotifications().initialize(
-    null,
-    [
-      NotificationChannel(
-        channelKey: 'basic_channel',
-        channelName: 'Basic notifications',
-        channelDescription: 'Notifica '
-            'tion channel for basic tests',
-        defaultColor: Colors.teal,
-        ledColor: Colors.white,
-      ),
-    ],
-  );
+  var user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    FirebaseMessaging.instance.getToken().then((token) {
+      if (token != null) {
+        FirebaseFirestore.instance.collection('users').doc(user.uid).update({
+          'fcm': token,
+        });
+      }
+    });
+  } else {
+    print('⚠️ No user is signed in yet.');
+  }
+
 
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => BottomNavbarProvider()),
@@ -90,6 +85,9 @@ class _AppState extends State<App> {
                   Provider.of<LocalizationProvider>(context).textDirection,
               child: user == null ? const MyHomePage() : const HomeView());
         }),
+        theme: ThemeData(
+
+        ),
       ),
     );
   }
@@ -137,11 +135,13 @@ class AuthService {
   Future<void> createUserProfile({
     required String userId,
     required String name,
+    required String vatNum,
     required String phone,
   }) async {
     try {
       await _firestore.collection('users').doc(userId).set({
         'name': name,
+        'vatNum': vatNum,
         'phone': phone,
       });
     } catch (e) {
@@ -155,7 +155,7 @@ class AuthService {
     required String name,
     required String phone,
     // required String cr,
-    // required String vat,
+     required String vatNum,
   }) async {
     try {
       // show loading
@@ -168,6 +168,7 @@ class AuthService {
       );
       await _firestore.collection('users').doc(userId).update({
         'name': name,
+        'vatNum': vatNum,
         'phone': phone,
         // 'cr': cr,
         // 'vat': vat,
@@ -289,7 +290,7 @@ class Address2 {
 class UserProfile {
   @override
   String toString() {
-    return 'UserProfile(name: $name, phone: $phone, cr: $cr, role: $role, vat: $vat, addresses: $addresses, isAdmin: $isAdmin, email: $email)';
+    return 'UserProfile(name: $name, phone: $phone, cr: $cr, role: $role, vatNum: $vatNum, addresses: $addresses, isAdmin: $isAdmin, email: $email)';
   }
 
   final String? id;
@@ -297,7 +298,7 @@ class UserProfile {
   final String phone;
   final String cr;
   final String? role;
-  final String vat;
+  final String vatNum;
   final String? photo;
   final bool isAdmin;
   final String? email;
@@ -308,7 +309,7 @@ class UserProfile {
       'phone': phone,
       'cr': cr,
       'role': role,
-      'vat': vat,
+      'vatNum': vatNum,
       'photo': photo,
       'isAdmin': isAdmin,
       'email': email,
@@ -326,7 +327,7 @@ class UserProfile {
       this.photo,
       this.id,
       this.role,
-      required this.vat,
+      required this.vatNum,
       required this.addresses,
       this.email,
       this.isAdmin = false});
@@ -340,7 +341,7 @@ class UserProfile {
       role: map['role'],
       email: map['email'],
       cr: map['cr'] ?? '',
-      vat: map['vat'] ?? "",
+      vatNum: map['vatNum'] ?? "",
       photo: map['photo'] ?? '',
       addresses: map['addresses'] == null
           ? []
